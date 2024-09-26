@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "data-tables/data-table",
+	"version": "0.1.0",
+	"title": "Data Tables",
+	"description": "Display data tables.",
+	"category": "widgets",
+	"icon": "editor-table",
+	"attributes": {
+		"tableType": {
+			"type": "string",
+			"default": "think-tank-archive"
+		},
+		"searchLabel": {
+			"type": "string"
+		}
+	},
+	"example": {},
+	"supports": {
+		"interactivity": true
+	},
+	"usesContext": [
+		"data-tables/data-filter-donor-type/donorType", 
+		"data-tables/data-filter-donation-year/donationYear"
+	],
+	"textdomain": "data-tables",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScriptModule": "file:./view.js"
+}
