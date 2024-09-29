@@ -2,7 +2,7 @@
 /**
  * Get Data Functions
  */
-namespace TTFT\Data_Tables;
+namespace TTFT\Data_Tables\Data;
 
 /**
  * Get Raw Table Data
@@ -84,6 +84,14 @@ function get_top_ten_raw_data( $donor_type = '', $donation_year = '', $number_of
  * @return array
  */
 function get_think_tank_donor_raw_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
+
+	$think_tank_var    = $_GET['think_tank'];
+	$donation_year_var = $_GET['donation_year'];
+	$donor_type_var    = $_GET['donor_type'];
+
+	$think_tank    = ( $think_tank_var ) ? sanitize_text_field( $think_tank_var ) : sanitize_text_field( $think_tank );
+	$donation_year = ( $donation_year_var ) ? sanitize_text_field( $donation_year_var ) : sanitize_text_field( $donation_year );
+	$donor_type    = ( $donor_type_var ) ? sanitize_text_field( $donor_type_var ) : sanitize_text_field( $donor_type );
 
 	$args = array(
 		'post_type'      => 'transaction',

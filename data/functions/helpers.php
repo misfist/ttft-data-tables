@@ -2,7 +2,7 @@
 /**
  * Helper Functions
  */
-namespace TTFT\Data_Tables;
+namespace TTFT\Data_Tables\Data;
 
 /**
  * Retrieves the Transparency Score for a given think tank slug.

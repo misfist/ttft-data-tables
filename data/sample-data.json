@@ -1,0 +1,246 @@
+1. think-tank-archive Column and Table Data
+
+Column Data
+
+[
+    {
+        "title": "Think Tank",
+        "data": "thinkTank",
+        "className": "column-think-tank",
+        "orderable": true
+    },
+    {
+        "title": "Pentagon Contractor",
+        "data": "pentagonContractor",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "U.S. Government",
+        "data": "usGovernment",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Foreign Government",
+        "data": "foreignGovernment",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Score",
+        "data": "score",
+        "className": "column-numeric column-transparency-score",
+        "orderable": true
+    }
+]
+
+Table Data
+
+[
+    {
+        "title": "Think Tank",
+        "data": "thinkTank",
+        "className": "column-think-tank",
+        "orderable": true
+    },
+    {
+        "title": "Pentagon Contractor",
+        "data": "pentagonContractor",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "U.S. Government",
+        "data": "usGovernment",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Foreign Government",
+        "data": "foreignGovernment",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Score",
+        "data": "score",
+        "className": "column-numeric column-transparency-score",
+        "orderable": true
+    }
+]
+
+2. donor-archive Column and Table Data
+
+Column Data
+
+[
+    {
+        "title": "Donor",
+        "data": "donor",
+        "className": "column-donor",
+        "orderable": true
+    },
+    {
+        "title": "Min Amount",
+        "data": "minAmount",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Type",
+        "data": "type",
+        "className": "column-type",
+        "orderable": true
+    }
+]
+
+Table Data
+
+[
+    {
+        "donor": "Accenture",
+        "minAmount": "325,000",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Accenture > Accenture (via Accenture Federal Services)",
+        "minAmount": "850,000",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Airbus",
+        "minAmount": "1,350,000",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Australia > Department of Foreign Affairs and Trade, Australia",
+        "minAmount": "810,001",
+        "type": "Foreign Government"
+    }
+]
+
+3. single-think-tank Column and Table Data
+
+Column Data
+
+[
+    {
+        "title": "Donor",
+        "data": "donor",
+        "className": "column-donor",
+        "orderable": true
+    },
+    {
+        "title": "Min Amount",
+        "data": "minAmount",
+        "className": "column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Source",
+        "data": "source",
+        "className": "column-source",
+        "orderable": false
+    },
+    {
+        "title": "Year",
+        "data": "year",
+        "className": "column-year",
+        "orderable": true
+    },
+    {
+        "title": "Type",
+        "data": "type",
+        "className": "column-type",
+        "orderable": true
+    }
+]
+
+Table Data
+
+[
+    {
+        "donor": "Accenture",
+        "minAmount": "25,000",
+        "source": "https://www.atlanticcouncil.org/in-depth-research-reports/report/2021-annual-report-honor-roll-of-contributors/",
+        "year": "2021",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Accenture",
+        "minAmount": "250,000",
+        "source": "https://www.atlanticcouncil.org/in-depth-research-reports/report/2021-annual-report-honor-roll-of-contributors/",
+        "year": "2021",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Accenture > Accenture (via Accenture Federal Services)",
+        "minAmount": "100,000",
+        "source": "https://www.atlanticcouncil.org/wp-content/uploads/2020/11/Annual-Report-2019_20.pdf",
+        "year": "2019",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Accenture > Accenture (via Accenture Federal Services)",
+        "minAmount": "250,000",
+        "source": "https://www.atlanticcouncil.org/wp-content/uploads/2021/11/2021-annual-report.pdf",
+        "year": "2020",
+        "type": "Pentagon Contractor"
+    },
+    {
+        "donor": "Accenture > Accenture (via Accenture Federal Services)",
+        "minAmount": "250,000",
+        "source": "https://www.atlanticcouncil.org/in-depth-research-reports/report/2022-honor-roll-of-contributors/",
+        "year": "2022",
+        "type": "Pentagon Contractor"
+    }
+]
+
+4. single-donor Column and Table Data
+
+Column Data
+
+[
+    {
+        "title": "Think Tank",
+        "data": "thinkTank",
+        "className": "column-think-tank",
+        "orderable": true
+    },
+    {
+        "title": "Donor",
+        "data": "donor",
+        "className": "column-donor",
+        "orderable": true
+    },
+    {
+        "title": "Min Amount",
+        "data": "minAmount",
+        "className": "column-numeric column-min-amount",
+        "orderable": true
+    },
+    {
+        "title": "Source",
+        "data": "source",
+        "className": "column-source",
+        "orderable": false
+    }
+]
+
+Table Data
+
+[
+    {
+        "thinkTank": "Aspen Institute",
+        "donor": "Accenture",
+        "minAmount": "50,000",
+        "source": "https://www.aspeninstitute.org/wp-content/uploads/2022/09/impact-report-2022.pdf"
+    },
+    {
+        "thinkTank": "Atlantic Council",
+        "donor": "Accenture (via Accenture Federal Services)",
+        "minAmount": "1,125,000",
+        "source": "https://www.atlanticcouncil.org/wp-content/uploads/2024/05/Atlantic-Council-2023-2024-Annual-Report.pdf"
+    }
+]
