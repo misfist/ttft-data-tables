@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import { store, getContext, getElement, useState, useEffect } from '@wordpress/interactivity';
 
 let initTable = ( el ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
@@ -33,14 +33,80 @@ let initTable = ( el ) => {
 	} );
 }
 
+const skeletonTable = `
+    <table class="dataTable">
+        <thead>
+            <tr>
+                <th>Loading...</th>
+                <th>Loading...</th>
+                <th>Loading...</th>
+                <th>Loading...</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+        </tbody>
+    </table>
+`;
+
+// let initTable = ( el, state ) => {
+//     const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
+//     return new DataTable( el, {
+//         info: false,
+//         pageLength: 50,
+//         layout: {
+//             bottomEnd: {
+//                 paging: {
+//                     type: 'simple_numbers',
+//                 },
+//             },
+//             topEnd: {
+//                 search: {
+//                     placeholder: 'Enter keyword...',
+//                     text: state.searchLabel, // Ensure state is passed as a parameter
+//                 },
+//             },
+//             topStart: {
+//                 buttons: [
+//                     {
+//                         extend: 'csvHtml5',
+//                         title: title,
+//                         text: 'Download Data',
+//                     },
+//                 ],
+//             },
+//         }
+//     } );
+// };
+
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
-		isLoading: false
+		isLoading: false,
+        searchLabel: ''
 	},
     actions: {
         async renderTable() {
+            const context = getContext();
+
             try {
-                const { tableType, thinkTank, donor, donationYear, donorType, ajaxUrl, action, nonce } = state;
+                const { tableType, thinkTank, donor, donationYear, donorType, searchLabel, ajaxUrl, action, nonce } = state;
 
                 const formData = new FormData();
                 formData.append( 'action', action );
@@ -55,6 +121,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 callbacks.logFormData( formData );
 
 				state.isLoading = true;
+                context.isLoaded = false;
 
                 const response = await fetch( ajaxUrl, {
                     method: 'POST',
@@ -89,10 +156,11 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 console.error( `catch( event ) renderTable:`, event );
             } finally {
                 state.isLoading = false;
+                context.isLoaded = true;
             }
         },
 		initTable: () => {
-			state.table = initTable( `#${state.tableId}` );
+			state.table = initTable( `#${state.tableId}`, state );
 		},
 		destroyTable: () => {
 			state.table.clear().draw();
@@ -106,6 +174,13 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
         }
     },
     callbacks: {
+        loadAnimation: () => {
+            useEffect( () => { 
+                const container = document.getElementById( state.elementId ); 
+                if ( state.isLoading ) { 
+                    container.innerHTML = skeletonTable; 
+                } }, [ state.isLoading ] );
+        },
         initLog: () => {
             console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
             const { tableType, donationYear, donorType, isLoaded } = getContext();

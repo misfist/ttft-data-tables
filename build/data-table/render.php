@@ -28,17 +28,50 @@ $selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attribut
 
 $search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
 
+$skeleton_table = '
+<table class="dataTable">
+	<thead>
+		<tr>
+			<th>Loading...</th>
+			<th>Loading...</th>
+			<th>Loading...</th>
+			<th>Loading...</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+		</tr>
+		<tr>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+		</tr>
+		<tr>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+			<td><div class="skeleton-box"></div></td>
+		</tr>
+	</tbody>
+</table>';
+
 $args = array(
-	'tableId'     => $table_id,
-	'searchLabel' => $search_label,
-	'tableType'   => $table_type,
-	'donor'       => $selectedDonor,
-	'thinkTank'   => $selectedThinkTank,
-	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
-	'action'      => 'do_get_data_table',
-	'nonce'       => wp_create_nonce( "{$app_namespace}_nonce" ),
-	'elementId'   => 'data-table-container',
-	'tableData'   => '',
+	'tableId'       => $table_id,
+	'searchLabel'   => $search_label,
+	'tableType'     => $table_type,
+	'donor'         => $selectedDonor,
+	'thinkTank'     => $selectedThinkTank,
+	'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+	'action'        => 'do_get_data_table',
+	'nonce'         => wp_create_nonce( "{$app_namespace}_nonce" ),
+	'elementId'     => 'data-table-container',
+	'tableData'     => '',
+	'skeletonTable' => $skeleton_table,
 );
 
 wp_interactivity_state(
@@ -46,7 +79,9 @@ wp_interactivity_state(
 	$args
 );
 
-$context = array();
+$context = array(
+	'isLoaded' => true,
+);
 
 ob_start();
 ?>
@@ -76,7 +111,7 @@ ob_start();
 	<div data-wp-text="context.donationYear"></div>
 	<div data-wp-text="context.donorType"></div>
 
-	<div data-wp-bind--id="state.elementId"><?php echo generate_data_table( $table_type, $args ); ?></div>
+	<div data-wp-bind--id="state.elementId" data-wp-run="callbacks.loadAnimation"><?php echo generate_data_table( $table_type, $args ); ?></div>
 
 </div>
 

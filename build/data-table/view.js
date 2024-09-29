@@ -89,16 +89,81 @@ let initTable = el => {
     }
   });
 };
+const skeletonTable = `
+    <table class="dataTable">
+        <thead>
+            <tr>
+                <th>Loading...</th>
+                <th>Loading...</th>
+                <th>Loading...</th>
+                <th>Loading...</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+            <tr>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+                <td><div class="skeleton-box"></div></td>
+            </tr>
+        </tbody>
+    </table>
+`;
+
+// let initTable = ( el, state ) => {
+//     const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
+//     return new DataTable( el, {
+//         info: false,
+//         pageLength: 50,
+//         layout: {
+//             bottomEnd: {
+//                 paging: {
+//                     type: 'simple_numbers',
+//                 },
+//             },
+//             topEnd: {
+//                 search: {
+//                     placeholder: 'Enter keyword...',
+//                     text: state.searchLabel, // Ensure state is passed as a parameter
+//                 },
+//             },
+//             topStart: {
+//                 buttons: [
+//                     {
+//                         extend: 'csvHtml5',
+//                         title: title,
+//                         text: 'Download Data',
+//                     },
+//                 ],
+//             },
+//         }
+//     } );
+// };
+
 const {
   state,
   actions,
   callbacks
 } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.store)('ttft/data-tables', {
   state: {
-    isLoading: false
+    isLoading: false,
+    searchLabel: ''
   },
   actions: {
     async renderTable() {
+      const context = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getContext)();
       try {
         const {
           tableType,
@@ -106,6 +171,7 @@ const {
           donor,
           donationYear,
           donorType,
+          searchLabel,
           ajaxUrl,
           action,
           nonce
@@ -121,6 +187,7 @@ const {
         formData.append('donor', donor);
         callbacks.logFormData(formData);
         state.isLoading = true;
+        context.isLoaded = false;
         const response = await fetch(ajaxUrl, {
           method: 'POST',
           body: formData
@@ -145,10 +212,11 @@ const {
         console.error(`catch( event ) renderTable:`, event);
       } finally {
         state.isLoading = false;
+        context.isLoaded = true;
       }
     },
     initTable: () => {
-      state.table = initTable(`#${state.tableId}`);
+      state.table = initTable(`#${state.tableId}`, state);
     },
     destroyTable: () => {
       state.table.clear().draw();
@@ -162,6 +230,14 @@ const {
     }
   },
   callbacks: {
+    loadAnimation: () => {
+      (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+        const container = document.getElementById(state.elementId);
+        if (state.isLoading) {
+          container.innerHTML = skeletonTable;
+        }
+      }, [state.isLoading]);
+    },
     initLog: () => {
       console.log(`Initial State: `, JSON.stringify(state, undefined, 2));
       const {
