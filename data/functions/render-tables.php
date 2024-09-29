@@ -19,7 +19,11 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 	if ( $data ) :
 		?>
 
-		<table id="table-<?php echo sanitize_title( $donor_type ); ?>" class="top-ten-recipients dataTable" data-total-rows="<?php echo intval( count( $data ) ); ?>">
+		<table 
+			id="table-<?php echo sanitize_title( $donor_type ); ?>" 
+			class="top-ten-recipients dataTable" 
+			data-total-rows="<?php echo intval( count( $data ) ); ?>"
+			>
 			<thead>
 				<tr>
 					<th class="column-think-tank"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
