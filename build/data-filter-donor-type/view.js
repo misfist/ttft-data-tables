@@ -69,11 +69,11 @@ const {
 } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.store)('ttft/data-tables', {
   actions: {
     updateType: () => {
-      const context = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getContext)();
+      var _ref$value;
       const {
         ref
       } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getElement)();
-      state.donorType = ref.value;
+      state.donorType = (_ref$value = ref.value) !== null && _ref$value !== void 0 ? _ref$value : 'all';
     }
   },
   callbacks: {
