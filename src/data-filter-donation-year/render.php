@@ -32,12 +32,12 @@ $options   = $all + $term_list;
 wp_interactivity_state(
 	$app_namespace,
 	array(
-		$state_key => $selected,
+		$state_key => $selected ?? 'all',
 	),
 );
 
 $context = array(
-	$state_key => $selected,
+	$state_key => $selected ?? 'all',
 	'options'  => $options,
 );
 

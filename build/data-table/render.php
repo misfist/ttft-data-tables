@@ -23,8 +23,8 @@ $unique_id = wp_unique_id( 'p-' );
 $table_type        = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
 $selectedThinkTank = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
 $selectedDonor     = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
-$selectedYear      = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) );
-$selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) );
+$selectedYear      = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
+$selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
 
 $search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
 

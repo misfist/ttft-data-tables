@@ -32,12 +32,12 @@ $options   = $all + $term_list;
 wp_interactivity_state(
 	$app_namespace,
 	array(
-		$state_key => $selected,
+		$state_key => $selected ?? 'all',
 	),
 );
 
 $context = array(
-	$state_key => $selected,
+	$state_key => $selected ?? 'all',
 	'options'  => $options,
 );
 
@@ -67,13 +67,11 @@ ob_start();
 			'data-state-key'          => $state_key,
 			'data-wp-href'            => add_query_arg( $taxonomy, $value ),
 			'data-wp-on-async--click' => 'actions.updateYear',
-			// 'data-wp-bind--checked' => "state.{$state_key} == {$value}",
 		);
 		if ( (int) $selected === (int) $value ) {
 			$input_attrs['checked'] = true;
 		}
 
-		// Normalize input attributes as a html string.
 		$normalized_input_attrs = array();
 		foreach ( $input_attrs as $attr_key => $attr_value ) {
 			$normalized_input_attrs[] = $attr_key . '="' . esc_attr( $attr_value ) . '"';

@@ -114,8 +114,9 @@ const {
         formData.append('action', action);
         formData.append('nonce', nonce);
         formData.append('table_type', tableType);
-        formData.append('donation_year', donationYear);
-        formData.append('donor_type', donorType);
+        formData.append('search_label', searchLabel || 'Enter keyword...');
+        formData.append('donation_year', donationYear || 'all');
+        formData.append('donor_type', donorType || 'all');
         formData.append('think_tank', thinkTank);
         formData.append('donor', donor);
         callbacks.logFormData(formData);
