@@ -73,21 +73,20 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 
                 if ( jsonResponse.success ) {
                     state.tableData = jsonResponse.data;
-                    // console.log( 'renderTable', JSON.stringify( state.tableData, undefined, 2 ) );
 
 					actions.destroyTable();
 
 					const container = document.getElementById( state.elementId );
                     container.innerHTML = ''; 
-
                     container.innerHTML = jsonResponse.data;
+
 					state.table = initTable( `#${state.tableId}` );
 
                 } else {
-                    console.error( 'Error fetching table data:', jsonResponse.data );
+                    console.error( `Error fetching table data:`, jsonResponse.data );
                 }
             } catch ( event ) {
-                console.error( 'Something went wrong!', event );
+                console.error( `catch( event ) renderTable:`, event );
             } finally {
                 state.isLoading = false;
             }
@@ -109,26 +108,32 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
     callbacks: {
         initLog: () => {
             console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
-            // const context = getContext();
-            const { tableType, donationYear, donorType } = getContext();
-            console.log( `Initial Context: ${tableType}, ${donationYear}, ${donorType}` );
+            const { tableType, donationYear, donorType, isLoaded } = getContext();
+            console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
         },
         logTable: () => {
-            console.log( `State: `, JSON.stringify( state, undefined, 2 )  );
-            // const context = getContext();
-            const { tableType, donationYear, donorType } = getContext();
-            console.log( `Context: ${tableType}, ${donationYear}, ${donorType}` );
+            const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
+            console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
         },
         logFormData: ( data ) => {
             for ( const [ key, value ] of data.entries() ) {
                 console.log( `${ key }: ${ value }` );
             }
         },
+        logState: ( key ) => {
+            console.log( `key: `, state.key );
+        },
         logResponseData: ( data ) => {
             // console.log( 'Raw response:', data );
         },
 		logLoading: () => {
-			console.log( `IS LOADING ${state.isLoading}` );
-		}
+			console.log( `IS LOADING: `, state.isLoading );
+		},
+        log: ( message, data ) => {
+            console.log( message, data );
+        },
+        logError: ( message, error ) => {
+            console.error( message, error );
+        }
     },
 });

@@ -56,14 +56,18 @@ ob_start();
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
 	data-wp-watch="actions.renderTable"
+	
 	data-wp-bind--table_type='state.tableType'
 	data-wp-bind--think_tank='state.thinkTank'
 	data-wp-bind--donor='state.donor'
 	data-wp-bind--year='state.donationYear'
 	data-wp-bind--type='state.donorType'
 	data-wp-init="actions.initTable"
-	data-wp-class--loading="state.isLoading"
-	data-wp-watch--loading="state.isLoading"
+	data-wp-init--initLog="actions.initLog"
+	data-wp-class--is-loading="state.isLoading"
+	data-wp-class--is-loaded="context.isLoaded"
+	data-wp-watch--log-loading="callbacks.logLoading"
+	data-wp-watch--log-table="callbacks.logTable"
 >
 	
 	<div data-wp-text="state.donationYear"></div>
