@@ -85,9 +85,6 @@ const {
         donationYear
       } = state;
       console.log(`donationYear: `, donationYear);
-      // const context = getContext();
-      // console.log( 'Context:', JSON.stringify( context, undefined, 2 ) );
-      // actions.stringifyState();
     },
     isSelected: () => {
       const {

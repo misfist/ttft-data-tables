@@ -82,9 +82,6 @@ const {
         donorType
       } = state;
       console.log(`donorType: `, donorType);
-      // const context = getContext();
-      // console.log( 'Context:', JSON.stringify( context, undefined, 2 ) );
-      // actions.stringifyState();
     },
     isSelected: () => {
       const {
