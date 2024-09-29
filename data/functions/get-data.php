@@ -83,7 +83,7 @@ function get_top_ten_raw_data( $donor_type = '', $donation_year = '', $number_of
  * @param string $donor_type    Optional. Slug of the donor type.
  * @return array
  */
-function get_think_tank_donor_raw_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
+function get_single_think_tank_raw_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
 
 	$think_tank_var    = $_GET['think_tank'];
 	$donation_year_var = $_GET['donation_year'];
@@ -171,7 +171,7 @@ function get_think_tank_donor_raw_data( $think_tank = '', $donation_year = '', $
  * @param string $donation_year Optional. Slug of the donation_year taxonomy term to filter by.
  * @return array Array of transaction data.
  */
-function get_donor_think_tank_raw_data( $donor = '', $donation_year = '', $donor_type = '' ) {
+function get_single_donor_raw_data( $donor = '', $donation_year = '', $donor_type = '' ) {
 	$args = array(
 		'post_type'      => 'transaction',
 		'posts_per_page' => -1,
@@ -263,7 +263,7 @@ function get_donor_think_tank_raw_data( $donor = '', $donation_year = '', $donor
  * @param string $donation_year The slug of the donation year to filter transactions by (optional).
  * @return array
  */
-function get_donors_raw_data( $donation_year = '', $donor_type = '' ): array {
+function get_donor_archive_raw_data( $donation_year = '', $donor_type = '' ): array {
 	$args = array(
 		'post_type'      => 'transaction',
 		'posts_per_page' => -1,
@@ -369,7 +369,7 @@ function get_top_ten_data( $donor_type = '', $donation_year = '', $number_of_ite
  * @param string $donation_year The donation year to filter by.
  * @return array Array of think tank data.
  */
-function get_think_tanks_data( $donation_year = '' ) {
+function get_think_tank_archive_data( $donation_year = '' ) {
 	$year_var = get_query_var( 'donation_year', '' );
 	$args     = array(
 		'post_type'      => 'transaction',
@@ -453,8 +453,8 @@ function get_think_tanks_data( $donation_year = '' ) {
  * @param string $donor_type    Optional. Slug of the donor type.
  * @return array
  */
-function get_think_tank_donor_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
-	$raw_data = get_think_tank_donor_raw_data( $think_tank, $donation_year, $donor_type );
+function get_single_think_tank_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
+	$raw_data = get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 	if ( empty( $raw_data ) ) {
 		return array();
@@ -495,8 +495,8 @@ function get_think_tank_donor_data( $think_tank = '', $donation_year = '', $dono
  * @param string $donation_year Optional. Slug of the donation_year taxonomy term to filter by.
  * @return array Aggregated data with summed 'amount_calc' values.
  */
-function get_donor_think_tank_data( $donor = '', $donation_year = '', $donor_type = '' ) {
-	$raw_data = get_donor_think_tank_raw_data( $donor, $donation_year, $donor_type );
+function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ) {
+	$raw_data = get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 	$data = array_reduce(
 		$raw_data,
@@ -530,8 +530,8 @@ function get_donor_think_tank_data( $donor = '', $donation_year = '', $donor_typ
  * @param  string $donation_year
  * @return array
  */
-function get_donors_data( $donation_year = '', $donor_type = '' ) {
-	$donor_data = get_donors_raw_data( $donation_year, $donor_type );
+function get_donor_archive_data( $donation_year = '', $donor_type = '' ) {
+	$donor_data = get_donor_archive_raw_data( $donation_year, $donor_type );
 	$data       = array_reduce(
 		$donor_data,
 		function ( $carry, $item ) {

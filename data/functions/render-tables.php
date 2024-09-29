@@ -156,7 +156,7 @@ function generate_think_tank_archive_table( $donation_year = '' ): string {
 	$donation_year = sanitize_text_field( $donation_year );
 	$table_type    = 'think-tank-archive';
 
-	$data = get_think_tanks_data( $donation_year );
+	$data = get_think_tank_archive_data( $donation_year );
 
 	ob_start();
 	if ( $data ) :
@@ -210,7 +210,7 @@ function generate_single_think_tank_table( $think_tank = '', $donation_year = ''
 	$donor_type    = sanitize_text_field( $donor_type );
 	$table_type    = 'single-think-tank';
 
-	$data = get_think_tank_donor_data( $think_tank, $donation_year, $donor_type );
+	$data = get_single_think_tank_data( $think_tank, $donation_year, $donor_type );
 
 	ob_start();
 	if ( $data ) :
@@ -258,7 +258,7 @@ function generate_donor_archive_table( $donation_year = '', $donor_type = '' ): 
 	$donor_type    = sanitize_text_field( $donor_type );
 	$table_type    = 'donor-archive';
 
-	$data = get_donors_data( $donation_year, $donor_type );
+	$data = get_donor_archive_data( $donation_year, $donor_type );
 
 	ob_start();
 	if ( $data ) :
@@ -305,7 +305,7 @@ function generate_single_donor_table( $donor = '', $donation_year = '', $donor_t
 	$donor_type    = sanitize_text_field( $donor_type );
 	$table_type    = 'single-donor';
 
-	$data = get_donor_think_tank_data( $donor, $donation_year, $donor_type );
+	$data = get_single_donor_data( $donor, $donation_year, $donor_type );
 
 	ob_start();
 	if ( $data ) :
