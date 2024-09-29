@@ -6,11 +6,16 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
-.wp-block-data-tables-data-tables input[type=text] {
-  font-size: 1em;
-  color: inherit;
-  background: inherit;
-  border: 0;
+.wp-block-data-tables-data-filter-donation-year {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  -moz-column-gap: var(--wp--preset--spacing--20);
+       column-gap: var(--wp--preset--spacing--20);
+  row-gap: var(--wp--preset--spacing--10);
+  background-color: var(--wp--preset--color--gray-200);
+  padding: var(--wp--preset--spacing--10);
 }
 
 /*# sourceMappingURL=index.css.map*/

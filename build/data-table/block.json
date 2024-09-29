@@ -3,16 +3,27 @@
   "apiVersion": 3,
   "name": "data-tables/data-table",
   "version": "0.1.0",
-  "title": "Data Tables",
-  "description": "Display data tables.",
+  "title": "Data Table",
+  "description": "Display data table.",
   "category": "widgets",
   "icon": "editor-table",
   "attributes": {
     "tableType": {
-      "type": "string",
-      "default": "think-tank-archive"
+      "type": "string"
     },
-    "searchLabel": {
+    "thinkTank": {
+      "type": "string"
+    },
+    "donor": {
+      "type": "string"
+    },
+    "donationYear": {
+      "type": "string"
+    },
+    "donorType": {
+      "type": "string"
+    },
+    "defaultDonationYear": {
       "type": "string"
     }
   },
@@ -20,10 +31,6 @@
   "supports": {
     "interactivity": true
   },
-  "usesContext": [
-    "data-tables/data-filter-donor-type/donorType",
-    "data-tables/data-filter-donation-year/donationYear"
-  ],
   "textdomain": "data-tables",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

@@ -22,6 +22,7 @@ $terms     = get_terms(
 	array(
 		'taxonomy'   => $taxonomy,
 		'hide_empty' => false,
+		'order'      => 'DESC',
 	)
 );
 $term_list = wp_list_pluck( $terms, 'name', 'slug' );
@@ -47,7 +48,8 @@ ob_start();
 	<?php echo get_block_wrapper_attributes(); ?>
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
-	data-wp-watch="callbacks.log"
+	data-wp-watch="callbacks.logYear"
+	data-wp-bind--year='state.donationYear'
 >
 
 	<?php
@@ -56,15 +58,15 @@ ob_start();
 	$selected   = $context[ $state_key ];
 	$options    = $context['options'];
 	foreach ( $options as $value => $label ) :
-		$input_id    = "{$input_type}-{$value}";
+		$input_id    = "{$input_name}-{$value}";
 		$input_attrs = array(
-			'id'                => $input_id,
-			'name'              => $input_name,
-			'type'              => $input_type,
-			'value'             => $value,
-			'data-state-key'    => $state_key,
-			'data-wp-href'      => add_query_arg( $taxonomy, $value ),
-			'data-wp-on--click' => 'actions.updateYear',
+			'id'                      => $input_id,
+			'name'                    => $input_name,
+			'type'                    => $input_type,
+			'value'                   => $value,
+			'data-state-key'          => $state_key,
+			'data-wp-href'            => add_query_arg( $taxonomy, $value ),
+			'data-wp-on-async--click' => 'actions.updateYear',
 			// 'data-wp-bind--checked' => "state.{$state_key} == {$value}",
 		);
 		if ( (int) $selected === (int) $value ) {

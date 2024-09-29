@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps } from '@wordpress/block-editor';
+import { Dashicon } from '@wordpress/components';
 
 /**
  * The edit function describes the structure of your block in the context of the
@@ -30,7 +31,7 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	return (
 		<p { ...blockProps }>
-			{ __( 'Data filter - donor type', 'data-tables' ) }
+			<Dashicon icon="building" /> { __( 'Donor Type Filter', 'data-tables' ) }
 		</p>
 	);
 }

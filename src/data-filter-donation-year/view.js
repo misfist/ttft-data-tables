@@ -3,17 +3,24 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { state, actions } = store( 'ttft/data-tables', {
+const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	actions: {
 		updateYear: () => {
 			const context = getContext();
 			const { ref } = getElement();
 			state.donationYear = ref.value;
+		},
+		stringifyState: () => {
+			state.jsonState = JSON.stringify( state.tableData, null, 2 );
 		}
 	},
 	callbacks: {
-		log: () => {
-			console.log( `State: ${ state.donationYear }` );
+		logYear: () => {
+			const { donationYear } = state;
+			console.log( `donationYear: `, donationYear );
+			// const context = getContext();
+            // console.log( 'Context:', JSON.stringify( context, undefined, 2 ) );
+			// actions.stringifyState();
 		},
 		isSelected: () => {
 			const { ref } = getElement();
@@ -21,3 +28,4 @@ const { state, actions } = store( 'ttft/data-tables', {
 		}
 	},
 } );
+

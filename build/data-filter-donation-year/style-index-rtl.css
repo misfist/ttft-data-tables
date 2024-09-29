@@ -7,8 +7,48 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
-.wp-block-data-tables-data-tables {
-  font-size: 1em;
-  background: rgba(255, 255, 0, 0.1019607843);
-  padding: 1em;
+.wp-block-data-tables-data-filter-donation-year {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  -moz-column-gap: var(--wp--preset--spacing--20);
+       column-gap: var(--wp--preset--spacing--20);
+  row-gap: var(--wp--preset--spacing--10);
+}
+.wp-block-data-tables-data-filter-donation-year.type {
+  background-color: var(--wp--preset--color--gray-200);
+  padding: var(--wp--preset--spacing--10);
+}
+.wp-block-data-tables-data-filter-donation-year.type label {
+  font-size: var(--wp--preset--font-size--small);
+  font-weight: 400;
+  padding: calc(var(--wp--preset--spacing--10) / 2);
+  border-radius: var(--wp--custom--border--radius--sm);
+}
+.wp-block-data-tables-data-filter-donation-year input[type=radio] {
+  display: none;
+}
+.wp-block-data-tables-data-filter-donation-year label {
+  display: inline-block;
+  padding: var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);
+  margin-left: 5px;
+  cursor: pointer;
+  background-color: var(--wp--preset--color--gray-200);
+  transition: background-color 0.3s, color 0.3s;
+  text-align: center;
+}
+.wp-block-data-tables-data-filter-donation-year label:hover, .wp-block-data-tables-data-filter-donation-year label:focus {
+  background-color: var(--wp--custom--color--hover);
+}
+.wp-block-data-tables-data-filter-donation-year .year label {
+  background-color: var(--wp--preset--color--gray-200);
+  padding: var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);
+}
+.wp-block-data-tables-data-filter-donation-year .year label:hover, .wp-block-data-tables-data-filter-donation-year .year label:focus {
+  background-color: var(--wp--custom--color--hover);
+}
+.wp-block-data-tables-data-filter-donation-year input[type=radio]:checked + label {
+  background-color: var(--wp--preset--color--contrast-2);
+  color: var(--wp--preset--color--white);
 }

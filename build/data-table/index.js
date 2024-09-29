@@ -16,8 +16,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/core-data */ "@wordpress/core-data");
+/* harmony import */ var _wordpress_core_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
 /**
  * Retrieves the translation of text.
  *
@@ -27,10 +35,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /**
  * React hook that is used to mark the block wrapper element.
- * It provides all the necessary props like the class name.
+ * It provides all the necessary props like the className name.
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
+
+
+
+
 
 
 /**
@@ -47,13 +59,180 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 function Edit({
-  attributes,
+  attributes: {
+    tableType,
+    thinkTank,
+    donor,
+    donorType,
+    donationYear
+  },
   setAttributes
 }) {
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+  const [tableTypeState, setTableTypeState] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)(tableType);
+  const donorTerms = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__.store).getEntityRecords('taxonomy', 'donor', {
+    per_page: -1,
+    orderby: 'name'
+  }), []);
+  const thinkTankTerms = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__.store).getEntityRecords('taxonomy', 'think_tank', {
+    per_page: -1,
+    orderby: 'name'
+  }), []);
+  const donorTypeTerms = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__.store).getEntityRecords('taxonomy', 'donor_type', {
+    per_page: -1,
+    orderby: 'name'
+  }), []);
+  const donationYearTerms = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => select(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__.store).getEntityRecords('taxonomy', 'donation_year', {
+    per_page: -1,
+    orderby: 'name',
+    order: 'desc'
+  }), []);
+  const tableTypeOptions = [{
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor Archive', 'data-table'),
+    value: 'donor-archive'
+  }, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Single Donor', 'data-table'),
+    value: 'single-donor'
+  }, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Think Tank Archive', 'data-table'),
+    value: 'think-tank-archive'
+  }, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Single Think Tank', 'data-table'),
+    value: 'single-think-tank'
+  }];
+  const donorOptions = donorTerms ? donorTerms.map(term => ({
+    label: term.name,
+    value: term.slug
+  })) : [];
+  const thinkTankOptions = thinkTankTerms ? thinkTankTerms.map(term => ({
+    label: term.name,
+    value: term.slug
+  })) : [];
+  const donorTypeOptions = donorTypeTerms ? [{
+    label: 'All',
+    value: 'all'
+  }, ...donorTypeTerms.map(term => ({
+    label: term.name,
+    value: term.slug
+  }))] : [];
+  const donationYearOptions = donationYearTerms ? [{
+    label: 'All',
+    value: 'all'
+  }, ...donationYearTerms.map(term => ({
+    label: term.name,
+    value: term.slug
+  }))] : [];
+  const isSingleDonor = type => type === 'single-donor';
+  const isSingleThinkTank = type => type === 'single-think-tank';
+  if (!donorTerms || !thinkTankTerms || !donorTypeTerms || !donationYearTerms) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Spinner, {});
+  }
+  const missingSelectionsMessage = isSingleDonor(tableTypeState) && !donor || isSingleThinkTank(tableTypeState) && !thinkTank;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
     ...blockProps,
-    children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Data Tables – hello from the editor!', 'data-tables')
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InspectorControls, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Table Settings', 'data-table'),
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Table Type', 'data-table'),
+          value: tableTypeState,
+          options: tableTypeOptions,
+          onChange: value => {
+            setTableTypeState(value);
+            setAttributes({
+              tableType: value
+            });
+          }
+        }), isSingleDonor(tableTypeState) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor', 'data-table'),
+          value: donor,
+          options: donorOptions,
+          onChange: value => setAttributes({
+            donor: value
+          })
+        }), isSingleThinkTank(tableTypeState) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Think Tank', 'data-table'),
+          value: thinkTank,
+          options: thinkTankOptions,
+          onChange: value => setAttributes({
+            thinkTank: value
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor Type', 'data-table'),
+          value: donorType,
+          options: donorTypeOptions,
+          onChange: value => setAttributes({
+            donorType: value
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donation Year', 'data-table'),
+          value: donationYear,
+          options: donationYearOptions,
+          onChange: value => setAttributes({
+            donationYear: value
+          })
+        })]
+      })
+    }), missingSelectionsMessage && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
+      style: {
+        color: 'var(--wp--preset--color--vivid-red)',
+        fontWeight: 'bold'
+      },
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Required selections are missing', 'data-table')
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("figure", {
+        className: "wp-block-table",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("figcaption", {
+          className: "wp-element-caption",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Dashicon, {
+            icon: "editor-table"
+          }), " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Selected Attributes', 'data-table')]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("table", {
+          className: "dataTable",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("thead", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("th", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Attribute', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("th", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Value', 'data-table')
+              })]
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tbody", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Table Type', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: tableTypeOptions.find(option => option.value === tableTypeState)?.label || tableTypeState
+              })]
+            }), isSingleDonor(tableTypeState) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: donorTerms.find(term => term.slug === donor)?.name || missingSelectionsMessage
+              })]
+            }), isSingleThinkTank(tableTypeState) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Think Tank', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: thinkTankTerms.find(term => term.slug === thinkTank)?.name || missingSelectionsMessage
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor Type', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: donorTypeTerms.find(term => term.slug === donorType)?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('All', 'data-table')
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donation Year', 'data-table')
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("td", {
+                children: donationYearTerms.find(term => term.slug === donationYear)?.name || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('All', 'data-table')
+              })]
+            })]
+          })]
+        })]
+      })
+    })]
   });
 }
 
@@ -164,6 +343,46 @@ module.exports = window["wp"]["blocks"];
 
 /***/ }),
 
+/***/ "@wordpress/components":
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["components"];
+
+/***/ }),
+
+/***/ "@wordpress/core-data":
+/*!**********************************!*\
+  !*** external ["wp","coreData"] ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["coreData"];
+
+/***/ }),
+
+/***/ "@wordpress/data":
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["data"];
+
+/***/ }),
+
+/***/ "@wordpress/element":
+/*!*********************************!*\
+  !*** external ["wp","element"] ***!
+  \*********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["element"];
+
+/***/ }),
+
 /***/ "@wordpress/i18n":
 /*!******************************!*\
   !*** external ["wp","i18n"] ***!
@@ -180,7 +399,7 @@ module.exports = window["wp"]["i18n"];
   \***********************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"data-tables/data-table","version":"0.1.0","title":"Data Tables","description":"Display data tables.","category":"widgets","icon":"editor-table","attributes":{"tableType":{"type":"string","default":"think-tank-archive"},"searchLabel":{"type":"string"}},"example":{},"supports":{"interactivity":true},"usesContext":["data-tables/data-filter-donor-type/donorType","data-tables/data-filter-donation-year/donationYear"],"textdomain":"data-tables","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScriptModule":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"data-tables/data-table","version":"0.1.0","title":"Data Table","description":"Display data table.","category":"widgets","icon":"editor-table","attributes":{"tableType":{"type":"string"},"thinkTank":{"type":"string"},"donor":{"type":"string"},"donationYear":{"type":"string"},"donorType":{"type":"string"},"defaultDonationYear":{"type":"string"}},"example":{},"supports":{"interactivity":true},"textdomain":"data-tables","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScriptModule":"file:./view.js"}');
 
 /***/ })
 

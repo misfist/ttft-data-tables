@@ -47,7 +47,8 @@ ob_start();
 	<?php echo get_block_wrapper_attributes(); ?>
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
-	data-wp-watch="callbacks.log"
+	data-wp-watch="callbacks.logType"
+	data-wp-bind--donor='state.donorType'
 >
 
 	<?php
@@ -57,22 +58,20 @@ ob_start();
 	$options    = $context['options'];
 
 	foreach ( $options as $value => $label ) :
-		$input_id    = "{$input_type}-{$value}";
+		$input_id    = "{$input_name}-{$value}";
 		$input_attrs = array(
-			'id'                => $input_id,
-			'name'              => $input_name,
-			'type'              => $input_type,
-			'value'             => $value,
-			'data-state-key'    => $state_key,
-			'data-wp-href'      => add_query_arg( $taxonomy, $value ),
-			'data-wp-on--click' => 'actions.updateType',
-			// 'data-wp-bind--checked' => "state.{$state_key} == {$value}",
+			'id'                      => $input_id,
+			'name'                    => $input_name,
+			'type'                    => $input_type,
+			'value'                   => $value,
+			'data-state-key'          => $state_key,
+			'data-wp-href'            => add_query_arg( $taxonomy, $value ),
+			'data-wp-on-async--click' => 'actions.updateType',
 		);
 		if ( $selected === $value ) {
 			$input_attrs['checked'] = true;
 		}
 
-		// Normalize input attributes as a html string.
 		$normalized_input_attrs = array();
 		foreach ( $input_attrs as $attr_key => $attr_value ) {
 			$normalized_input_attrs[] = $attr_key . '="' . esc_attr( $attr_value ) . '"';

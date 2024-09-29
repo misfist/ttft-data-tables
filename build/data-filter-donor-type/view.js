@@ -51,6 +51,8 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__wordpress_interactivity_8e89b257__;
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
 /*!********************************************!*\
   !*** ./src/data-filter-donor-type/view.js ***!
   \********************************************/
@@ -62,7 +64,8 @@ __webpack_require__.r(__webpack_exports__);
 
 const {
   state,
-  actions
+  actions,
+  callbacks
 } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.store)('ttft/data-tables', {
   actions: {
     updateType: () => {
@@ -74,8 +77,14 @@ const {
     }
   },
   callbacks: {
-    log: () => {
-      console.log(`State: ${state.donorType}`);
+    logType: () => {
+      const {
+        donorType
+      } = state;
+      console.log(`donorType: `, donorType);
+      // const context = getContext();
+      // console.log( 'Context:', JSON.stringify( context, undefined, 2 ) );
+      // actions.stringifyState();
     },
     isSelected: () => {
       const {
@@ -85,5 +94,7 @@ const {
     }
   }
 });
+})();
+
 
 //# sourceMappingURL=view.js.map
