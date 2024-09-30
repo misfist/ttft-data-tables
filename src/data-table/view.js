@@ -178,7 +178,10 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 if ( state.isLoading && container ) {
                     const columns = container.querySelectorAll( 'thead th' ).length;
                     const skeletonTable = actions.generateSkeletonTable( columns );
-                    container.querySelector( 'tbody' ).innerHTML = skeletonTable;
+                    const body = container.querySelector( 'tbody' );
+                    if( body ) {
+                        body.innerHTML = skeletonTable;
+                    }
                 } }, [ state.isLoading ] );
         },
         initLog: () => {
