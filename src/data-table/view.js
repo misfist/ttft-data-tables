@@ -141,13 +141,17 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 if ( jsonResponse.success ) {
                     state.tableData = jsonResponse.data;
 
-					actions.destroyTable();
+                    await actions.destroyTableAsync();
 
-					const container = document.getElementById( state.elementId );
-                    container.innerHTML = ''; 
-                    container.innerHTML = jsonResponse.data;
+                    const container = document.getElementById( state.elementId );
 
-					state.table = initTable( `#${state.tableId}` );
+                    if ( container ) {
+                        container.innerHTML = jsonResponse.data;
+
+                        if ( state.table ) {
+                            state.table = initTable( `#${state.tableId}` );
+                        }
+                    }
 
                 } else {
                     console.error( `Error fetching table data:`, jsonResponse.data );
@@ -166,6 +170,12 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 			state.table.clear().draw();
 			state.table.destroy();
 		},
+        destroyTableAsync: () => {
+            return new Promise( ( resolve ) => {
+                actions.destroyTable();
+                resolve();
+            });
+        },
         updateContext: () => {
             const context = getContext();
             context.tableType = state.tableType;
