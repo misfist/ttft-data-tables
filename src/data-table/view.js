@@ -92,7 +92,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 formData.append( 'think_tank', thinkTank );
                 formData.append( 'donor', donor );
 
-                callbacks.logFormData( formData );
+                // console.log( `formData: `, formData );
 
 				state.isLoading = true;
                 context.isLoaded = false;
@@ -104,7 +104,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 
                 const responseText = await response.text();
 
-                callbacks.logResponseData( responseText );
+                // console.log( `responseText: `, responseText );
 
 				if ( ! response.ok ) {
                     throw new Error( `HTTP error! status: ${response.status}` );
@@ -130,10 +130,10 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                     }
 
                 } else {
-                    console.error( `Error fetching table data:`, jsonResponse.data );
+                    // console.error( `Error fetching table data:`, jsonResponse.data );
                 }
             } catch ( event ) {
-                console.error( `catch( event ) renderTable:`, event );
+                // console.error( `catch( event ) renderTable:`, event );
             } finally {
                 state.isLoading = false;
                 context.isLoaded = true;
@@ -178,39 +178,22 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                     const columns = container.querySelectorAll( 'thead th' ).length;
                     const skeletonTable = actions.generateSkeletonTable( columns );
                     container.querySelector( 'tbody' ).innerHTML = skeletonTable;
-                    // container.innerHTML = skeletonTable; 
                 } }, [ state.isLoading ] );
         },
         initLog: () => {
-            console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
-            const { tableType, donationYear, donorType, isLoaded } = getContext();
-            console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
+            // console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
+            // const { tableType, donationYear, donorType, isLoaded } = getContext();
+            // console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
         },
         logTable: () => {
-            const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
-            console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
-        },
-        logFormData: ( data ) => {
-            for ( const [ key, value ] of data.entries() ) {
-                console.log( `${ key }: ${ value }` );
-            }
+            // const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
+            // console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
         },
         logState: ( key ) => {
             console.log( `key: `, state.key );
         },
-        logResponseData: ( data ) => {
-            // console.log( 'Raw response:', data );
-        },
 		logLoading: () => {
-			console.log( `IS LOADING: `, state.isLoading );
-            console.log( state.pageLength );
-
-		},
-        log: ( message, data ) => {
-            console.log( message, data );
-        },
-        logError: ( message, error ) => {
-            console.error( message, error );
-        }
+			// console.log( `IS LOADING: `, state.isLoading );
+		}
     },
 });

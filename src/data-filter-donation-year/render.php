@@ -85,9 +85,7 @@ ob_start();
 		<?php
 	endforeach;
 	?>
-
-	<div data-wp-text="state.<?php echo $state_key; ?>"></div>
-
+	
 </div>
 
 <?php

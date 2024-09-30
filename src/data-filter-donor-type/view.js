@@ -13,7 +13,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	callbacks: {
 		logType: () => {
 			const { donorType } = state;
-			console.log( `donorType: `, donorType );
+			// console.log( `donorType: `, donorType );
 		},
 		isSelected: () => {
 			const { ref } = getElement();

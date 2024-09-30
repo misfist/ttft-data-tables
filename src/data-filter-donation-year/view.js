@@ -8,15 +8,12 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		updateYear: () => {
 			const { ref } = getElement();
 			state.donationYear = ref.value ?? 'all';
-		},
-		stringifyState: () => {
-			state.jsonState = JSON.stringify( state.tableData, null, 2 );
 		}
 	},
 	callbacks: {
 		logYear: () => {
 			const { donationYear } = state;
-			console.log( `donationYear: `, donationYear );
+			// console.log( `donationYear: `, donationYear );
 		},
 		isSelected: () => {
 			const { ref } = getElement();
