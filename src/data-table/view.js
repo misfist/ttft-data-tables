@@ -42,21 +42,28 @@ let initTable = ( table ) => {
 				],
 			},
 		},
+
         footerCallback: function( row, data, start, end, display ) {
             const api = this.api();
-            const intVal = function( value ) {
-                return typeof value === 'string' ? value.replace( /[\$,]/g, '' ) * 1 : typeof value === 'number' ? value : 0;
-            };
+
+            if ( 'undefined' == typeof window.jQuery ) {
+                return;
+            }
+
             Array.from( api.columns().header() ).forEach( ( header, index ) => {
-                if ( header.getAttribute( 'data-summed' ) !== null ) {
-                    const total = api.column( index ).data().reduce( function( a, b ) {
-                        return intVal( a ) + intVal( b );
+                if ( header.getAttribute( 'data-summed' ) ) {
+
+                    const total = api.column( index ).data().reduce( function( a, b ) {;
+                        return Number( a ) + Number( b );
                     }, 0 );
-                    // Ensure footer element exists before setting innerHTML
-                    const footer = api.column( index ).footer();
-                    if ( footer ) {
-                        footer.innerHTML = total;
+
+                    const $column = api.column( index );
+                    const $footer = jQuery( $column.footer() );
+
+                    if ( $footer ) {
+                        $footer.html( total );
                     }
+
                 }
             });
         }
