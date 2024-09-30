@@ -3,10 +3,10 @@
  */
 import { store, getContext, getElement, useState, useEffect } from '@wordpress/interactivity';
 
-let initTable = ( el ) => {
+let initTable = ( table ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
     const pageLength = state.pageLength;
-	return new DataTable( el, {
+	return new DataTable( table, {
 		info: false,
 		pageLength: 50,
 		layout: {
@@ -30,35 +30,27 @@ let initTable = ( el ) => {
 					},
 				],
 			},
-		}
+		},
+        footerCallback: function( row, data, start, end, display ) {
+            const api = this.api();
+            const intVal = function( value ) {
+                return typeof value === 'string' ? value.replace( /[\$,]/g, '' ) * 1 : typeof value === 'number' ? value : 0;
+            };
+            Array.from( api.columns().header() ).forEach( ( header, index ) => {
+                if ( header.getAttribute( 'data-summed' ) !== null ) {
+                    const total = api.column( index ).data().reduce( function( a, b ) {
+                        return intVal( a ) + intVal( b );
+                    }, 0 );
+                    // Ensure footer element exists before setting innerHTML
+                    const footer = api.column( index ).footer();
+                    if ( footer ) {
+                        footer.innerHTML = total;
+                    }
+                }
+            });
+        }
 	} );
 }
-
-const skeletonTable = `
-    <div class="table skeleton">
-	<div class="row">
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-	</div>
-	<div class="row">
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-	</div>
-	<div class="row">
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-		<div class="cell"><div class="loader"></div></div>
-	</div>
-</div>
-`;
 
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
@@ -106,6 +98,8 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 if ( jsonResponse.success ) {
                     state.tableData = jsonResponse.data;
 
+                    // debugger;
+
                     await actions.destroyTableAsync();
 
                     const container = document.getElementById( state.elementId );
@@ -146,13 +140,26 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
             context.tableType = state.tableType;
             context.donationYear = state.donationYear;
             context.donorType = state.donorType;
+        },
+        generateSkeletonTable: ( columns ) => {
+            let skeletonRows = '';
+            for ( let i = 0; i < 10; i++ ) {
+                skeletonRows += '<tr class="row" width="100%">';
+                for ( let j = 0; j < columns; j++ ) {
+                    skeletonRows += '<td class="cell"><div class="loader"></div></td>';
+                }
+                skeletonRows += '</tr>';
+            }
+            return skeletonRows;
         }
     },
     callbacks: {
         loadAnimation: () => {
             useEffect( () => { 
                 const container = document.getElementById( state.elementId );
-                if ( state.isLoading && container ) { 
+                if ( state.isLoading && container ) {
+                    const columns = container.querySelectorAll( 'thead th' ).length;
+                    const skeletonTable = actions.generateSkeletonTable( columns );
                     container.querySelector( 'tbody' ).innerHTML = skeletonTable;
                     // container.innerHTML = skeletonTable; 
                 } }, [ state.isLoading ] );
