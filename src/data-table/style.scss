@@ -5,25 +5,87 @@
  * Replace them with your own styles or remove the file completely.
  */
 
+$color: #7B7B7B;
+$start: rgba( $color, .1);
+$middle: rgba( $color, .3 );
+
 .wp-block-data-tables-data-table {
-    .skeleton-box {
-        width: 100%;
-        height: 20px;
-        background-color: var( --wp--preset--color--gray-200 );
-        border-radius: 4px;
-        margin-bottom: 10px;
-        animation: skeleton-loading 1.5s infinite;
+    .skeleton,
+    .row,
+    .cell {
+        display: flex;
+        flex: 1;
     }
-    
-    @keyframes skeleton-loading {
-        0% {
-            background-color: var( --wp--preset--color--gray-200 );
+
+    .skeleton {
+        flex-direction: column;
+        max-width: 100%;
+        margin: auto;
+
+        .row {
+            justify-content: center;
         }
-        50% {
-            background-color: var( --wp--preset--color--white );
+
+        .row + .row {
+            border-top: 1px solid var( --wp--preset--color--gray-200 );
+        }
+
+        .cell {
+            align-items: center;
+			height: var( --wp--preset--spacing--40 );
+
+            &:nth-child(1) {
+                .loader {
+                    animation-delay: 0
+                }
+            }
+            &:nth-child(2) {
+                .loader {
+                    animation-delay: 1s
+                }
+            }
+            &:nth-child(3) {
+                .loader {
+                    animation-delay: .5s
+                }
+            }
+            &:nth-child(4) {
+                .loader {
+                    animation-delay: 1.5s
+                }
+            }
+        }
+
+        .loader {
+            flex: 1;
+			height: 1.5rem;
+			border-radius: 3px;
+			margin: calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--30 ) calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--10 );
+
+            background: linear-gradient(-90deg, $start, $middle, $start );
+            background-size: auto;
+            background-size: 1000% 100%;
+            animation: loader 2s ease-in-out alternate infinite;
+        }
+    }
+
+    @keyframes row {
+        0% {
+            opacity: .5
         }
         100% {
-            background-color: var( --wp--preset--color--gray-200 );
+            opacity: 1
+        }
+		
+    }
+	
+    @keyframes loader {
+        0% {
+            background-position: 0% 0%
+        }
+        
+        100% {
+            background-position: 100% 0%
         }
     }
     

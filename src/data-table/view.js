@@ -5,6 +5,7 @@ import { store, getContext, getElement, useState, useEffect } from '@wordpress/i
 
 let initTable = ( el ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
+    const pageLength = state.pageLength;
 	return new DataTable( el, {
 		info: false,
 		pageLength: 50,
@@ -34,42 +35,36 @@ let initTable = ( el ) => {
 }
 
 const skeletonTable = `
-    <table class="dataTable">
-        <thead>
-            <tr>
-                <th>Loading...</th>
-                <th>Loading...</th>
-                <th>Loading...</th>
-                <th>Loading...</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table skeleton">
+	<div class="row">
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+	</div>
+	<div class="row">
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+	</div>
+	<div class="row">
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+		<div class="cell"><div class="loader"></div></div>
+	</div>
+</div>
 `;
 
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
 		isLoading: false,
-        searchLabel: ''
+        searchLabel: '',
+        pageLength: 50,
 	},
     actions: {
         async renderTable() {
@@ -156,9 +151,10 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
     callbacks: {
         loadAnimation: () => {
             useEffect( () => { 
-                const container = document.getElementById( state.elementId ); 
-                if ( state.isLoading ) { 
-                    container.innerHTML = skeletonTable; 
+                const container = document.getElementById( state.elementId );
+                if ( state.isLoading && container ) { 
+                    container.querySelector( 'tbody' ).innerHTML = skeletonTable;
+                    // container.innerHTML = skeletonTable; 
                 } }, [ state.isLoading ] );
         },
         initLog: () => {
@@ -183,6 +179,8 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
         },
 		logLoading: () => {
 			console.log( `IS LOADING: `, state.isLoading );
+            console.log( state.pageLength );
+
 		},
         log: ( message, data ) => {
             console.log( message, data );
