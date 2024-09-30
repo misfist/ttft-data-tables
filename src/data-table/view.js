@@ -85,7 +85,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 formData.append( 'search_label', searchLabel || 'Enter keyword...' );
                 formData.append( 'donation_year', donationYear || 'all' );
                 formData.append( 'donor_type', donorType || 'all' );
-				formData.append( 'think_tank', thinkTank );
+                formData.append( 'think_tank', thinkTank );
                 formData.append( 'donor', donor );
 
                 callbacks.logFormData( formData );
