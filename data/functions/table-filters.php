@@ -106,36 +106,24 @@ function generate_year_filters( $years ): string {
 			data-wp-interactive="<?php echo APP_NAMESPACE; ?>"
 			<?php echo wp_interactivity_data_wp_context( $context ); ?>
 		>
-			<input 
-				type="radio" 
-				name="filter-year" 
-				id="filter-year-all" 
-				class="filter-checkbox" 
-				value="all" 
-				checked
-				data-query-var="donation_year=all" 
-				data-wp-on--click="actions.updateYear"
-				data-wp-interactive-key="<?php echo esc_attr( 'donationYear' ); ?>"
-			/>
-			<label for="filter-year-all">
-				<?php esc_html_e( 'All', 'ttt' ); ?>
-			</label>
+
 			<?php
 			foreach ( $years as $year ) :
 				$url = esc_url( add_query_arg( 'donation_year', $year, get_permalink( $post_id ) ) );
+				$year = esc_attr( $year );
 				?>
 				<input 
 					type="radio" 
-					id="filter-year-<?php echo intval( $year ); ?>" 
+					id="filter-year-<?php echo $year; ?>" 
 					name="filter-year" 
 					class="filter-checkbox" 
-					value="<?php echo intval( $year ); ?>" 
-					data-query-var="donation_year=<?php echo intval( $year ); ?>" 
+					value="<?php echo $year; ?>" 
+					data-query-var="donation_year=<?php echo $year; ?>" 
 					data-wp-on--click="actions.updateYear"
 					data-wp-interactive-key="<?php echo esc_attr( 'donationYear' ); ?>"
-					data-wp-interactive-value="<?php echo intval( $year ); ?>"
+					data-wp-interactive-value="<?php echo $year; ?>"
 				/>
-				<label for="filter-year-<?php echo intval( $year ); ?>">
+				<label for="filter-year-<?php echo $year; ?>">
 					<?php echo esc_html( $year ); ?>
 				</label>
 				<?php
@@ -177,20 +165,22 @@ function generate_type_filters( $types ): string {
 		>
 			<?php
 			foreach ( $types as $type ) :
+				$slug = esc_attr( $type->slug );
+				$name = esc_html( $type->name );
 				?>
 				<input 
 					type="radio" 
-					id="filter-<?php echo esc_attr( $type->slug ); ?>" 
+					id="filter-<?php echo $slug; ?>" 
 					name="filter-type" 
 					class="filter-checkbox" 
-					value="<?php echo esc_attr( $type->slug ); ?>" 
-					data-query-var="donor_type='<?php echo esc_attr( $type->slug ); ?>'" 
+					value="<?php echo $slug; ?>" 
+					data-query-var="donor_type='<?php echo $slug; ?>'" 
 					data-wp-on--click="actions.updateType"
 					data-wp-interactive-key="<?php echo esc_attr( 'donorType' ); ?>"
-					data-wp-interactive-value="<?php echo esc_attr( $type->slug ); ?>"
+					data-wp-interactive-value="<?php echo $slug; ?>"
 				/>
-				<label for="filter-<?php echo esc_attr( $type->slug ); ?>">
-					<?php echo esc_html( $type->name ); ?>
+				<label for="filter-<?php echo $slug; ?>">
+					<?php echo $name; ?>
 				</label>
 				<?php
 			endforeach;
