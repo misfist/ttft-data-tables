@@ -73,7 +73,6 @@ let initTable = ( table ) => {
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
 		isLoading: false,
-        searchLabel: '',
         pageLength: 50,
 	},
     actions: {
@@ -87,7 +86,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
                 formData.append( 'action', action );
                 formData.append( 'nonce', nonce );
                 formData.append( 'table_type', tableType );
-                formData.append( 'search_label', searchLabel || 'Enter keyword...' );
+                formData.append( 'search_label', searchLabel || 'Search' );
                 formData.append( 'donation_year', donationYear || 'all' );
                 formData.append( 'donor_type', donorType || 'all' );
                 formData.append( 'think_tank', thinkTank );
