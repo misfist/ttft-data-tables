@@ -7,18 +7,29 @@ let initTable = ( table ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
     const pageLength = state.pageLength;
 	return new DataTable( table, {
-		info: false,
 		pageLength: 50,
 		layout: {
+            bottomStart: {
+                info: {
+                    callback: function ( s, start, end, max, total, result ) {
+                        return ``;
+                    }
+                },
+            },
 			bottomEnd: {
 				paging: {
 					type: 'simple_numbers',
 				},
+                info: {
+                    callback: function ( s, start, end, max, total, result ) {
+                        return `${max} Records Found.`;
+                    }
+                }
 			},
 			topEnd: {
 				search: {
 					placeholder: 'Enter keyword...',
-					text: state.searchLabel,
+					text: state.searchLabel || 'Search',
 				},
 			},
 			topStart: {
