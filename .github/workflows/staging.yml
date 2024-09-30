@@ -1,0 +1,19 @@
+name: Deploy to Staging
+on:
+  push:
+    branches:
+     - staging
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: GitHub Action Deploy to WP Engine
+      uses: wpengine/github-action-wpe-site-deploy@v3
+      with:
+        WPE_SSHG_KEY_PRIVATE: ${{ secrets.WPE_SSHG_KEY_PRIVATE }}
+        WPE_ENV: fptpstg
+        SRC_PATH: "./"
+        REMOTE_PATH: "wp-content/plugins/ttft-data-tables/"
+        FLAGS: -azvr --inplace --delete --exclude=".*"
+        CACHE_CLEAR: TRUE
