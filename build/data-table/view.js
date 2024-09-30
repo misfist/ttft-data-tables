@@ -121,37 +121,6 @@ const skeletonTable = `
         </tbody>
     </table>
 `;
-
-// let initTable = ( el, state ) => {
-//     const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
-//     return new DataTable( el, {
-//         info: false,
-//         pageLength: 50,
-//         layout: {
-//             bottomEnd: {
-//                 paging: {
-//                     type: 'simple_numbers',
-//                 },
-//             },
-//             topEnd: {
-//                 search: {
-//                     placeholder: 'Enter keyword...',
-//                     text: state.searchLabel, // Ensure state is passed as a parameter
-//                 },
-//             },
-//             topStart: {
-//                 buttons: [
-//                     {
-//                         extend: 'csvHtml5',
-//                         title: title,
-//                         text: 'Download Data',
-//                     },
-//                 ],
-//             },
-//         }
-//     } );
-// };
-
 const {
   state,
   actions,
