@@ -10,17 +10,18 @@ $start: rgba( $color, .1);
 $middle: rgba( $color, .3 );
 
 .wp-block-data-tables-data-table {
-    .skeleton,
-    .row,
-    .cell {
-        display: flex;
-        flex: 1;
-    }
 
-    .skeleton {
-        flex-direction: column;
-        max-width: 100%;
-        margin: auto;
+    &.is-loading {
+        tbody,
+        .skeleton,
+        .row {
+            min-width: 100%;
+        }
+    
+        .skeleton {
+            // flex-direction: column;
+            // margin: auto;
+        }
 
         .row {
             justify-content: center;
@@ -32,7 +33,7 @@ $middle: rgba( $color, .3 );
 
         .cell {
             align-items: center;
-			height: var( --wp--preset--spacing--40 );
+            height: var( --wp--preset--spacing--40 );
 
             &:nth-child(1) {
                 .loader {
@@ -58,9 +59,9 @@ $middle: rgba( $color, .3 );
 
         .loader {
             flex: 1;
-			height: 1.5rem;
-			border-radius: 3px;
-			margin: calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--30 ) calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--10 );
+            height: 1.5rem;
+            border-radius: 3px;
+            margin: calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--10 ) calc( var( --wp--preset--spacing--10 ) / 2 ) var( --wp--preset--spacing--10 );
 
             background: linear-gradient(-90deg, $start, $middle, $start );
             background-size: auto;
