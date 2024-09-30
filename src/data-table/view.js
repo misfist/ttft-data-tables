@@ -159,15 +159,16 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
             context.donorType = state.donorType;
         },
         generateSkeletonTable: ( columns ) => {
-            let skeletonRows = '';
-            for ( let i = 0; i < 10; i++ ) {
-                skeletonRows += '<tr class="row" width="100%">';
-                for ( let j = 0; j < columns; j++ ) {
-                    skeletonRows += '<td class="cell"><div class="loader"></div></td>';
+            let rows = '';
+            const max = 10;
+            for ( let rowIndex = 0; rowIndex < max; rowIndex++ ) {
+                rows += '<tr class="row" width="100%">';
+                for ( let colIndex = 0; colIndex < columns; colIndex++ ) {
+                    rows += '<td class="cell"><div class="loader"></div></td>';
                 }
-                skeletonRows += '</tr>';
+                rows += '</tr>';
             }
-            return skeletonRows;
+            return rows;
         }
     },
     callbacks: {
