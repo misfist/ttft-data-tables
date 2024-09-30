@@ -62,21 +62,33 @@ __webpack_require__.r(__webpack_exports__);
  * WordPress dependencies
  */
 
-let initTable = el => {
+let initTable = table => {
   const title = document.querySelector('.site-main h1')?.innerText || document.title;
-  return new DataTable(el, {
-    info: false,
+  const pageLength = state.pageLength;
+  return new DataTable(table, {
     pageLength: 50,
     layout: {
+      bottomStart: {
+        info: {
+          callback: function (s, start, end, max, total, result) {
+            return ``;
+          }
+        }
+      },
       bottomEnd: {
         paging: {
           type: 'simple_numbers'
+        },
+        info: {
+          callback: function (s, start, end, max, total, result) {
+            return `${max} Records Found.`;
+          }
         }
       },
       topEnd: {
         search: {
           placeholder: 'Enter keyword...',
-          text: state.searchLabel
+          text: state.searchLabel || 'Search'
         }
       },
       topStart: {
@@ -86,41 +98,28 @@ let initTable = el => {
           text: 'Download Data'
         }]
       }
+    },
+    footerCallback: function (row, data, start, end, display) {
+      const api = this.api();
+      if ('undefined' == typeof window.jQuery) {
+        return;
+      }
+      Array.from(api.columns().header()).forEach((header, index) => {
+        if (header.getAttribute('data-summed')) {
+          const total = api.column(index).data().reduce(function (a, b) {
+            ;
+            return Number(a) + Number(b);
+          }, 0);
+          const $column = api.column(index);
+          const $footer = jQuery($column.footer());
+          if ($footer) {
+            $footer.html(total);
+          }
+        }
+      });
     }
   });
 };
-const skeletonTable = `
-    <table class="dataTable">
-        <thead>
-            <tr>
-                <th>Loading...</th>
-                <th>Loading...</th>
-                <th>Loading...</th>
-                <th>Loading...</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-            <tr>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-                <td><div class="skeleton-box"></div></td>
-            </tr>
-        </tbody>
-    </table>
-`;
 const {
   state,
   actions,
@@ -128,7 +127,7 @@ const {
 } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.store)('ttft/data-tables', {
   state: {
     isLoading: false,
-    searchLabel: ''
+    pageLength: 50
   },
   actions: {
     async renderTable() {
@@ -149,12 +148,14 @@ const {
         formData.append('action', action);
         formData.append('nonce', nonce);
         formData.append('table_type', tableType);
-        formData.append('search_label', searchLabel || 'Enter keyword...');
+        formData.append('search_label', searchLabel || 'Search');
         formData.append('donation_year', donationYear || 'all');
         formData.append('donor_type', donorType || 'all');
         formData.append('think_tank', thinkTank);
         formData.append('donor', donor);
-        callbacks.logFormData(formData);
+
+        // console.log( `formData: `, formData );
+
         state.isLoading = true;
         context.isLoaded = false;
         const response = await fetch(ajaxUrl, {
@@ -162,13 +163,18 @@ const {
           body: formData
         });
         const responseText = await response.text();
-        callbacks.logResponseData(responseText);
+
+        // console.log( `responseText: `, responseText );
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const jsonResponse = JSON.parse(responseText);
         if (jsonResponse.success) {
           state.tableData = jsonResponse.data;
+
+          // debugger;
+
           await actions.destroyTableAsync();
           const container = document.getElementById(state.elementId);
           if (container) {
@@ -178,10 +184,10 @@ const {
             }
           }
         } else {
-          console.error(`Error fetching table data:`, jsonResponse.data);
+          // console.error( `Error fetching table data:`, jsonResponse.data );
         }
       } catch (event) {
-        console.error(`catch( event ) renderTable:`, event);
+        // console.error( `catch( event ) renderTable:`, event );
       } finally {
         state.isLoading = false;
         context.isLoaded = true;
@@ -205,57 +211,45 @@ const {
       context.tableType = state.tableType;
       context.donationYear = state.donationYear;
       context.donorType = state.donorType;
+    },
+    generateSkeletonTable: columns => {
+      let rows = '';
+      const max = 10;
+      for (let rowIndex = 0; rowIndex < max; rowIndex++) {
+        rows += '<tr class="row" width="100%">';
+        for (let colIndex = 0; colIndex < columns; colIndex++) {
+          rows += '<td class="cell"><div class="loader"></div></td>';
+        }
+        rows += '</tr>';
+      }
+      return rows;
     }
   },
   callbacks: {
     loadAnimation: () => {
       (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
         const container = document.getElementById(state.elementId);
-        if (state.isLoading) {
-          container.innerHTML = skeletonTable;
+        if (state.isLoading && container) {
+          const columns = container.querySelectorAll('thead th').length;
+          const skeletonTable = actions.generateSkeletonTable(columns);
+          container.querySelector('tbody').innerHTML = skeletonTable;
         }
       }, [state.isLoading]);
     },
     initLog: () => {
-      console.log(`Initial State: `, JSON.stringify(state, undefined, 2));
-      const {
-        tableType,
-        donationYear,
-        donorType,
-        isLoaded
-      } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getContext)();
-      console.log(`Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}`);
+      // console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
+      // const { tableType, donationYear, donorType, isLoaded } = getContext();
+      // console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
     },
     logTable: () => {
-      const {
-        tableType,
-        thinkTank,
-        donor,
-        donationYear,
-        donorType,
-        isLoading
-      } = state;
-      console.log(`State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading);
-    },
-    logFormData: data => {
-      for (const [key, value] of data.entries()) {
-        console.log(`${key}: ${value}`);
-      }
+      // const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
+      // console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
     },
     logState: key => {
       console.log(`key: `, state.key);
     },
-    logResponseData: data => {
-      // console.log( 'Raw response:', data );
-    },
     logLoading: () => {
-      console.log(`IS LOADING: `, state.isLoading);
-    },
-    log: (message, data) => {
-      console.log(message, data);
-    },
-    logError: (message, error) => {
-      console.error(message, error);
+      // console.log( `IS LOADING: `, state.isLoading );
     }
   }
 });

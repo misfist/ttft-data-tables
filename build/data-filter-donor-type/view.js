@@ -81,7 +81,7 @@ const {
       const {
         donorType
       } = state;
-      console.log(`donorType: `, donorType);
+      // console.log( `donorType: `, donorType );
     },
     isSelected: () => {
       const {

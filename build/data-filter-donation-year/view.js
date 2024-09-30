@@ -74,9 +74,6 @@ const {
         ref
       } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getElement)();
       state.donationYear = (_ref$value = ref.value) !== null && _ref$value !== void 0 ? _ref$value : 'all';
-    },
-    stringifyState: () => {
-      state.jsonState = JSON.stringify(state.tableData, null, 2);
     }
   },
   callbacks: {
@@ -84,7 +81,7 @@ const {
       const {
         donationYear
       } = state;
-      console.log(`donationYear: `, donationYear);
+      // console.log( `donationYear: `, donationYear );
     },
     isSelected: () => {
       const {

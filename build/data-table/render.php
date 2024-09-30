@@ -28,38 +28,6 @@ $selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attribut
 
 $search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
 
-$skeleton_table = '
-<table class="dataTable">
-	<thead>
-		<tr>
-			<th>Loading...</th>
-			<th>Loading...</th>
-			<th>Loading...</th>
-			<th>Loading...</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-		</tr>
-		<tr>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-		</tr>
-		<tr>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-			<td><div class="skeleton-box"></div></td>
-		</tr>
-	</tbody>
-</table>';
-
 $args = array(
 	'tableId'       => $table_id,
 	'searchLabel'   => $search_label,
@@ -71,7 +39,6 @@ $args = array(
 	'nonce'         => wp_create_nonce( "{$app_namespace}_nonce" ),
 	'elementId'     => 'data-table-container',
 	'tableData'     => '',
-	'skeletonTable' => $skeleton_table,
 );
 
 wp_interactivity_state(
@@ -91,7 +58,6 @@ ob_start();
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
 	data-wp-watch="actions.renderTable"
-	
 	data-wp-bind--table_type='state.tableType'
 	data-wp-bind--think_tank='state.thinkTank'
 	data-wp-bind--donor='state.donor'
@@ -105,14 +71,10 @@ ob_start();
 	data-wp-watch--log-table="callbacks.logTable"
 	data-wp-run="callbacks.loadAnimation"
 >
-	
-	<div data-wp-text="state.donationYear"></div>
-	<div data-wp-text="state.donorType"></div>
 
-	<div data-wp-text="context.donationYear"></div>
-	<div data-wp-text="context.donorType"></div>
-
-	<div data-wp-bind--id="state.elementId"><?php echo generate_data_table( $table_type, $args ); ?></div>
+	<div data-wp-bind--id="state.elementId">
+		<?php  echo generate_data_table( $table_type, $args ); ?>
+	</div>
 
 </div>
 
