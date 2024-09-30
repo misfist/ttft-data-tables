@@ -103,6 +103,7 @@ ob_start();
 	data-wp-class--is-loaded="context.isLoaded"
 	data-wp-watch--log-loading="callbacks.logLoading"
 	data-wp-watch--log-table="callbacks.logTable"
+	data-wp-run="callbacks.loadAnimation"
 >
 	
 	<div data-wp-text="state.donationYear"></div>
@@ -111,7 +112,7 @@ ob_start();
 	<div data-wp-text="context.donationYear"></div>
 	<div data-wp-text="context.donorType"></div>
 
-	<div data-wp-bind--id="state.elementId" data-wp-run="callbacks.loadAnimation"><?php echo generate_data_table( $table_type, $args ); ?></div>
+	<div data-wp-bind--id="state.elementId"><?php echo generate_data_table( $table_type, $args ); ?></div>
 
 </div>
 
