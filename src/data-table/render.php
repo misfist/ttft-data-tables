@@ -112,7 +112,9 @@ ob_start();
 	<div data-wp-text="context.donationYear"></div>
 	<div data-wp-text="context.donorType"></div>
 
-	<div data-wp-bind--id="state.elementId"><?php echo generate_data_table( $table_type, $args ); ?></div>
+	<div data-wp-bind--id="state.elementId">
+		<?php  echo generate_data_table( $table_type, $args ); ?>
+	</div>
 
 </div>
 
