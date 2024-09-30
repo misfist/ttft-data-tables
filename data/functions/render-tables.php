@@ -226,7 +226,6 @@ function generate_single_think_tank_table( $think_tank = '', $donation_year = ''
 					<th class="column-numeric column-min-amount" data-summed="true"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
 					<th class="column-source"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
 					<th class="column-type"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
-					<th class="column-score"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
