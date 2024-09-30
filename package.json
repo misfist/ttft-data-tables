@@ -18,7 +18,9 @@
 		"[^.]*"
 	],
 	"dependencies": {
-		"@wordpress/interactivity": "^6.8.2"
+		"@wordpress/element": "^6.8.0",
+		"@wordpress/interactivity": "^6.8.2",
+		"datatables.net-dt": "^2.1.7"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^30.0.2"
