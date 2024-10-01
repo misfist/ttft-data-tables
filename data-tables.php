@@ -9,8 +9,9 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       data-tables
+ * Update URI:        ttft-data-tables
  *
- * @package           data-tables
+ * @package           ttft-data-tables
  */
 namespace TTFT\Data_Tables;
 
@@ -33,20 +34,20 @@ define( 'TTFT_URL', trailingslashit( plugins_url( plugin_basename( __DIR__ ) ) )
 /**
  * Enqueue scripts and styles.
  *
- * @author Quincy
+ * @see https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/
  *
  * @return void
  */
 function scripts(): void {
 	// wp_enqueue_style(
-	// 	'ttft-data-tables',
-	// 	TTFT_URL . 'src/assets/DataTables/datatables.min.css',
-	// 	array(),
-	// 	VERSION
+	// 'ttft-data-tables',
+	// TTFT_URL . 'assets/DataTables/datatables.min.css',
+	// array(),
+	// VERSION
 	// );
 	wp_enqueue_script(
 		'ttft-data-tables',
-		TTFT_URL . 'src/assets/DataTables/datatables.min.js',
+		TTFT_URL . 'assets/DataTables/datatables.min.js',
 		array( 'jquery' ),
 		VERSION,
 		true
@@ -54,7 +55,9 @@ function scripts(): void {
 }
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\scripts' );
 
-
+/**
+ * Load data handler
+ */
 $file = TTFT_PATH . '/data/class-data-handler.php';
 if ( file_exists( $file ) ) {
 	require_once $file;
