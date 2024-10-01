@@ -15,31 +15,40 @@ namespace TTFT\Data_Tables\Blocks;
 use TTFT\Data_Tables\Data_Handler as Data_Handler;
 use function TTFT\Data_Tables\Data\generate_data_table;
 
+global $wp_query;
+
 $app_namespace = Data_Handler::APP_NAMESPACE;
-$table_id      = Data_Handler::TABLE_ID;
 
 $unique_id = wp_unique_id( 'p-' );
 
-$table_type        = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
-$selectedThinkTank = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
-$selectedDonor     = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
-$selectedYear      = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
-$selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
-
-$search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
+$table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
+$table_id             = Data_Handler::TABLE_ID . '-' . $table_type;
+$selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
+$selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
+$selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
+$selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
+$search_label         = ( strpos( $table_type, 'donor' ) !== false ) ? __( 'Filter by specific donor' ) : __( 'Filter by specific think tank' );
+$search               = get_search_query();
 
 $args = array(
-	'tableId'       => $table_id,
-	'searchLabel'   => $search_label,
-	'tableType'     => $table_type,
-	'donor'         => $selectedDonor,
-	'thinkTank'     => $selectedThinkTank,
-	'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-	'action'        => 'do_get_data_table',
-	'nonce'         => wp_create_nonce( "{$app_namespace}_nonce" ),
-	'elementId'     => 'data-table-container',
-	'tableData'     => '',
+	'tableId'     => $table_id,
+	'tableType'   => $table_type,
+	'searchLabel' => $search_label,
+	'donor'       => $selectedDonor,
+	'thinkTank'   => $selectedThinkTank,
+	'search'      => $search,
+	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+	'action'      => 'do_get_data_table',
+	'nonce'       => wp_create_nonce( "{$app_namespace}_nonce" ),
+	'elementId'   => 'data-table-container',
+	'tableData'   => '',
 );
+
+if ( is_tax( 'donation_year' ) ) {
+	$args['donationYear'] = get_queried_object()->slug;
+} elseif ( is_tax( 'donor_type' ) ) {
+	$args['donorType'] = get_queried_object()->slug;
+}
 
 wp_interactivity_state(
 	$app_namespace,
@@ -50,30 +59,30 @@ $context = array(
 	'isLoaded' => true,
 );
 
+$block_wrapper_attributes = array(
+	'data-wp-interactive'      => $app_namespace,
+	'data-wp-run'              => 'callbacks.renderTable',
+	'data-wp-run--animate'     => 'callbacks.loadAnimation',
+	'data-wp-bind--table_type' => 'state.tableType',
+	'data-wp-bind--think_tank' => 'state.thinkTank',
+	'data-wp-bind--donor'      => 'state.donor',
+	'data-wp-bind--year'       => 'state.donationYear',
+	'data-wp-bind--type'       => 'state.donorType',
+	'data-wp-init'             => 'actions.initTable',
+	'data-wp-init-set-context' => 'actions.setContext',
+	'data-wp-init--initLog'    => 'callbacks.initLog',
+	'data-wp-watch--log'       => 'callbacks.initLog',
+);
+
 ob_start();
 ?>
 
 <div
-	<?php echo get_block_wrapper_attributes(); ?>
-	data-wp-interactive="<?php echo $app_namespace; ?>"
+	<?php echo get_block_wrapper_attributes( $block_wrapper_attributes ); ?>
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
-	data-wp-watch="actions.renderTable"
-	data-wp-bind--table_type='state.tableType'
-	data-wp-bind--think_tank='state.thinkTank'
-	data-wp-bind--donor='state.donor'
-	data-wp-bind--year='state.donationYear'
-	data-wp-bind--type='state.donorType'
-	data-wp-init="actions.initTable"
-	data-wp-init--initLog="actions.initLog"
-	data-wp-class--is-loading="state.isLoading"
-	data-wp-class--is-loaded="context.isLoaded"
-	data-wp-watch--log-loading="callbacks.logLoading"
-	data-wp-watch--log-table="callbacks.logTable"
-	data-wp-run="callbacks.loadAnimation"
 >
-
 	<div data-wp-bind--id="state.elementId">
-		<?php  echo generate_data_table( $table_type, $args ); ?>
+		<?php echo generate_data_table( $table_type, $args ); ?>
 	</div>
 
 </div>
