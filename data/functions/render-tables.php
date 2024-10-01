@@ -21,8 +21,11 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 
 		<table 
 			id="table-<?php echo sanitize_title( $donor_type ); ?>" 
-			class="top-ten-recipients" 
+			class="top-ten-recipients dataTable" 
 			data-total-rows="<?php echo intval( count( $data ) ); ?>"
+			data-donor-type="<?php echo esc_attr( $donor_type ); ?>"
+			data-donation-year="<?php echo esc_attr( $donation_year ); ?>"
+			data-number="<?php echo esc_attr( $number_of_items ); ?>"
 			>
 			<thead>
 				<tr>
