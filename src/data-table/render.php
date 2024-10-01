@@ -20,25 +20,25 @@ $table_id      = Data_Handler::TABLE_ID;
 
 $unique_id = wp_unique_id( 'p-' );
 
-$table_type        = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
-$selectedThinkTank = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
-$selectedDonor     = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
-$selectedYear      = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
-$selectedType      = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
+$table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
+$selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
+$selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
+$selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
+$selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
 
 $search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
 
 $args = array(
-	'tableId'       => $table_id,
-	'searchLabel'   => $search_label,
-	'tableType'     => $table_type,
-	'donor'         => $selectedDonor,
-	'thinkTank'     => $selectedThinkTank,
-	'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-	'action'        => 'do_get_data_table',
-	'nonce'         => wp_create_nonce( "{$app_namespace}_nonce" ),
-	'elementId'     => 'data-table-container',
-	'tableData'     => '',
+	'tableId'     => $table_id,
+	'searchLabel' => $search_label,
+	'tableType'   => $table_type,
+	'donor'       => $selectedDonor,
+	'thinkTank'   => $selectedThinkTank,
+	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+	'action'      => 'do_get_data_table',
+	'nonce'       => wp_create_nonce( "{$app_namespace}_nonce" ),
+	'elementId'   => 'data-table-container',
+	'tableData'   => '',
 );
 
 wp_interactivity_state(
@@ -73,7 +73,7 @@ ob_start();
 >
 
 	<div data-wp-bind--id="state.elementId">
-		<?php  echo generate_data_table( $table_type, $args ); ?>
+		<?php echo generate_data_table( $table_type, $args ); ?>
 	</div>
 
 </div>
