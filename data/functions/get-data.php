@@ -255,7 +255,7 @@ function get_single_donor_raw_data( $donor = '', $donation_year = '', $donor_typ
  * @param string $donation_year The slug of the donation year to filter transactions by (optional).
  * @return array
  */
-function get_donor_archive_raw_data( $donation_year = '', $donor_type = '' ): array {
+function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 	$args = array(
 		'post_type'      => 'transaction',
 		'posts_per_page' => -1,
@@ -279,8 +279,18 @@ function get_donor_archive_raw_data( $donation_year = '', $donor_type = '' ): ar
 			),
 		);
 	}
+	if ( ! empty( $search ) ) {
+		$args['s'] = sanitize_text_field( $search );
+	}
 
-	$query = new \WP_Query( $args );
+	if ( function_exists( 'relevanssi_do_query' ) ) {
+		$query = new \WP_Query();
+		$query->parse_query( $args );
+
+		relevanssi_do_query( $query );
+	} else {
+		$query = new \WP_Query( $args );
+	}
 
 	$data = array();
 
@@ -361,13 +371,11 @@ function get_top_ten_data( $donor_type = '', $donation_year = '', $number_of_ite
  * @param string $donation_year The donation year to filter by.
  * @return array Array of think tank data.
  */
-function get_think_tank_archive_data( $donation_year = '' ) {
-	$year_var = get_query_var( 'donation_year', '' );
-	$args     = array(
+function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
+	$args = array(
 		'post_type'      => 'transaction',
 		'posts_per_page' => -1,
 		'post_status'    => 'publish',
-		'tax_query'      => array(),
 	);
 
 	if ( ! empty( $donation_year ) ) {
@@ -377,13 +385,24 @@ function get_think_tank_archive_data( $donation_year = '' ) {
 			'terms'    => $donation_year,
 		);
 	}
+	if ( ! empty( $search ) ) {
+		$args['s'] = sanitize_text_field( $search );
+	}
 
-	$query = new \WP_Query( $args );
+	if ( function_exists( 'relevanssi_do_query' ) ) {
+		$query = new \WP_Query();
+		$query->parse_query( $args );
+
+		relevanssi_do_query( $query );
+	} else {
+		$query = new \WP_Query( $args );
+	}
 
 	$data            = array();
 	$all_donor_types = array();
 
 	if ( $query->have_posts() ) {
+
 		while ( $query->have_posts() ) {
 			$query->the_post();
 
@@ -431,6 +450,50 @@ function get_think_tank_archive_data( $donation_year = '' ) {
 			}
 		}
 	}
+
+	ksort( $data );
+
+	return $data;
+}
+
+/**
+ * Get data for donors
+ *
+ * @param  string $donation_year
+ * @return array
+ */
+function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+	$donor_data = get_donor_archive_raw_data( $donation_year, $donor_type, $search );
+	$data       = array_reduce(
+		$donor_data,
+		function ( $carry, $item ) {
+			$donor_slug  = $item['donor_slug'];
+			$amount_calc = $item['amount_calc'];
+			$year        = $item['year'];
+
+			if ( ! isset( $carry[ $donor_slug ] ) ) {
+				$carry[ $donor_slug ] = array(
+					'donor'       => $item['donor'],
+					'amount_calc' => $amount_calc,
+					'donor_type'  => $item['donor_type'],
+					'donor_slug'  => $donor_slug,
+					'donor_link'  => $item['donor_link'],
+					'year'        => $year,
+				);
+			} else {
+				$carry[ $donor_slug ]['amount_calc'] += $amount_calc;
+
+				$years = explode( ', ', $carry[ $donor_slug ]['year'] );
+				if ( ! in_array( $year, $years ) ) {
+					$years[]                      = $year;
+					$carry[ $donor_slug ]['year'] = implode( ', ', $years );
+				}
+			}
+
+			return $carry;
+		},
+		array()
+	);
 
 	ksort( $data );
 
@@ -505,50 +568,6 @@ function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = 
 				);
 			}
 			$carry[ $think_tank_slug ]['amount_calc'] += $item['amount_calc'];
-
-			return $carry;
-		},
-		array()
-	);
-
-	ksort( $data );
-
-	return $data;
-}
-
-/**
- * Get data for donors
- *
- * @param  string $donation_year
- * @return array
- */
-function get_donor_archive_data( $donation_year = '', $donor_type = '' ) {
-	$donor_data = get_donor_archive_raw_data( $donation_year, $donor_type );
-	$data       = array_reduce(
-		$donor_data,
-		function ( $carry, $item ) {
-			$donor_slug  = $item['donor_slug'];
-			$amount_calc = $item['amount_calc'];
-			$year        = $item['year'];
-
-			if ( ! isset( $carry[ $donor_slug ] ) ) {
-				$carry[ $donor_slug ] = array(
-					'donor'       => $item['donor'],
-					'amount_calc' => $amount_calc,
-					'donor_type'  => $item['donor_type'],
-					'donor_slug'  => $donor_slug,
-					'donor_link'  => $item['donor_link'],
-					'year'        => $year,
-				);
-			} else {
-				$carry[ $donor_slug ]['amount_calc'] += $amount_calc;
-
-				$years = explode( ', ', $carry[ $donor_slug ]['year'] );
-				if ( ! in_array( $year, $years ) ) {
-					$years[]                      = $year;
-					$carry[ $donor_slug ]['year'] = implode( ', ', $years );
-				}
-			}
 
 			return $carry;
 		},
