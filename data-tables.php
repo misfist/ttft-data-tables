@@ -75,6 +75,7 @@ function init() {
 	register_block_type_from_metadata( __DIR__ . '/build/data-test' );
 	register_block_type_from_metadata( __DIR__ . '/build/data-filter-donation-year' );
 	register_block_type_from_metadata( __DIR__ . '/build/data-filter-donor-type' );
+	register_block_type_from_metadata( __DIR__ . '/build/data-filter-entity-type' );
 	register_block_type_from_metadata( __DIR__ . '/build/top-ten' );
 }
 add_action( 'init', __NAMESPACE__ . '\init' );

@@ -1,0 +1,15 @@
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-data-tables-data-filter-entity-type {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	background-color: var( --wp--preset--color--gray-200 );
+	padding: var( --wp--preset--spacing--10 );
+
+}
