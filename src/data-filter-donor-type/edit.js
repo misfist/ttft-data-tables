@@ -31,7 +31,8 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	return (
 		<p { ...blockProps }>
-			<Dashicon icon="building" /> { __( 'Donor Type Filter', 'data-tables' ) }
+			<Dashicon icon="building" />{ ' ' }
+			{ __( 'Donor Type Filter', 'data-tables' ) }
 		</p>
 	);
 }

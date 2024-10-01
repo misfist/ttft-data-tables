@@ -31,7 +31,8 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	return (
 		<p { ...blockProps }>
-			<Dashicon icon="calendar-alt" /> { __( 'Donation Year Filter', 'data-tables' ) }
+			<Dashicon icon="calendar-alt" />{ ' ' }
+			{ __( 'Donation Year Filter', 'data-tables' ) }
 		</p>
 	);
 }

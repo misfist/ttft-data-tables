@@ -8,7 +8,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		updateType: () => {
 			const { ref } = getElement();
 			state.donorType = ref.value ?? 'all';
-		}
+		},
 	},
 	callbacks: {
 		logType: () => {
@@ -18,6 +18,6 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		isSelected: () => {
 			const { ref } = getElement();
 			return state.donorType == ref.value;
-		}
+		},
 	},
 } );

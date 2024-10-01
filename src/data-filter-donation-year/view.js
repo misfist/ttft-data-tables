@@ -8,7 +8,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		updateYear: () => {
 			const { ref } = getElement();
 			state.donationYear = ref.value ?? 'all';
-		}
+		},
 	},
 	callbacks: {
 		logYear: () => {
@@ -18,7 +18,6 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		isSelected: () => {
 			const { ref } = getElement();
 			return state.donationYear == ref.value;
-		}
+		},
 	},
 } );
-
