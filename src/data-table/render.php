@@ -27,20 +27,19 @@ $selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attri
 $selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
 $selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
 $selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
-
-$search_label = ( isset( $attributes['searchLabel'] ) ) ? esc_attr( $attributes['searchLabel'] ) : esc_attr( 'Filter by specific think tank', 'data-tables' );
+$search_label = ( strpos( $table_type, 'donor' ) !== false ) ? __( 'Filter by specific donor' ) : __( 'Filter by specific think tank' );
 
 $args = array(
-	'tableId'     => $table_id,
-	'searchLabel' => $search_label,
-	'tableType'   => $table_type,
-	'donor'       => $selectedDonor,
-	'thinkTank'   => $selectedThinkTank,
-	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
-	'action'      => 'do_get_data_table',
-	'nonce'       => wp_create_nonce( "{$app_namespace}_nonce" ),
-	'elementId'   => 'data-table-container',
-	'tableData'   => '',
+	'tableId'      => $table_id,
+	'tableType'    => $table_type,
+	'searchLabel'  => $search_label,
+	'donor'        => $selectedDonor,
+	'thinkTank'    => $selectedThinkTank,
+	'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+	'action'       => 'do_get_data_table',
+	'nonce'        => wp_create_nonce( "{$app_namespace}_nonce" ),
+	'elementId'    => 'data-table-container',
+	'tableData'    => '',
 );
 
 if ( is_tax( 'donation_year' ) ) {
