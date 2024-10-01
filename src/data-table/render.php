@@ -72,12 +72,8 @@ ob_start();
 	data-wp-bind--year='state.donationYear'
 	data-wp-bind--type='state.donorType'
 	data-wp-init="actions.initTable"
+	data-wp-init-set-context="actions.setContext"
 	data-wp-init--initLog="actions.initLog"
-	data-wp-class--is-loading="state.isLoading"
-	data-wp-class--is-loaded="context.isLoaded"
-	data-wp-watch--log-loading="callbacks.logLoading"
-	data-wp-watch--log-table="callbacks.logTable"
-	data-wp-run="callbacks.loadAnimation"
 >
 
 	<div data-wp-bind--id="state.elementId">
