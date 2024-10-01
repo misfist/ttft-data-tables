@@ -21,7 +21,7 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 
 		<table 
 			id="table-<?php echo sanitize_title( $donor_type ); ?>" 
-			class="top-ten-recipients dataTable" 
+			class="top-ten-recipients" 
 			data-total-rows="<?php echo intval( count( $data ) ); ?>"
 			>
 			<thead>
