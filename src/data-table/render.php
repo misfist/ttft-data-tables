@@ -15,6 +15,8 @@ namespace TTFT\Data_Tables\Blocks;
 use TTFT\Data_Tables\Data_Handler as Data_Handler;
 use function TTFT\Data_Tables\Data\generate_data_table;
 
+global $wp_query;
+
 $app_namespace = Data_Handler::APP_NAMESPACE;
 $table_id      = Data_Handler::TABLE_ID;
 
@@ -40,6 +42,12 @@ $args = array(
 	'elementId'   => 'data-table-container',
 	'tableData'   => '',
 );
+
+if ( is_tax( 'donation_year' ) ) {
+	$args['donationYear'] = get_queried_object()->slug;
+} elseif ( is_tax( 'donor_type' ) ) {
+	$args['donorType'] = get_queried_object()->slug;
+}
 
 wp_interactivity_state(
 	$app_namespace,
