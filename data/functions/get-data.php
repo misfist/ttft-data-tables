@@ -13,9 +13,6 @@ namespace TTFT\Data_Tables\Data;
  * @return array An array of transaction data including think_tank term and total amount.
  */
 function get_top_ten_raw_data( $donor_type = '', $donation_year = '', $number_of_items = 10 ): array {
-	$type_var = get_query_var( 'donor_type', '' );
-	$year_var = get_query_var( 'donation_year', '' );
-
 	$args = array(
 		'post_type'      => 'transaction',
 		'post_status'    => 'publish',
@@ -84,9 +81,9 @@ function get_top_ten_raw_data( $donor_type = '', $donation_year = '', $number_of
  * @return array
  */
 function get_single_think_tank_raw_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
-	$think_tank    = ( $think_tank_var ) ? sanitize_text_field( $think_tank_var ) : sanitize_text_field( $think_tank );
-	$donation_year = ( $donation_year_var ) ? sanitize_text_field( $donation_year_var ) : sanitize_text_field( $donation_year );
-	$donor_type    = ( $donor_type_var ) ? sanitize_text_field( $donor_type_var ) : sanitize_text_field( $donor_type );
+	$think_tank    = sanitize_text_field( $think_tank );
+	$donation_year = sanitize_text_field( $donation_year );
+	$donor_type    = sanitize_text_field( $donor_type );
 
 	$args = array(
 		'post_type'      => 'transaction',
