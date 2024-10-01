@@ -40,6 +40,8 @@ class Data_Handler {
 		add_action( 'wp_ajax_' . $this->action_name, array( $this, 'handle_request' ) );
 		add_action( 'wp_ajax_nopriv_' . $this->action_name, array( $this, 'handle_request' ) );
 
+		// \add_filter( 'pre_get_posts', array( $this, 'modify_think_tank_archive_query' ) );
+
 		$this->dependencies( TTFT_PATH . 'data/functions' );
 	}
 
@@ -387,7 +389,7 @@ class Data_Handler {
 	 *
 	 * @return array Column data for a single Donor.
 	 */
-	function get_single_donor_columns() {
+	public function get_single_donor_columns() {
 		return array(
 			array(
 				'title'     => 'Think Tank',
@@ -421,7 +423,7 @@ class Data_Handler {
 	 *
 	 * @return array Table data for a single Donor.
 	 */
-	function get_single_donor_data() {
+	public function get_single_donor_data() {
 		return array(
 			array(
 				'thinkTank' => 'Aspen Institute',
@@ -444,7 +446,7 @@ class Data_Handler {
 	 * @param array $args The array with camelCase keys.
 	 * @return array The array with keys converted to lowercase separated by underscores.
 	 */
-	function convert_camel_to_snake_keys( array $args ): array {
+	public function convert_camel_to_snake_keys( array $args ): array {
 		$converted_args = array();
 		foreach ( $args as $key => $value ) {
 			$new_key                    = strtolower( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $key ) );
@@ -459,8 +461,66 @@ class Data_Handler {
 	 * @param array $args The array with camelCase keys.
 	 * @return array The array with keys converted to lowercase separated by underscores.
 	 */
-	function convert_camel_to_snake_key( $key ): string {
+	public function convert_camel_to_snake_key( $key ): string {
 		return strtolower( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $key ) );
+	}
+
+	/**
+	 * Modify the query for the Think Tank Archive.
+	 *
+	 * @param  object $query
+	 * @return void
+	 */
+	public function modify_think_tank_archive_query( $query ) : void {
+		if ( ! is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+
+		if( ! $query->is_post_type_archive( 'think_tank' ) ) {
+			return;
+		}
+
+		$query->set( 'post_type', 'transaction' );
+		$query->set( 'posts_per_page', -1 );
+
+		$term_query = array();
+
+		$donation_year = get_query_var( 'donation_year' );
+		$donor_type = get_query_var( 'donor_type' );
+		
+		if ( is_tax( 'donation_year' ) || isset( $_GET['donation_year'] ) || isset( $_POST['donation_year'] ) ) {
+
+			$var = isset( $_GET['donation_year'] ) ? $_GET['donation_year'] : $_POST['donation_year'];
+
+			$term = $donation_year ? $donation_year : $var;
+
+
+			if( $term ) {
+				$term_query[] = array(
+					'taxonomy' => 'donation_year',
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $term ),
+				);
+			}
+		}
+
+		if ( is_tax( 'donor_type' ) || isset( $_GET['donor_type'] ) || isset( $_POST['donor_type'] ) ) {
+
+			$var = isset( $_GET['donor_type'] ) ? $_GET['donor_type'] : $_POST['donor_type'];
+
+			$term = $donor_type ? $donor_type : $var;
+
+
+			if( $term ) {
+				$term_query[] = array(
+					'taxonomy' => 'donor_type',
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $term ),
+				);
+			}
+		}
+
+		$query->set( 'term_query', $term_query );
 	}
 
 }

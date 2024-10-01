@@ -13,7 +13,7 @@ const initTable = ( table ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
 	const pageLength = state.pageLength;
 	return new DataTable( table, {
-		pageLength: 50,
+		pageLength: 25,
 		retrieve: true,
 		api: true,
 		layout: {
