@@ -162,9 +162,9 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
             let rows = '';
             const max = 10;
             for ( let rowIndex = 0; rowIndex < max; rowIndex++ ) {
-                rows += '<tr class="row" width="100%">';
+                rows += '<tr class="row skeleton-row" width="100%">';
                 for ( let colIndex = 0; colIndex < columns; colIndex++ ) {
-                    rows += '<td class="cell"><div class="loader"></div></td>';
+                    rows += '<td class="cell skeleton-cell"><div class="loader"></div></td>';
                 }
                 rows += '</tr>';
             }
