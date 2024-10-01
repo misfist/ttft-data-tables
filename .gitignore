@@ -19,7 +19,10 @@ yarn-error.log*
 node_modules/
 
 # composer
-vendor/
+!vendor/*
+!vendor/composer/
+!vendor/composer/*
+!vendor/autoload.php
 
 # theme
 # build/
