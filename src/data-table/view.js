@@ -15,6 +15,10 @@ let initTable = ( table ) => {
 	const pageLength = state.pageLength;
 	return new DataTable( table, {
 		pageLength: 50,
+		language: {
+			search: state.searchLabel || 'Search',
+			searchPlaceholder: 'Enter keyword...',
+		},
 		layout: {
 			bottomStart: {
 				info: {
@@ -50,38 +54,34 @@ let initTable = ( table ) => {
 			},
 		},
 
-		footerCallback: function ( row, data, start, end, display ) {
-			const api = this.api();
-
-			if ( 'undefined' == typeof window.jQuery ) {
-				return;
-			}
-
-			Array.from( api.columns().header() ).forEach( ( header, index ) => {
-				if ( header.getAttribute( 'data-summed' ) ) {
-					const total = api
-						.column( index )
-						.data()
-						.reduce( function ( a, b ) {
-							return Number( a ) + Number( b );
-						}, 0 );
-
-					const $column = api.column( index );
-					const $footer = jQuery( $column.footer() );
-
-					if ( $footer ) {
-						$footer.html( total );
-					}
-				}
-			} );
-		},
+		footerCallback: function ( row, data, start, end, display ) {},
 	} );
+};
+
+const hasStateChanged = () => {
+    const [ type, setType ] = useState( state.donorType );
+    const [ year, setYear ] = useState( state.donationYear );
+
+    const checkStateChanged = () => {
+        return type !== state.donorType || year !== state.donationYear;
+    };
+
+    useEffect(() => {
+        if ( checkStateChanged() ) {
+            setType( state.donorType );
+            setYear( state.donationYear );
+        }
+    }, [ state.donorType, state.donationYear ] );
+
+    return checkStateChanged();
 };
 
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
 		isLoading: false,
 		pageLength: 50,
+		donationYear: 'all',
+		donorType: 'all',
 	},
 	actions: {
 		async renderTable() {
@@ -151,7 +151,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 						}
 					}
 				} else {
-					// console.error( `Error fetching table data:`, jsonResponse.data );
+					console.error( `Error fetching table data:`, jsonResponse.data );
 				}
 			} catch ( event ) {
 				// console.error( `catch( event ) renderTable:`, event );
@@ -161,7 +161,8 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 			}
 		},
 		initTable: () => {
-			state.table = initTable( `#${ state.tableId }`, state );
+			state.table = initTable( `#${state.tableId}` );
+			// console.log( `initTable: `, state.table, state.searchLabel );
 		},
 		destroyTable: () => {
 			state.table.clear().draw();
@@ -173,11 +174,12 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 				resolve();
 			} );
 		},
-		updateContext: () => {
+		setContext: () => {
 			const context = getContext();
-			context.tableType = state.tableType;
-			context.donationYear = state.donationYear;
-			context.donorType = state.donorType;
+			// context.tableType && ( context.tableType = state.tableType );
+			// context.donationYear && ( context.donationYear = state.donationYear );
+			// context.donorType && ( context.donorType = state.donorType );
+			context.searchLabel && ( context.searchLabel = state.searchLabel );
 		},
 		generateSkeletonTable: ( columns ) => {
 			let rows = '';
@@ -194,14 +196,20 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		},
 	},
 	callbacks: {
+		renderTable: () => {
+			const hasChanged = hasStateChanged();
+			useEffect( () => {
+				if ( hasChanged ) {
+					actions.renderTable();
+				}
+			} );
+		},
 		loadAnimation: () => {
 			useEffect( () => {
 				const container = document.getElementById( state.elementId );
 				if ( state.isLoading && container ) {
-					const columns =
-						container.querySelectorAll( 'thead th' ).length;
-					const skeletonTable =
-						actions.generateSkeletonTable( columns );
+					const columns = container.querySelectorAll( 'thead th' ).length;
+					const skeletonTable = actions.generateSkeletonTable( columns );
 					const body = container.querySelector( 'tbody' );
 					if ( body ) {
 						body.innerHTML = skeletonTable;
@@ -210,19 +218,20 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 			}, [ state.isLoading ] );
 		},
 		initLog: () => {
-			// console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
-			// const { tableType, donationYear, donorType, isLoaded } = getContext();
-			// console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
+			console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
+			const { tableType, donationYear, donorType, isLoaded } = getContext();
+			console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
 		},
 		logTable: () => {
-			// const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
-			// console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
+			const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
+			console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
 		},
 		logState: ( key ) => {
 			console.log( `key: `, state.key );
 		},
 		logLoading: () => {
-			// console.log( `IS LOADING: `, state.isLoading );
+			const context = getContext();
+			console.log( `IS LOADING: `, state.isLoading, context.isLoaded );
 		},
 	},
 } );

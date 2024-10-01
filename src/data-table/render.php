@@ -65,7 +65,8 @@ ob_start();
 	<?php echo get_block_wrapper_attributes(); ?>
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
-	data-wp-watch="actions.renderTable"
+	data-wp-run="callbacks.renderTable"
+	data-wp-run--animate="callbacks.loadAnimation"
 	data-wp-bind--table_type='state.tableType'
 	data-wp-bind--think_tank='state.thinkTank'
 	data-wp-bind--donor='state.donor'
