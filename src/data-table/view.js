@@ -9,16 +9,13 @@ import {
 	useEffect,
 } from '@wordpress/interactivity';
 
-let initTable = ( table ) => {
-	const title =
-		document.querySelector( '.site-main h1' )?.innerText || document.title;
+const initTable = ( table ) => {
+	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
 	const pageLength = state.pageLength;
 	return new DataTable( table, {
 		pageLength: 50,
-		language: {
-			search: state.searchLabel || 'Search',
-			searchPlaceholder: 'Enter keyword...',
-		},
+		retrieve: true,
+		api: true,
 		layout: {
 			bottomStart: {
 				info: {
@@ -82,6 +79,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		pageLength: 50,
 		donationYear: 'all',
 		donorType: 'all',
+		entityType: 'think_tank',
 	},
 	actions: {
 		async renderTable() {
@@ -94,6 +92,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 					donor,
 					donationYear,
 					donorType,
+					search,
 					searchLabel,
 					ajaxUrl,
 					action,
@@ -109,8 +108,9 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 				formData.append( 'donor_type', donorType || 'all' );
 				formData.append( 'think_tank', thinkTank );
 				formData.append( 'donor', donor );
+				formData.append( 'search', search || '' );
 
-				// console.log( `formData: `, formData );
+				console.log( `formData: `, formData );
 
 				state.isLoading = true;
 				context.isLoaded = false;
@@ -122,7 +122,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 
 				const responseText = await response.text();
 
-				// console.log( `responseText: `, responseText );
+				console.log( `responseText: `, responseText );
 
 				if ( ! response.ok ) {
 					throw new Error(
@@ -154,7 +154,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 					console.error( `Error fetching table data:`, jsonResponse.data );
 				}
 			} catch ( event ) {
-				// console.error( `catch( event ) renderTable:`, event );
+				console.error( `catch( event ) renderTable:`, event );
 			} finally {
 				state.isLoading = false;
 				context.isLoaded = true;
@@ -162,7 +162,6 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		},
 		initTable: () => {
 			state.table = initTable( `#${state.tableId}` );
-			// console.log( `initTable: `, state.table, state.searchLabel );
 		},
 		destroyTable: () => {
 			state.table.clear().draw();
@@ -218,12 +217,12 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 			}, [ state.isLoading ] );
 		},
 		initLog: () => {
-			console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
-			const { tableType, donationYear, donorType, isLoaded } = getContext();
-			console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
+			// console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
+			// const { tableType, donationYear, donorType, isLoaded } = getContext();
+			// console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
 		},
 		logTable: () => {
-			const { tableType, thinkTank, donor, donationYear, donorType, isLoading } = state;
+			const { tableType, thinkTank, donor, donationYear, donorType, search, isLoading } = state;
 			console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
 		},
 		logState: ( key ) => {
