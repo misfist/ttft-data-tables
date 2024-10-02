@@ -710,7 +710,7 @@ function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = 
  * @param string $meta_key Meta key to retrieve.
  * @return array Array of meta values keyed by post ID.
  */
-function get_meta_values_for_posts( array $post_ids, string $meta_key ): array {
+function get_meta_values_for_records( array $post_ids, string $meta_key ): array {
 	global $wpdb;
 
 	if ( empty( $post_ids ) ) {
@@ -726,7 +726,7 @@ function get_meta_values_for_posts( array $post_ids, string $meta_key ): array {
 			"
             SELECT post_id, meta_value
             FROM $wpdb->postmeta
-            WHERE post_id IN ($placeholders)
+            WHERE post_id IN ( $placeholders )
             AND meta_key = %s
         ",
 			array_merge( $chunk, array( $meta_key ) )
