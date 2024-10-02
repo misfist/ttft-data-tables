@@ -21,12 +21,12 @@ $app_namespace = Data_Handler::APP_NAMESPACE;
 
 $unique_id = wp_unique_id( 'p-' );
 
-$table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ) );
+$table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ?? '' ) );
 $table_id             = Data_Handler::TABLE_ID . '-' . $table_type;
-$selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ) );
-$selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ) );
-$selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ) ) ?? 'all';
-$selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ) ) ?? 'all';
+$selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ?? '' ) );
+$selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ?? '' ) );
+$selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ?? 'all' ) );
+$selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ?? 'all' ) );
 $search_label         = ( strpos( $table_type, 'donor' ) !== false ) ? __( 'Filter by specific donor' ) : __( 'Filter by specific think tank' );
 $search               = get_search_query();
 
