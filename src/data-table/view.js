@@ -16,6 +16,7 @@ const initTable = ( table ) => {
 		pageLength: 25,
 		retrieve: true,
 		api: true,
+		autoWidth: false,
 		layout: {
 			bottomStart: {
 				info: {

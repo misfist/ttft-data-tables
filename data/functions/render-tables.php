@@ -29,8 +29,8 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 			>
 			<thead>
 				<tr>
-					<th class="column-think-tank"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
-					<th class="column-min-amount column-numeric" data-summed="true"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+					<th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+					<th class="column-min-amount column-numeric" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -79,7 +79,7 @@ function generate_table_top( $table_type, ?string $donation_year = null ): strin
 	<?php
 	if ( $donation_year ) :
 		?>
-		<caption><?php printf( 'Donations in <span class="donation-year"  data-wp-text="state.donationYear">%s</span> received from…', $donation_year ); ?></caption>
+		<caption><?php printf( 'Donations in <span class="donation-year"  data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
 		<?php
 	endif;
 
@@ -176,16 +176,16 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 		?>
 			<thead>
 				<tr>
-					<th class="column-think-tank"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+					<th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
 					<?php if ( ! empty( $data ) ) : ?>
 						<?php
 						$first_entry = reset( $data );
 						foreach ( $first_entry['donor_types'] as $donor_type => $amount ) :
 							?>
-							<th class="column-numeric column-min-amount" data-summed="true"><?php echo esc_html( $donor_type ); ?></th>
+							<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 						<?php endforeach; ?>
 					<?php endif; ?>
-					<th class="column-numeric column-transparency-score"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
+					<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -230,10 +230,10 @@ function generate_single_think_tank_table( $think_tank = '', $donation_year = ''
 		?>
 			<thead>
 				<tr>
-					<th class="column-donor"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
-					<th class="column-numeric column-min-amount" data-summed="true"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
-					<th class="column-source"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
-					<th class="column-type"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
+					<th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+					<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+					<th class="column-source" scope="col"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
+					<th class="column-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -279,9 +279,9 @@ function generate_donor_archive_table( $donation_year = '', $donor_type = '', $s
 		?>
 			<thead>
 				<tr>
-					<th class="column-donor"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
-					<th class="column-numeric column-min-amount" data-summed="true"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
-					<th class="column-type"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
+					<th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+					<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+					<th class="column-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -326,10 +326,10 @@ function generate_single_donor_table( $donor = '', $donation_year = '', $donor_t
 		?>
 			<thead>
 				<tr>
-					<th class="column-think-tank"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
-					<th class="column-donor"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
-					<th class="column-numeric column-min-amount" data-summed="true"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
-					<th class="column-source"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
+					<th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+					<th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+					<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+					<th class="column-source" scope="col"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
