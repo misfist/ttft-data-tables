@@ -349,6 +349,7 @@ function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $sea
 	return $data;
 }
 
+
 /**
  * Get data for top ten
  *
@@ -464,15 +465,13 @@ function get_think_tank_archive_data( $donation_year = '', $search = '' ): array
 				$think_tank_data['donor_types'][ $donor_type ] = 0;
 			}
 		}
+		/**
+		 * Ensure donor types are sorted alphabetically
+		 */
+		ksort( $think_tank_data['donor_types'] );
 	}
 
 	ksort( $data );
-
-	// echo '<pre>';
-
-	// var_dump( $data );
-
-	// echo '</pre>';
 
 	return $data;
 }
