@@ -9,36 +9,39 @@ import {
 	useEffect,
 } from '@wordpress/interactivity';
 
-const initTable = ( table ) => {
+const initTable = ( tableId ) => {
 	const title = document.querySelector( '.site-main h1' )?.innerText || document.title;
-	const pageLength = state.pageLength;
-	return new DataTable( table, {
-		pageLength: 25,
+	let USDollar = new Intl.NumberFormat( 'en-US', {
+		style: 'currency',
+		currency: 'USD',
+	} );
+
+	const {
+		tableType,
+		thinkTank,
+		donor,
+		donationYear,
+		donorType,
+		search,
+		searchLabel,
+		ajaxUrl,
+		action,
+		nonce,
+		pageLength
+	} = state;
+
+	const table = new DataTable( tableId, {
+		// pageLength: pageLength || 50,
 		retrieve: true,
 		api: true,
 		autoWidth: false,
+		processing: true,
 		layout: {
-			bottomStart: {
-				info: {
-					callback: function ( s, start, end, max, total, result ) {
-						return ``;
-					},
-				},
-			},
-			bottomEnd: {
-				paging: {
-					type: 'simple_numbers',
-				},
-				info: {
-					callback: function ( s, start, end, max, total, result ) {
-						return `${ max } Records Found.`;
-					},
-				},
-			},
 			topEnd: {
 				search: {
 					placeholder: 'Enter keyword...',
 					text: state.searchLabel || 'Search',
+					processing: true,
 				},
 			},
 			topStart: {
@@ -49,11 +52,54 @@ const initTable = ( table ) => {
 						text: 'Download Data',
 					},
 				],
+				info: {
+					callback: function ( s, start, end, max, total, result ) {
+						return `${ max } Records Found`;
+					},
+				},
+			},
+			bottomStart: false,
+			bottomEnd: {
+				paging: {
+					type: 'simple_numbers',
+				},
 			},
 		},
-
+		render: {
+			currency: function ( data, type, row ) {
+				return USDollar.format( data );
+			},
+			number: function ( data, type, row ) {
+				return data.toString().replace( /\B(?=(\d{3})+(?!\d))/g, "'" );
+			},
+			// date: function ( data, type, row ) {
+			// 	return new Date( data ).toLocaleDateString();
+			// },
+			// dateRange: function ( data, type, row ) {
+			// 	return `${ new Date( data.start ).toLocaleDateString() } - ${ new Date( data.end ).toLocaleDateString() }`;
+			// },
+			// link: function ( data, type, row ) {
+			// 	return `<a href="${ data }" target="_blank">${ data }</a>`;
+			// },
+			// image: function ( data, type, row ) {
+			// 	return `<img src="${ data }" alt="${ row.name }" />`;
+			// },
+		},
+		drawCallback: function ( settings ) {
+			// console.log( `drawCallback: `, settings );
+		},
+		initComplete: function ( settings, json ) {
+			// console.log( `initComplete: `, settings );
+		}, 
+		// formatNumber: function ( toFormat ) {
+		// 	console.log( `toFormat: `, toFormat );
+		// 	return toFormat.toString().replace( /\B(?=(\d{3})+(?!\d))/g, "'" );
+		// },
+		headerCallback: function ( thead, data, start, end, display ) {},
 		footerCallback: function ( row, data, start, end, display ) {},
 	} );
+
+	return table;
 };
 
 const hasStateChanged = () => {
@@ -77,7 +123,6 @@ const hasStateChanged = () => {
 const { state, actions, callbacks } = store( 'ttft/data-tables', {
 	state: {
 		isLoading: false,
-		pageLength: 50,
 		donationYear: 'all',
 		donorType: 'all',
 		entityType: 'think_tank',
