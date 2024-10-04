@@ -104,3 +104,24 @@ function convert_start_rating( $score ): string {
 	return $stars;
 }
 
+/**
+ * Match donor type name with post meta key
+ *
+ * @param  string $donor_type
+ * @return string
+ */
+function get_donation_accepted_key( $donor_type ): string {
+	$donor_type = strtolower( $donor_type );
+	$us_pattern = '/[uU][\.\-]?[sS]/';
+
+	switch ( true ) {
+		case strpos( $donor_type, 'foreign' ) !== false:
+			return 'no_foreign_accepted';
+		case ( strpos( $donor_type, 'pentagon' ) !== false ) || strpos( $donor_type, 'defense' ) !== false:
+			return 'no_defense_accepted';
+		case preg_match( $us_pattern, $donor_type ):
+			return 'no_domestic_accepted';
+		default:
+			return '';
+	}
+}
