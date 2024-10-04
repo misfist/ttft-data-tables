@@ -189,7 +189,7 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							<th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 						<?php endforeach; ?>
 					<?php endif; ?>
-					<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
+					<th class="column-numeric column-transparency-score noExport" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -202,11 +202,13 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							$key = get_donation_accepted_key( $donor_type );
 							if ( $data[ $key ] && 0 === $amount ) :
 								?>
-								<span class="not-accepted"><?php esc_html_e( 'Not Accepted', 'ttft-data-tables' ); ?></span>
+								<span class="screen-reader-text" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
+								<span class="not-accepted"></span>
 								<?php
 							elseif ( $data['limited_info'] && 0 === $amount ) :
 								?>
-								<span class="not-disclosed"><?php esc_html_e( 'Not Disclosed', 'ttft-data-tables' ); ?></span>
+								<span class="screen-reader-text"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
+								<span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t disclose funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"></span>
 								<?php
 							else :
 								?>

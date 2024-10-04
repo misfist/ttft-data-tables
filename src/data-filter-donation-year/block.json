@@ -17,7 +17,12 @@
 	},
 	"example": {},
 	"supports": {
-		"interactivity": true
+		"interactivity": true,
+		"customClassName": true,
+		"renaming": true
+	},
+	"providesContext": {
+		"data-tables/donation-year": "donationYear"
 	},
 	"textdomain": "data-tables",
 	"editorScript": "file:./index.js",

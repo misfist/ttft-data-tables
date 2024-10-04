@@ -29,8 +29,19 @@
   },
   "example": {},
   "supports": {
-    "interactivity": true
+    "interactivity": true,
+    "customClassName": true,
+    "renaming": true
   },
+  "providesContext": {
+    "data-tables/table-type": "tableType",
+    "data-tables/think-tank": "thinkTank",
+    "data-tables/donor": "donor"
+  },
+  "usesContext": [
+    "data-tables/donation-year",
+    "data-tables/donor-type"
+  ],
   "textdomain": "data-tables",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

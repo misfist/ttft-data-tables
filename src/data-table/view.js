@@ -50,6 +50,9 @@ const initTable = ( tableId ) => {
 						extend: 'csvHtml5',
 						title: title,
 						text: 'Download Data',
+						exportOptions: {
+							columns:':visible:not(.noExport)'
+						}
 					},
 				],
 				info: {

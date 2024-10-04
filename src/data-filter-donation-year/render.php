@@ -45,11 +45,12 @@ ob_start();
 ?>
 
 <div
-	<?php echo get_block_wrapper_attributes(); ?>
+	<?php echo get_block_wrapper_attributes( array( 'class' => 'data-filter data-filter--donation-year' ) ); ?>
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
 	data-wp-watch="callbacks.logYear"
 	data-wp-bind--year='state.donationYear'
+	tab-index="1"
 >
 
 	<?php
@@ -80,7 +81,7 @@ ob_start();
 		?>
 
 			<input <?php echo $normalized_input_attrs; ?>>
-			<label for="<?php echo $input_id; ?>"><?php echo esc_html( $label ); ?></label>
+			<label for="<?php echo $input_id; ?>" class="option"><?php echo esc_html( $label ); ?></label>
 
 		<?php
 	endforeach;

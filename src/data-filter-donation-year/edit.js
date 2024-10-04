@@ -27,7 +27,7 @@ import { Dashicon } from '@wordpress/components';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: 'data-filter data-filter--donation-year' } );
 
 	return (
 		<p { ...blockProps }>
