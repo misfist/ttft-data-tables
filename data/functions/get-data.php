@@ -550,7 +550,7 @@ function get_think_tank_archive_data_by_post_type( $donation_year = '', $search 
 				$data[ $think_tank_name ] = array(
 					'think_tank'         => $think_tank_title,
 					'donor_types'        => $donor_types,
-					'transparency_score' => get_transparency_score( $think_tank_name ),
+					'transparency_score' => get_transparency_score_from_slug( $think_tank_name ),
 				);
 			}
 
