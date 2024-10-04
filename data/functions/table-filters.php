@@ -123,7 +123,7 @@ function generate_year_filters( $years ): string {
 					data-wp-interactive-key="<?php echo esc_attr( 'donationYear' ); ?>"
 					data-wp-interactive-value="<?php echo $year; ?>"
 				/>
-				<label for="filter-year-<?php echo $year; ?>">
+				<label for="filter-year-<?php echo $year; ?>" class="option">
 					<?php echo esc_html( $year ); ?>
 				</label>
 				<?php
@@ -179,7 +179,7 @@ function generate_type_filters( $types ): string {
 					data-wp-interactive-key="<?php echo esc_attr( 'donorType' ); ?>"
 					data-wp-interactive-value="<?php echo $slug; ?>"
 				/>
-				<label for="filter-<?php echo $slug; ?>">
+				<label for="filter-<?php echo $slug; ?>" class="option">
 					<?php echo $name; ?>
 				</label>
 				<?php
