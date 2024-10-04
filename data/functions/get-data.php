@@ -430,12 +430,23 @@ function get_think_tank_archive_data( $donation_year = '', $search = '' ): array
 			$think_tank_slug = $think_tank_terms[0]->slug;
 
 			if ( ! isset( $data[ $think_tank_slug ] ) ) {
+				$post_id = get_post_from_term( $think_tank_slug, 'think_tank' );
+				if ( is_array( $post_id ) && ! empty( $post_id ) ) {
+					$post_id = $post_id[0];
+				}
+				$no_defense_accepted  = get_post_meta( $post_id, 'no_defense_accepted', true );
+				$no_domestic_accepted = get_post_meta( $post_id, 'no_domestic_accepted', true );
+				$no_foreign_accepted  = get_post_meta( $post_id, 'no_foreign_accepted', true );
+				$limited_info         = get_post_meta( $post_id, 'limited_info', true );
 
-				$post_id                  = get_post_from_term( $think_tank_slug, 'think_tank' );
 				$data[ $think_tank_slug ] = array(
-					'think_tank'         => $think_tank,
-					'donor_types'        => array(),
-					'transparency_score' => get_transparency_score( $think_tank_slug ),
+					'think_tank'           => $think_tank,
+					'donor_types'          => array(),
+					'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
+					'no_defense_accepted'  => $no_defense_accepted,
+					'no_domestic_accepted' => $no_domestic_accepted,
+					'no_foreign_accepted'  => $no_foreign_accepted,
+					'limited_info'         => $limited_info,
 				);
 			}
 
