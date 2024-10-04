@@ -84,7 +84,7 @@ function generate_table_top( $table_type, ?string $donation_year = null ): strin
 	<?php
 	if ( $donation_year ) :
 		?>
-		<caption><?php printf( 'Donations in <span class="donation-year"  data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
+		<caption><?php printf( 'Donations in <span class="donation-year" data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
 		<?php
 	endif;
 
@@ -121,7 +121,6 @@ function generate_data_table( $table_type, $args ): string {
 	$donor_type    = $args['donor_type'] ?? '';
 	$search        = $args['search'] ?? '';
 
-
 	if ( $donation_year === 'all' ) {
 		$donation_year = '';
 	}
@@ -145,7 +144,7 @@ function generate_data_table( $table_type, $args ): string {
 		case 'donor-archive':
 			return generate_donor_archive_table(
 				$donation_year,
-				$donor_type.
+				$donor_type .
 				$search
 			);
 		case 'single-donor':
@@ -187,7 +186,7 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 						$first_entry = reset( $data );
 						foreach ( $first_entry['donor_types'] as $donor_type => $amount ) :
 							?>
-							<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
+							<th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 						<?php endforeach; ?>
 					<?php endif; ?>
 					<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
@@ -204,17 +203,17 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							if ( $data[ $key ] && 0 === $amount ) :
 								?>
 								<span class="not-accepted"><?php esc_html_e( 'Not Accepted', 'ttft-data-tables' ); ?></span>
-								<?php 
-							elseif ( $data['limited_info'] && 0 === $amount ) : 
+								<?php
+							elseif ( $data['limited_info'] && 0 === $amount ) :
 								?>
 								<span class="not-disclosed"><?php esc_html_e( 'Not Disclosed', 'ttft-data-tables' ); ?></span>
-								<?php 
-							else : 
+								<?php
+							else :
 								?>
 								<?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
-							<?php 
-						endif; 
-						?>
+								<?php
+						endif;
+							?>
 						</td>
 						<?php endforeach; ?>
 						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo convert_start_rating( intval( $data['transparency_score'] ) ); ?></td>
