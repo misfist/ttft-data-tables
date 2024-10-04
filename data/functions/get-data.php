@@ -88,9 +88,9 @@ function get_single_think_tank_raw_data( $think_tank = '', $donation_year = '', 
 	$transient_key = 'single_think_tank_' . md5( $think_tank . $donation_year . $donor_type );
 
 	$data = get_transient( $transient_key );
-    if ( false !== $data ) {
-        return $data;
-    }
+	if ( false !== $data ) {
+		return $data;
+	}
 
 	$args = array(
 		'post_type'      => 'transaction',
@@ -126,11 +126,11 @@ function get_single_think_tank_raw_data( $think_tank = '', $donation_year = '', 
 		);
 	}
 
-	$query   = new \WP_Query( $args );
-	$data = array();
+	$query = new \WP_Query( $args );
+	$data  = array();
 
 	if ( $query->have_posts() ) {
-		foreach( $query->posts as $post_id ) {
+		foreach ( $query->posts as $post_id ) {
 			$donors = wp_get_object_terms( $post_id, 'donor', array( 'orderby' => 'parent' ) );
 			if ( empty( $donors ) || is_wp_error( $donors ) ) {
 				continue;
@@ -582,13 +582,8 @@ function get_think_tank_archive_data_by_post_type( $donation_year = '', $search 
 		wp_reset_postdata();
 	}
 
-	// echo '<pre>';
-	// var_dump( $data );
-	// echo '</pre>';
-
 	return $data;
 }
-
 
 /**
  * Get data for donors
