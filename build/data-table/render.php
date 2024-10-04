@@ -28,12 +28,15 @@ $selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes
 $selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ?? 'all' ) );
 $selectedDonorType    = sanitize_text_field( get_query_var( 'donor_type', $attributes['donorType'] ?? 'all' ) );
 $search_label         = ( strpos( $table_type, 'donor' ) !== false ) ? __( 'Filter by specific donor' ) : __( 'Filter by specific think tank' );
+$settings             = get_option( 'site_settings' );
+$rows_per_page        = $settings['rows_per_page'] ?? 50;
 $search               = get_search_query();
 
 $args = array(
 	'tableId'     => $table_id,
 	'tableType'   => $table_type,
 	'searchLabel' => $search_label,
+	'pageLength'  => $rows_per_page,
 	'donor'       => $selectedDonor,
 	'thinkTank'   => $selectedThinkTank,
 	'search'      => $search,
@@ -60,18 +63,20 @@ $context = array(
 );
 
 $block_wrapper_attributes = array(
-	'data-wp-interactive'      => $app_namespace,
-	'data-wp-run'              => 'callbacks.renderTable',
-	'data-wp-run--animate'     => 'callbacks.loadAnimation',
-	'data-wp-bind--table_type' => 'state.tableType',
-	'data-wp-bind--think_tank' => 'state.thinkTank',
-	'data-wp-bind--donor'      => 'state.donor',
-	'data-wp-bind--year'       => 'state.donationYear',
-	'data-wp-bind--type'       => 'state.donorType',
-	'data-wp-init'             => 'actions.initTable',
-	'data-wp-init-set-context' => 'actions.setContext',
-	'data-wp-init--initLog'    => 'callbacks.initLog',
-	'data-wp-watch--log'       => 'callbacks.initLog',
+	'data-wp-interactive'       => $app_namespace,
+	'data-wp-run'               => 'callbacks.renderTable',
+	'data-wp-run--animate'      => 'callbacks.loadAnimation',
+	'data-wp-bind--table_type'  => 'state.tableType',
+	'data-wp-bind--think_tank'  => 'state.thinkTank',
+	'data-wp-bind--donor'       => 'state.donor',
+	'data-wp-bind--year'        => 'state.donationYear',
+	'data-wp-bind--type'        => 'state.donorType',
+	'data-wp-init'              => 'actions.initTable',
+	'data-wp-init-set-context'  => 'actions.setContext',
+	'data-wp-init--initLog'     => 'callbacks.initLog',
+	'data-wp-watch--log'        => 'callbacks.initLog',
+	'data-wp-class--is-loading' => 'state.isLoading,',
+	'data-wp-class--is-loaded'  => '!state.isLoading',
 );
 
 ob_start();
