@@ -95,7 +95,7 @@ class Data_Handler {
 		} else {
 			wp_send_json_error(
 				array(
-					'message' => __( 'No data found.', 'my-plugin' ),
+					'message' => __( 'No data found.', 'ttft-data-tables' ),
 				)
 			);
 		}
