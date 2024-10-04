@@ -51,6 +51,7 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 	return ob_get_clean();
 }
 
+
 /**
  * Generates the top portion of the table HTML.
  *
@@ -64,6 +65,8 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
  */
 function generate_table_top( $table_type, ?string $donation_year = null ): string {
 	ob_start();
+	$settings      = get_option( 'site_settings' );
+	$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
 	?>
 	<table
 		id="<?php echo \TTFT\Data_Tables\Data_Handler::TABLE_ID . '-' . $table_type; ?>"
@@ -75,11 +78,13 @@ function generate_table_top( $table_type, ?string $donation_year = null ): strin
 		data-wp-bind--year='state.donationYear'
 		data-wp-bind--type='state.donorType'
 		data-wp-bind--data-search-label='state.searchLabel'
+		data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
+		data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page ) ); ?>'
 	>
 	<?php
 	if ( $donation_year ) :
 		?>
-		<caption><?php printf( 'Donations in <span class="donation-year"  data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
+		<caption><?php printf( 'Donations in <span class="donation-year" data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
 		<?php
 	endif;
 
@@ -116,7 +121,6 @@ function generate_data_table( $table_type, $args ): string {
 	$donor_type    = $args['donor_type'] ?? '';
 	$search        = $args['search'] ?? '';
 
-
 	if ( $donation_year === 'all' ) {
 		$donation_year = '';
 	}
@@ -140,7 +144,7 @@ function generate_data_table( $table_type, $args ): string {
 		case 'donor-archive':
 			return generate_donor_archive_table(
 				$donation_year,
-				$donor_type.
+				$donor_type .
 				$search
 			);
 		case 'single-donor':
@@ -182,7 +186,7 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 						$first_entry = reset( $data );
 						foreach ( $first_entry['donor_types'] as $donor_type => $amount ) :
 							?>
-							<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
+							<th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 						<?php endforeach; ?>
 					<?php endif; ?>
 					<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
@@ -193,9 +197,26 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 					<tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
 						<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'ttft-data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $data['think_tank'] ); ?></a></td>
 						<?php foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
-							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
+							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
+							<?php
+							$key = get_donation_accepted_key( $donor_type );
+							if ( $data[ $key ] && 0 === $amount ) :
+								?>
+								<span class="not-accepted"><?php esc_html_e( 'Not Accepted', 'ttft-data-tables' ); ?></span>
+								<?php
+							elseif ( $data['limited_info'] && 0 === $amount ) :
+								?>
+								<span class="not-disclosed"><?php esc_html_e( 'Not Disclosed', 'ttft-data-tables' ); ?></span>
+								<?php
+							else :
+								?>
+								<?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+								<?php
+						endif;
+							?>
+						</td>
 						<?php endforeach; ?>
-						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo esc_html( $data['transparency_score'] ); ?></td>
+						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo convert_start_rating( intval( $data['transparency_score'] ) ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
