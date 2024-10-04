@@ -51,6 +51,7 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
 	return ob_get_clean();
 }
 
+
 /**
  * Generates the top portion of the table HTML.
  *
@@ -64,6 +65,8 @@ function generate_top_ten_table( $donor_type = '', $donation_year = '', $number_
  */
 function generate_table_top( $table_type, ?string $donation_year = null ): string {
 	ob_start();
+	$settings      = get_option( 'site_settings' );
+	$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
 	?>
 	<table
 		id="<?php echo \TTFT\Data_Tables\Data_Handler::TABLE_ID . '-' . $table_type; ?>"
@@ -75,6 +78,8 @@ function generate_table_top( $table_type, ?string $donation_year = null ): strin
 		data-wp-bind--year='state.donationYear'
 		data-wp-bind--type='state.donorType'
 		data-wp-bind--data-search-label='state.searchLabel'
+		data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
+		data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page ) ); ?>'
 	>
 	<?php
 	if ( $donation_year ) :
