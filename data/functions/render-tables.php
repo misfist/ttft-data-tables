@@ -193,9 +193,26 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 					<tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
 						<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'ttft-data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $data['think_tank'] ); ?></a></td>
 						<?php foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
-							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
+							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
+							<?php
+							$key = get_donation_accepted_key( $donor_type );
+							if ( $data[ $key ] && 0 === $amount ) :
+								?>
+								<span class="not-accepted"><?php esc_html_e( 'Not Accepted', 'ttft-data-tables' ); ?></span>
+								<?php 
+							elseif ( $data['limited_info'] && 0 === $amount ) : 
+								?>
+								<span class="not-disclosed"><?php esc_html_e( 'Not Disclosed', 'ttft-data-tables' ); ?></span>
+								<?php 
+							else : 
+								?>
+								<?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+							<?php 
+						endif; 
+						?>
+						</td>
 						<?php endforeach; ?>
-						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo esc_html( $data['transparency_score'] ); ?></td>
+						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo convert_start_rating( intval( $data['transparency_score'] ) ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
