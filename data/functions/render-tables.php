@@ -304,7 +304,7 @@ function generate_donor_archive_table( $donation_year = '', $donor_type = '', $s
 				<tr>
 					<th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
 					<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
-					<th class="column-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
+					<th class="column-donor-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
