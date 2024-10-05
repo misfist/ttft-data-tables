@@ -333,17 +333,19 @@ function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $sea
 			$amount = get_post_meta( $post_id, 'amount_calc', true );
 			$amount = intval( $amount );
 
+			$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
+
 			$data[] = array(
 				'donor'       => $donor_name,
 				'amount_calc' => $amount,
-				'donor_type'  => get_the_term_list( $post_id, 'donor_type' ),
+				'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
 				'donor_slug'  => $donor_slug,
-				'donor_link'  => get_term_link( $donor_slugs[0], 'donor' ),
+				'donor_link'  => get_term_link( $donor_slug, 'donor' ),
 				'year'        => get_the_term_list( $post_id, 'donation_year' ),
 			);
-		}
 
-		wp_reset_postdata();
+			wp_reset_postdata();
+		}
 	}
 
 	return $data;
@@ -430,14 +432,19 @@ function get_think_tank_archive_data( $donation_year = '', $search = '' ): array
 			$think_tank_slug = $think_tank_terms[0]->slug;
 
 			if ( ! isset( $data[ $think_tank_slug ] ) ) {
-				$post_id = get_post_from_term( $think_tank_slug, 'think_tank' );
-				if ( is_array( $post_id ) && ! empty( $post_id ) ) {
-					$post_id = $post_id[0];
+				$think_tank_post_id = get_post_from_term( $think_tank_slug, 'think_tank' );
+
+				/**
+				 * If think tank post ID is not set, skip
+				 */
+				if( ! $think_tank_post_id ) {
+					continue;
 				}
-				$no_defense_accepted  = get_post_meta( $post_id, 'no_defense_accepted', true );
-				$no_domestic_accepted = get_post_meta( $post_id, 'no_domestic_accepted', true );
-				$no_foreign_accepted  = get_post_meta( $post_id, 'no_foreign_accepted', true );
-				$limited_info         = get_post_meta( $post_id, 'limited_info', true );
+
+				$no_defense_accepted  = get_post_meta( $think_tank_post_id, 'no_defense_accepted', true );
+				$no_domestic_accepted = get_post_meta( $think_tank_post_id, 'no_domestic_accepted', true );
+				$no_foreign_accepted  = get_post_meta( $think_tank_post_id, 'no_foreign_accepted', true );
+				$limited_info         = get_post_meta( $think_tank_post_id, 'limited_info', true );
 
 				$data[ $think_tank_slug ] = array(
 					'think_tank'           => $think_tank,
