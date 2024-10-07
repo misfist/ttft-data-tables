@@ -82,6 +82,7 @@ function convert_start_rating( $score ): string {
 	$max = 5;
 	ob_start();
 	?>
+	
 	<!-- wp:group {"metadata":{"name":"Transparency Stars"},"className":"star-group stars-<?php echo $score; ?>","layout":{"type":"default"}} -->
 	<div class="wp-block-group star-group stars-<?php echo $score; ?>" aria-label="<?php echo $score; ?> stars">
 		<?php
@@ -93,7 +94,7 @@ function convert_start_rating( $score ): string {
 
 		for ( $x = ( $score + 1 ); $x <= $max; $x++ ) :
 			?>
-			<span class="icon material-symbols-outlined star" data-filled="false" role="img"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg></g></svg></span>
+			<span class="icon material-symbols-outlined star" data-filled="false" role="img"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg></span>
 			<?php
 		endfor;
 		?>
