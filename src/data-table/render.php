@@ -12,17 +12,17 @@
 
 namespace TTFT\Data_Tables\Blocks;
 
-use TTFT\Data_Tables\Data_Handler as Data_Handler;
+use TTFT\Data_Tables\Data as Data;
 use function TTFT\Data_Tables\Data\generate_data_table;
 
 global $wp_query;
 
-$app_namespace = Data_Handler::APP_NAMESPACE;
+$app_namespace = Data::APP_NAMESPACE;
 
 $unique_id = wp_unique_id( 'p-' );
 
 $table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ?? '' ) );
-$table_id             = Data_Handler::TABLE_ID . '-' . $table_type;
+$table_id             = Data::TABLE_ID . '-' . $table_type;
 $selectedThinkTank    = sanitize_text_field( get_query_var( 'think_type', $attributes['thinkTank'] ?? '' ) );
 $selectedDonor        = sanitize_text_field( get_query_var( 'donor', $attributes['donor'] ?? '' ) );
 $selectedDonationYear = sanitize_text_field( get_query_var( 'donation_year', $attributes['donationYear'] ?? 'all' ) );

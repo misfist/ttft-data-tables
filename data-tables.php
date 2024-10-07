@@ -30,6 +30,8 @@ const APP_NAMESPACE = 'ttft/data-tables';
 define( 'TTFT_BASENAME', plugin_basename( __FILE__ ) );
 define( 'TTFT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TTFT_URL', trailingslashit( plugins_url( plugin_basename( __DIR__ ) ) ) );
+define( 'TTFT_APP_NAMESPACE', APP_NAMESPACE );
+define( 'TTFT_TABLE_ID', 'funding-data');
 
 /**
  * Enqueue scripts and styles.
@@ -56,9 +58,9 @@ function scripts(): void {
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\scripts' );
 
 /**
- * Load data handler
+ * Load data class
  */
-$file = TTFT_PATH . '/data/class-data-handler.php';
+$file = TTFT_PATH . '/data/class-data.php';
 if ( file_exists( $file ) ) {
 	require_once $file;
 }

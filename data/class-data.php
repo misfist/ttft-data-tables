@@ -10,7 +10,7 @@ namespace TTFT\Data_Tables;
 
 use function TTFT\Data_Tables\Data\generate_data_table;
 
-class Data_Handler {
+class Data {
 
 
 	const TABLE_ID = 'funding-data';
@@ -525,4 +525,4 @@ class Data_Handler {
 
 }
 
-new Data_Handler();
+new Data();
