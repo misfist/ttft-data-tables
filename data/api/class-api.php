@@ -32,8 +32,8 @@ class API {
 	 */
 	public function __construct() {
 		$this->settings = array(
-			'namespace' => 'data-tables/v1',
-			'endpoint'  => '/table-data',
+			'namespace'   => 'data-tables/v1',
+			'endpoint'    => '/table-data',
 			'table_types' => array(
 				'think_tank_archive',
 				'donor_archive',
@@ -178,6 +178,7 @@ class API {
 					'data'      => 'think_tank',
 					'title'     => 'Think Tank',
 					'className' => 'column-think-tank',
+					'type'      => 'html',
 				),
 				// Generate columns based on donor types.
 			),
@@ -198,6 +199,7 @@ class API {
 				'data'      => 'transparency_score',
 				'title'     => 'Score',
 				'className' => 'column-numeric column-transparency-score noExport',
+				'type'      => 'html',
 			);
 
 			foreach ( $data as $think_tank_slug => $think_tank_data ) {
@@ -243,23 +245,27 @@ class API {
 			'columns' => array(
 				array(
 					'data'      => 'donor',
-					'title'     => 'Donor',
+					'title'     => __( 'Donor', 'ttft-data-tables' ),
 					'className' => 'column-donor',
+					'type'      => 'html',
 				),
 				array(
 					'data'      => 'amount',
-					'title'     => 'Min Amount',
+					'title'     => __( 'Min Amount', 'ttft-data-tables' ),
 					'className' => 'column-numeric column-min-amount',
+					'type'      => 'currency',
 				),
 				array(
 					'data'      => 'source',
-					'title'     => 'Source',
+					'title'     => __( 'Source', 'ttft-data-tables' ),
 					'className' => 'column-source',
+					'type'      => 'html',
 				),
 				array(
 					'data'      => 'donor_type',
-					'title'     => 'Type',
+					'title'     => __( 'Type', 'ttft-data-tables' ),
 					'className' => 'column-type',
+					'type'      => 'html',
 				),
 			),
 			'data'    => array(),
@@ -305,18 +311,21 @@ class API {
 			'columns' => array(
 				array(
 					'data'      => 'donor',
-					'title'     => 'Donor',
+					'title'     => __( 'Donor', 'ttft-data-tables' ),
 					'className' => 'column-donor',
+					'type'      => 'html',
 				),
 				array(
 					'data'      => 'amount',
-					'title'     => 'Min Amount',
+					'title'     => __( 'Min Amount', 'ttft-data-tables' ),
 					'className' => 'column-numeric column-min-amount',
+					'type'      => 'currency',
 				),
 				array(
 					'data'      => 'donor_type',
-					'title'     => 'Type',
+					'title'     => __( 'Type', 'ttft-data-tables' ),
 					'className' => 'column-donor-type',
+					'type'      => 'html',
 				),
 			),
 			'data'    => array(),
@@ -357,23 +366,27 @@ class API {
 			'columns' => array(
 				array(
 					'data'      => 'think_tank',
-					'title'     => 'Think Tank',
+					'title'     => __( 'Think Tank', 'ttft-data-tables' ),
 					'className' => 'column-think-tank',
+					'type'      => 'html',
 				),
 				array(
 					'data'      => 'donor',
-					'title'     => 'Donor',
+					'title'     => __( 'Donor', 'ttft-data-tables' ),
 					'className' => 'column-donor',
+					'type'      => 'html',
 				),
 				array(
 					'data'      => 'amount',
-					'title'     => 'Min Amount',
+					'title'     => __( 'Min Amount', 'ttft-data-tables' ),
 					'className' => 'column-numeric column-min-amount',
+					'type'      => 'currency',
 				),
 				array(
 					'data'      => 'source',
-					'title'     => 'Source',
+					'title'     => __( 'Source', 'ttft-data-tables' ),
 					'className' => 'column-source',
+					'type'      => 'html',
 				),
 			),
 			'data'    => array(),

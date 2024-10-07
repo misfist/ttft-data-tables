@@ -8,6 +8,7 @@
  */
 namespace TTFT\Data_Tables;
 
+use TTFT\Data_Tables\API\Data\API\API;
 use function TTFT\Data_Tables\Data\generate_data_table;
 
 class Data {
@@ -43,6 +44,12 @@ class Data {
 		// \add_filter( 'pre_get_posts', array( $this, 'modify_think_tank_archive_query' ) );
 
 		$this->dependencies( TTFT_PATH . 'data/functions' );
+
+		$file = TTFT_PATH . '/data/api/class-api.php';
+		if ( file_exists( $file ) ) {
+			require_once $file;
+			$api = new API();
+		}
 	}
 
 	/**
