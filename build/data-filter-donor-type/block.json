@@ -6,7 +6,7 @@
   "title": "Data Filter - Donor Type",
   "description": "Display donor type filter.",
   "category": "widgets",
-  "icon": "bank",
+  "icon": "building",
   "attributes": {
     "donorType": {
       "type": "string"
