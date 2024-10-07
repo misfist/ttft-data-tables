@@ -186,7 +186,10 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 
 					// debugger;
 
-					await actions.destroyTableAsync();
+					/**
+					 * Maybe not necessary to destroy the table
+					 */
+					// await actions.destroyTableAsync();
 
 					const container = document.getElementById(
 						state.elementId
@@ -196,6 +199,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 						container.innerHTML = jsonResponse.data;
 
 						if ( state.table ) {
+							state.table.clear();
 							state.table = initTable( `#${ state.tableId }` );
 						}
 					}
