@@ -38,7 +38,7 @@ wp_interactivity_state(
 
 $context = array(
 	$state_key => $selected ?? 'all',
-	'options'  => $options,
+	'options'  => array_map( function( $value ) { return wp_strip_all_tags( $value ); }, $options ),
 );
 
 ob_start();
