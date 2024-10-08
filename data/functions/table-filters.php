@@ -92,7 +92,7 @@ function generate_year_filters( $years ): string {
 	if ( $years ) {
 		wp_interactivity_state( APP_NAMESPACE, array( 'donationYear', 'all' ) );
 
-		$all = array( 'all', __( 'All', 'ttft-data-tables' ) );
+		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
 		$years = $all + $years;
 		$context = array(
 			'donationYears' => array(
@@ -123,7 +123,11 @@ function generate_year_filters( $years ): string {
 					data-wp-interactive-key="<?php echo esc_attr( 'donationYear' ); ?>"
 					data-wp-interactive-value="<?php echo $year; ?>"
 				/>
-				<label for="filter-year-<?php echo $year; ?>" class="option">
+				<label 
+					for="filter-year-<?php echo $year; ?>" 
+					class="option"
+					aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $name ) ) ); ?>"
+				>
 					<?php echo esc_html( $year ); ?>
 				</label>
 				<?php
@@ -149,7 +153,7 @@ function generate_type_filters( $types ): string {
 
 	if ( $types ) {
 		wp_interactivity_state( APP_NAMESPACE, array( 'donorType', 'all' ) );
-		$all = array( 'all', __( 'All', 'ttft-data-tables' ) );
+		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
 		$types = $all + $types;
 		$context = array(
 			'donationTypes' => array(
@@ -179,7 +183,11 @@ function generate_type_filters( $types ): string {
 					data-wp-interactive-key="<?php echo esc_attr( 'donorType' ); ?>"
 					data-wp-interactive-value="<?php echo $slug; ?>"
 				/>
-				<label for="filter-<?php echo $slug; ?>" class="option">
+				<label 
+					for="filter-<?php echo $slug; ?>" 
+					class="option"
+					aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $name ) ) ); ?>"
+				>
 					<?php echo $name; ?>
 				</label>
 				<?php
