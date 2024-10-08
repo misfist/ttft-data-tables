@@ -37,3 +37,10 @@ $break-zoomed-in: 280px;
 		@content;
 	}
 }
+
+
+@include responsive-min( $break-small + 1px ) {
+		.mobile-only {
+      display: none;
+    }
+}
