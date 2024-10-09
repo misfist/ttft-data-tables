@@ -144,7 +144,7 @@ function generate_data_table( $table_type, $args ): string {
 		case 'donor-archive':
 			return generate_donor_archive_table(
 				$donation_year,
-				$donor_type .
+				$donor_type,
 				$search
 			);
 		case 'single-donor':
@@ -158,6 +158,7 @@ function generate_data_table( $table_type, $args ): string {
 			);
 		default:
 			return __( 'Invalid table type.', 'ttft-data-tables' );
+			break;
 	}
 }
 
@@ -173,6 +174,9 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 	$table_type    = 'think-tank-archive';
 
 	$data = get_think_tank_archive_data( $donation_year, $search );
+	// echo '<pre>';
+	// var_dump( $data );
+	// echo '</pre>';
 
 	ob_start();
 	if ( $data ) :
@@ -200,12 +204,12 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
 							<?php
 							$key = get_donation_accepted_key( $donor_type );
-							if ( $data[ $key ] && 0 === $amount ) :
+							if ( $data[ $key ] && 0 == $amount ) :
 								?>
 								<span class="screen-reader-text" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
 								<span class="not-accepted"></span>
 								<?php
-							elseif ( $data['limited_info'] && 0 === $amount ) :
+							elseif ( $data['limited_info'] && 0 == $amount ) :
 								?>
 								<span class="screen-reader-text"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
 								<span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t disclose funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"></span>
@@ -267,7 +271,7 @@ function generate_single_think_tank_table( $think_tank = '', $donation_year = ''
 					?>
 					<tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
 						<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'ttft-data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
-						<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min Amount', 'ttft-data-tables' ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+						<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min Amount', 'ttft-data-tables' ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
 						<td class="column-source" data-heading="<?php esc_attr_e( 'Source', 'ttft-data-tables' ); ?>"><?php echo ( $row['source'] ) ? $formatted_source : ''; ?></td>
 						<td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'ttft-data-tables' ); ?>"><?php echo $row['donor_type']; ?>
 					</tr>
@@ -364,7 +368,7 @@ function generate_single_donor_table( $donor = '', $donation_year = '', $donor_t
 					<tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
 						<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'ttft-data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $row['think_tank_slug'], 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
 						<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'ttft-data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
-						<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min Amount', 'ttft-data-tables' ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+						<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min Amount', 'ttft-data-tables' ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
 						<td class="column-source" data-heading="<?php esc_attr_e( 'Source', 'ttft-data-tables' ); ?>"><?php echo ( $row['source'] ) ? $formatted_source : ''; ?></td>
 					</tr>
 				<?php endforeach; ?>
