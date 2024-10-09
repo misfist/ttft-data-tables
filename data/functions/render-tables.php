@@ -144,7 +144,7 @@ function generate_data_table( $table_type, $args ): string {
 		case 'donor-archive':
 			return generate_donor_archive_table(
 				$donation_year,
-				$donor_type .
+				$donor_type,
 				$search
 			);
 		case 'single-donor':
