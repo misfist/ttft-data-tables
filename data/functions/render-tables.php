@@ -222,7 +222,7 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							?>
 						</td>
 						<?php endforeach; ?>
-						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo convert_start_rating( intval( $data['transparency_score'] ) ); ?></td>
+						<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'ttft-data-tables' ); ?>"><?php echo convert_star_rating( intval( $data['transparency_score'] ) ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

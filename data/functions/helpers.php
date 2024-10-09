@@ -59,7 +59,7 @@ function get_star_rating( $post_id = 0 ): string {
 	$post_id = (int) $post_id ?? get_the_ID();
 	$score   = get_post_meta( $post_id, 'transparency_score', true );
 
-	return convert_start_rating( $score );
+	return convert_star_rating( $score );
 }
 
 /**
@@ -78,7 +78,7 @@ function render_star_rating( $post_id = 0 ): void {
  * @param int $score The Transparency Score.
  * @return string The star rating.
  */
-function convert_start_rating( $score ): string {
+function convert_star_rating( $score = 0 ): string {
 	$max = 5;
 	ob_start();
 	?>
