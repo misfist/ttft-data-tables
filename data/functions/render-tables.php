@@ -200,12 +200,12 @@ function generate_think_tank_archive_table( $donation_year = '', $search = '' ):
 							<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
 							<?php
 							$key = get_donation_accepted_key( $donor_type );
-							if ( $data[ $key ] && 0 === $amount ) :
+							if ( $data[ $key ] && 0 == $amount ) :
 								?>
 								<span class="screen-reader-text" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
 								<span class="not-accepted"></span>
 								<?php
-							elseif ( $data['limited_info'] && 0 === $amount ) :
+							elseif ( $data['limited_info'] && 0 == $amount ) :
 								?>
 								<span class="screen-reader-text"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
 								<span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t disclose funding from %s', 'ttft-data-tables' ), $donor_type ) ); ?>"></span>
