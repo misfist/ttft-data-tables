@@ -58,6 +58,9 @@ function get_transparency_score_from_slug( $think_tank_slug ): int {
 function get_star_rating( $post_id = 0 ): string {
 	$post_id = (int) $post_id ?? get_the_ID();
 	$score   = get_post_meta( $post_id, 'transparency_score', true );
+	if ( ! $score ) {
+		return '';
+	}
 
 	return convert_star_rating( $score );
 }
@@ -79,6 +82,7 @@ function render_star_rating( $post_id = 0 ): void {
  * @return string The star rating.
  */
 function convert_star_rating( $score = 0 ): string {
+	$score = (int) $score;
 	$max = 5;
 	ob_start();
 	?>
