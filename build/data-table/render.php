@@ -86,6 +86,7 @@ ob_start();
 	<?php echo get_block_wrapper_attributes( $block_wrapper_attributes ); ?>
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
 >
+
 	<div data-wp-bind--id="state.elementId">
 		<?php echo generate_data_table( $table_type, $args ); ?>
 	</div>
