@@ -115,7 +115,7 @@ function get_donation_accepted_key( $donor_type ): string {
 	$donor_type = strtolower( $donor_type );
 	$us_pattern = '/[uU][\.\-]?[sS]/';
 
-	switch ( true ) {
+	switch ( $donor_type ) {
 		case strpos( $donor_type, 'foreign' ) !== false:
 			return 'no_foreign_accepted';
 		case ( strpos( $donor_type, 'pentagon' ) !== false ) || strpos( $donor_type, 'defense' ) !== false:
@@ -124,5 +124,6 @@ function get_donation_accepted_key( $donor_type ): string {
 			return 'no_domestic_accepted';
 		default:
 			return '';
+			break;
 	}
 }
