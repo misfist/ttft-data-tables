@@ -25,7 +25,7 @@ $terms     = get_terms(
 	)
 );
 $term_list = wp_list_pluck( $terms, 'name', 'slug' );
-$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
+$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
 $options   = $all + $term_list;
 
 wp_interactivity_state(
@@ -56,7 +56,7 @@ ob_start();
 	$input_type = 'radio';
 	$input_name = 'type-filter';
 	$selected   = $context[ $state_key ];
-	$options    = $context['options'];
+	$options    = $options;
 
 	foreach ( $options as $value => $label ) :
 		$input_id    = "{$input_name}-{$value}";

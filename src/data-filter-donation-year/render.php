@@ -26,7 +26,7 @@ $terms     = get_terms(
 	)
 );
 $term_list = wp_list_pluck( $terms, 'name', 'slug' );
-$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
+$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
 $options   = $all + $term_list;
 
 wp_interactivity_state(
@@ -57,7 +57,7 @@ ob_start();
 	$input_type = 'radio';
 	$input_name = 'year-filter';
 	$selected   = $context[ $state_key ];
-	$options    = $context['options'];
+	$options    = $options;
 	foreach ( $options as $value => $label ) :
 		$input_id    = "{$input_name}-{$value}";
 		$input_attrs = array(
@@ -83,7 +83,7 @@ ob_start();
 			<input <?php echo $normalized_input_attrs; ?>>
 			<label 
 				for="<?php echo $input_id; ?>" 
-				class="option"
+				class="option" 
 				aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $label ) ) ); ?>"
 			><?php echo $label; ?></label>
 

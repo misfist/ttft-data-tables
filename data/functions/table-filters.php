@@ -92,7 +92,7 @@ function generate_year_filters( $years ): string {
 	if ( $years ) {
 		wp_interactivity_state( APP_NAMESPACE, array( 'donationYear', 'all' ) );
 
-		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
+		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
 		$years = $all + $years;
 		$context = array(
 			'donationYears' => array(
@@ -153,7 +153,7 @@ function generate_type_filters( $types ): string {
 
 	if ( $types ) {
 		wp_interactivity_state( APP_NAMESPACE, array( 'donorType', 'all' ) );
-		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
+		$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
 		$types = $all + $types;
 		$context = array(
 			'donationTypes' => array(
