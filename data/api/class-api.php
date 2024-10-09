@@ -79,6 +79,10 @@ class API {
 						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
+					'search'        => array(
+						'required'          => false,
+						'sanitize_callback' => 'sanitize_text_field',
+					),
 				),
 			)
 		);
@@ -96,25 +100,22 @@ class API {
 		$donor         = $this->get_term_from_param( $request->get_param( 'donor' ), 'donor' );
 		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
 		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
+		$search        = $request->get_param( 'search' );
 
 		switch ( $table_type ) {
 			case 'think_tank_archive':
-				// Custom method call for think tank archive.
-				$data = $this->get_think_tank_archive_json( $donation_year, $request->get_param( 'search' ) );
+				$data = $this->get_think_tank_archive_json( $donation_year, $search );
 				break;
 
 			case 'donor_archive':
-				// Custom method call for donor archive.
-				$data = $this->get_donor_archive_json( $donation_year, $donor_type, $request->get_param( 'search' ) );
+				$data = $this->get_donor_archive_json( $donation_year, $donor_type, $search );
 				break;
 
 			case 'single_think_tank':
-				// Custom method call for a single think tank.
 				$data = $this->get_single_think_tank_json( $think_tank, $donation_year, $donor_type );
 				break;
 
 			case 'single_donor':
-				// Custom method call for a single donor.
 				$data = $this->get_single_donor_json( $donor, $donation_year, $donor_type );
 				break;
 
