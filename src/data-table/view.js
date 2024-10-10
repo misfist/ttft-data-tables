@@ -42,6 +42,7 @@ const initTable = ( tableId ) => {
 					placeholder: 'Enter keyword...',
 					text: state.searchLabel || 'Search',
 					processing: true,
+					menu: [25, 50, 75, 100]
 				},
 			},
 			topStart: {
