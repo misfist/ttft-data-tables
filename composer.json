@@ -1,0 +1,48 @@
+{
+    "name": "ttft/data-tables",
+    "description": "WordPress plugin to display data table blocks.",
+    "type": "wpackagist-plugin",
+    "authors": [
+        {
+            "name": "Pea",
+            "email": "pea@misfist.com"
+        }
+    ],
+    "prefer-stable": true,
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "alleyinteractive/composer-wordpress-autoloader": true
+        },
+        "optimize-autoloader": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Ttft\\Data_Tables\\": "src/"
+        },
+        "classmap": [
+            "src"
+        ],
+        "psr-0": {
+            "Ttft\\Data_Tables\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "require": {},
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "kporras07/composer-symlinks": "dev-master",
+        "alleyinteractive/wordpress-autoloader": "^1.1",
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "squizlabs/php_codesniffer": "*",
+        "wp-cli/dist-archive-command": "dev-main",
+        "wp-cli/i18n-command": "^2.4",
+        "wp-cli/wp-cli-bundle": "*",
+        "wp-coding-standards/wpcs": "*"
+    }
+}
