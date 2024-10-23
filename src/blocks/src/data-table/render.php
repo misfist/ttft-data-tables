@@ -10,10 +10,10 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-namespace TTFT\Data_Tables\Blocks;
+namespace Ttft\Data_Tables\Blocks;
 
-use TTFT\Data_Tables\Data as Data;
-use function TTFT\Data_Tables\Data\generate_data_table;
+use Ttft\Data_Tables\Data as Data;
+use function Ttft\Data_Tables\Data\generate_data_table;
 
 global $wp_query;
 

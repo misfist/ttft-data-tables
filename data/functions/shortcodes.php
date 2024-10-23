@@ -2,7 +2,7 @@
 /**
  * Shortcode Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
 
 /**
  * Shortcode to display the top ten table.

@@ -9,9 +9,9 @@
  *
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
-namespace TTFT\Data_Tables\Blocks;
+namespace Ttft\Data_Tables\Blocks;
 
-use function TTFT\Data_Tables\Data\render_top_ten_table;
+use function Ttft\Data_Tables\Data\render_top_ten_table;
 
 $donor_type = sanitize_text_field( $attributes['donorType'] ) ?? '';
 $donation_year = sanitize_text_field( $attributes['donationYear'] ) ?? '';

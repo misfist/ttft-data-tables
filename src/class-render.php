@@ -1,0 +1,362 @@
+<?php
+/**
+ * Render class for rendering data tables.
+ */
+namespace Ttft\Data_Tables;
+
+use Ttft\Data_Tables\Data;
+
+class Render {
+
+    protected $data;
+
+    /**
+     * Constructor to instantiate the Data class
+     */
+    public function __construct() {
+        $this->data = new Data();
+    }
+
+    /**
+     * Generate table for top ten
+     *
+     * @param string $donor_type Optional. The slug of the donor_type taxonomy term. Default empty.
+     * @param string $donation_year Optional. The slug of the donation_year taxonomy term. Default empty.
+     * @param int    $number_of_items Optional. The number of items to return. Default 10.
+     * @return string HTML table markup.
+     */
+    public function generate_top_ten_table( string $donor_type = '', string $donation_year = '', int $number_of_items = 10 ): string {
+        // Fetch the top ten data using Data
+        $data = $this->data->get_top_ten_data( $donor_type, $donation_year, $number_of_items );
+
+        ob_start();
+        if ( $data ) :
+            ?>
+            <table 
+                id="table-<?php echo sanitize_title( $donor_type ); ?>" 
+                class="top-ten-recipients dataTable" 
+                data-total-rows="<?php echo intval( count( $data ) ); ?>"
+                data-donor-type="<?php echo esc_attr( $donor_type ); ?>"
+                data-donation-year="<?php echo esc_attr( $donation_year ); ?>"
+                data-number="<?php echo esc_attr( $number_of_items ); ?>"
+            >
+                <thead>
+                    <tr>
+                        <th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+                        <th class="column-min-amount column-numeric" data-summed="true" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $data as $row ) : ?>
+                        <tr>
+                            <td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'ttft-data-tables' ); ?>">
+                                <a href="<?php echo esc_url( get_term_link( $row['think_tank'], 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a>
+                            </td>
+                            <td class="column-min-amount column-numeric" data-heading="<?php esc_attr_e( 'Min Amount', 'ttft-data-tables' ); ?>"><?php echo number_format( $row['total_amount'], 0 ); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Generates the top portion of the table HTML.
+     *
+     * @param string $table_type The CSS class to apply to the table, determining its styling.
+     * @param string|null $donation_year Optional. The year of the donations to be displayed in the caption. Default is null.
+     * @return string The generated HTML string for the top portion of the table.
+     */
+    public function generate_table_top( string $table_type, ?string $donation_year = null ): string {
+        ob_start();
+        $settings      = get_option( 'site_settings' );
+        $rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
+        ?>
+        <table
+            id="<?php echo TABLE_ID . '-' . $table_type; ?>"
+            data-wp-interactive="<?php echo APP_NAMESPACE; ?>"
+            class="<?php echo $table_type; ?> display dataTable"
+            data-wp-bind--id='state.tableId'
+            data-wp-bind--table-type='state.tableType'
+            data-wp-bind--think-tank='state.thinkTank'
+            data-wp-bind--year='state.donationYear'
+            data-wp-bind--type='state.donorType'
+            data-wp-bind--data-search-label='state.searchLabel'
+            data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
+            data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page ) ); ?>'
+        >
+        <?php
+        if ( $donation_year ) :
+            ?>
+            <caption><?php printf( 'Donations in <span class="donation-year" data-wp-text="state.donationYear">%s</span>...', $donation_year ); ?></caption>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Renders the top portion of the table HTML.
+     *
+     * @param string $table_type The CSS class to apply to the table.
+     * @param string|null $donation_year Optional. The year of the donations to be displayed in the caption.
+     * @return void
+     */
+    public function render_table_top( string $table_type, ?string $donation_year = null ): void {
+        echo $this->generate_table_top( $table_type, $donation_year );
+    }
+
+    /**
+     * Return the appropriate table based on the table_type.
+     *
+     * @param string $table_type The type of table to generate.
+     * @param array  $args Parameters required for table generation.
+     * @return string The generated table HTML markup.
+     */
+    public function generate_data_table( string $table_type, array $args ): string {
+        $args = $this->convert_camel_to_snake_keys( $args );
+
+        $donation_year = $args['donation_year'] ?? '';
+        $donor_type    = $args['donor_type'] ?? '';
+        $search        = $args['search'] ?? '';
+
+        if ( $donation_year === 'all' ) {
+            $donation_year = '';
+        }
+
+        if ( $donor_type === 'all' ) {
+            $donor_type = '';
+        }
+
+        switch ( $table_type ) {
+            case 'think-tank-archive':
+                return $this->generate_think_tank_archive_table( $donation_year, $search );
+            case 'single-think-tank':
+                if ( empty( $args['think_tank'] ) ) {
+                    return __( 'Think tank is required for single-think-tank.', 'ttft-data-tables' );
+                }
+                return $this->generate_single_think_tank_table(
+                    $args['think_tank'],
+                    $donation_year,
+                    $donor_type
+                );
+            case 'donor-archive':
+                return $this->generate_donor_archive_table(
+                    $donation_year,
+                    $donor_type,
+                    $search
+                );
+            case 'single-donor':
+                if ( empty( $args['donor'] ) ) {
+                    return __( 'Donor is required for single-donor.', 'ttft-data-tables' );
+                }
+                return $this->generate_single_donor_table(
+                    $args['donor'],
+                    $donation_year,
+                    $donor_type
+                );
+            default:
+                return __( 'Invalid table type.', 'ttft-data-tables' );
+        }
+    }
+
+    /**
+     * Generate table for think tanks archive.
+     *
+     * @param string $donation_year The donation year to filter by.
+     * @param string $search Optional search query.
+     * @return string HTML table markup.
+     */
+    public function generate_think_tank_archive_table( string $donation_year = '', string $search = '' ): string {
+        $data = $this->data->get_think_tank_archive_data( $donation_year, $search );
+
+        ob_start();
+        if ( $data ) :
+            $this->render_table_top( 'think-tank-archive', $donation_year );
+            ?>
+                <thead>
+                    <tr>
+                        <th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+                        <?php if ( ! empty( $data ) ) :
+                            $first_entry = reset( $data );
+                            foreach ( $first_entry['donor_types'] as $donor_type => $amount ) : ?>
+                                <th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        <th class="column-numeric column-transparency-score noExport" scope="col"><?php esc_html_e( 'Score', 'ttft-data-tables' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $data as $think_tank_slug => $data ) : ?>
+                        <tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
+                            <td class="column-think-tank"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $data['think_tank'] ); ?></a></td>
+                            <?php foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
+                                <td class="column-numeric column-min-amount"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
+                            <?php endforeach; ?>
+                            <td class="column-numeric column-transparency-score"><?php echo $this->generate_star_rating( intval( $data['transparency_score'] ) ); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Generate table for individual think tank.
+     *
+     * @param string $think_tank The slug of the think tank.
+     * @param string $donation_year The slug of the donation year.
+     * @param string $donor_type The slug of the donor type.
+     * @return string HTML table markup.
+     */
+    public function generate_single_think_tank_table( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): string {
+        $data = $this->data->get_single_think_tank_data( $think_tank, $donation_year, $donor_type );
+
+        ob_start();
+        if ( $data ) :
+            $this->render_table_top( 'single-think-tank', $donation_year );
+            ?>
+                <thead>
+                    <tr>
+                        <th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+                        <th class="column-numeric column-min-amount" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+                        <th class="column-source" scope="col"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
+                        <th class="column-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $data as $row ) : ?>
+                        <tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
+                            <td class="column-donor"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
+                            <td class="column-numeric column-min-amount"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="column-source"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" target="_blank">%1$s</a>', esc_url( $row['source'] ) ) : ''; ?></td>
+                            <td class="column-donor-type"><?php echo $row['donor_type']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Generate table for donors archive.
+     *
+     * @param string $donation_year The donation year.
+     * @param string $donor_type The donor type.
+     * @param string $search Optional search term.
+     * @return string HTML table markup.
+     */
+    public function generate_donor_archive_table( string $donation_year = '', string $donor_type = '', string $search = '' ): string {
+        $data = $this->data->get_donor_archive_data( $donation_year, $donor_type, $search );
+
+        ob_start();
+        if ( $data ) :
+            $this->render_table_top( 'donor-archive', $donation_year );
+            ?>
+                <thead>
+                    <tr>
+                        <th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+                        <th class="column-numeric column-min-amount" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+                        <th class="column-donor-type" scope="col"><?php esc_html_e( 'Type', 'ttft-data-tables' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $data as $row ) : ?>
+                        <tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
+                            <td class="column-donor"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
+                            <td class="column-numeric column-min-amount"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="column-donor-type"><?php echo $row['donor_type']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Generate table for individual donor.
+     *
+     * @param string $donor The slug of the donor.
+     * @param string $donation_year The slug of the donation year.
+     * @param string $donor_type The slug of the donor type.
+     * @return string HTML table markup.
+     */
+    public function generate_single_donor_table( string $donor = '', string $donation_year = '', string $donor_type = '' ): string {
+        $data = $this->data->get_single_donor_data( $donor, $donation_year, $donor_type );
+
+        ob_start();
+        if ( $data ) :
+            $this->render_table_top( 'single-donor', $donation_year );
+            ?>
+                <thead>
+                    <tr>
+                        <th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'ttft-data-tables' ); ?></th>
+                        <th class="column-donor" scope="col"><?php esc_html_e( 'Donor', 'ttft-data-tables' ); ?></th>
+                        <th class="column-numeric column-min-amount" scope="col"><?php esc_html_e( 'Min Amount', 'ttft-data-tables' ); ?></th>
+                        <th class="column-source" scope="col"><?php esc_html_e( 'Source', 'ttft-data-tables' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ( $data as $row ) : ?>
+                        <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
+                            <td class="column-think-tank"><a href="<?php echo esc_url( get_term_link( $row['think_tank_slug'], 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
+                            <td class="column-donor"><?php echo esc_html( $row['donor'] ); ?></td>
+                            <td class="column-numeric column-min-amount"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="column-source"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" target="_blank">%1$s</a>', esc_url( $row['source'] ) ) : ''; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php
+        endif;
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Convert a transparency score to a star rating
+     *
+     * @param int $score The transparency score to convert.
+     * @return string HTML for the star rating.
+     */
+    public function generate_star_rating( int $score ): string {
+        $star_rating = '';
+
+        for ( $i = 1; $i <= 5; $i++ ) {
+            if ( $i <= $score ) {
+                $star_rating .= '<span class="star filled">&#9733;</span>'; // filled star
+            } else {
+                $star_rating .= '<span class="star">&#9734;</span>'; // empty star
+            }
+        }
+
+        return $star_rating;
+    }
+
+    /**
+     * Convert camelCase keys to snake_case keys.
+     *
+     * @param array $args The array with camelCase keys.
+     * @return array The array with keys converted to snake_case.
+     */
+    private function convert_camel_to_snake_keys( array $args ): array {
+        $converted_args = array();
+        foreach ( $args as $key => $value ) {
+            $new_key = strtolower( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $key ) );
+            $converted_args[ $new_key ] = $value;
+        }
+        return $converted_args;
+    }
+}

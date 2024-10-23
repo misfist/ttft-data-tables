@@ -5,13 +5,15 @@
  * @package site-functionality
  */
 
-namespace TTFT\Data_Tables\API\Data\API;
+namespace Ttft\Data_Tables\API;
 
-use function \TTFT\Data_Tables\Data\get_think_tank_archive_data;
-use function \TTFT\Data_Tables\Data\get_single_think_tank_data;
-use function \TTFT\Data_Tables\Data\get_donor_archive_data;
-use function \TTFT\Data_Tables\Data\get_single_donor_data;
-use function \TTFT\Data_Tables\Data\convert_star_rating;
+use Ttft\Data_Tables\Data\Data;
+
+use function \Ttft\Data_Tables\Data\get_think_tank_archive_data;
+use function \Ttft\Data_Tables\Data\get_single_think_tank_data;
+use function \Ttft\Data_Tables\Data\get_donor_archive_data;
+use function \Ttft\Data_Tables\Data\get_single_donor_data;
+use function \Ttft\Data_Tables\Data\generate_star_rating;
 
 /**
  * Class API
@@ -217,7 +219,7 @@ class API {
 				}
 
 				// Custom function call to convert transparency score.
-				$row['transparency_score'] = convert_star_rating( intval( $think_tank_data['transparency_score'] ) );
+				$row['transparency_score'] = generate_star_rating( intval( $think_tank_data['transparency_score'] ) );
 
 				$response['data'][] = $row;
 			}

@@ -10,9 +10,9 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-namespace TTFT\Data_Tables\Blocks;
+namespace Ttft\Data_Tables\Blocks;
 
-$app_namespace = \TTFT\Data_Tables\APP_NAMESPACE;
+$app_namespace = APP_NAMESPACE;
 $state_key     = 'entityType';
 
 $entity_type = get_query_var( 'entity_type', 'think_tank' );

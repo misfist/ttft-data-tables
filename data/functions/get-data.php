@@ -2,7 +2,7 @@
 /**
  * Get Data Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
 
 /**
  * Get Raw Table Data

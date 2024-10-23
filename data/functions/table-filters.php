@@ -5,7 +5,7 @@
  * @package ttt
  */
 
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
 
 /**
  * Retrieve the most recent donation year term.

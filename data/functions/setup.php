@@ -2,7 +2,7 @@
 /**
  * Table Data Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
 
 // const TABLE_ID = 'funding-data';
 // const APP_ID   = 'think-tank-funding';

@@ -10,23 +10,22 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-namespace TTFT\Data_Tables\Blocks;
+namespace Ttft\Data_Tables\Blocks;
 
-$app_namespace = \TTFT\Data_Tables\APP_NAMESPACE;
+$app_namespace = APP_NAMESPACE;
 $unique_id     = wp_unique_id( 'p-' );
-$taxonomy      = 'donation_year';
-$state_key     = 'donationYear';
+$taxonomy      = 'donor_type';
+$state_key     = 'donorType';
 
 $selected  = sanitize_text_field( get_query_var( $taxonomy, 'all' ) );
 $terms     = get_terms(
 	array(
 		'taxonomy'   => $taxonomy,
 		'hide_empty' => false,
-		'order'      => 'DESC',
 	)
 );
 $term_list = wp_list_pluck( $terms, 'name', 'slug' );
-$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
+$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
 $options   = $all + $term_list;
 
 wp_interactivity_state(
@@ -45,19 +44,20 @@ ob_start();
 ?>
 
 <div
-	<?php echo get_block_wrapper_attributes( array( 'class' => 'data-filter data-filter--donation-year' ) ); ?>
+	<?php echo get_block_wrapper_attributes( array( 'class' => 'data-filter data-filter--donor-type' ) ); ?>
 	data-wp-interactive="<?php echo $app_namespace; ?>"
 	<?php echo wp_interactivity_data_wp_context( $context ); ?>
-	data-wp-watch="callbacks.logYear"
-	data-wp-bind--year='state.donationYear'
+	data-wp-watch="callbacks.logType"
+	data-wp-bind--donor='state.donorType'
 	tab-index="1"
 >
 
 	<?php
 	$input_type = 'radio';
-	$input_name = 'year-filter';
+	$input_name = 'type-filter';
 	$selected   = $context[ $state_key ];
 	$options    = $options;
+
 	foreach ( $options as $value => $label ) :
 		$input_id    = "{$input_name}-{$value}";
 		$input_attrs = array(
@@ -67,9 +67,9 @@ ob_start();
 			'value'                   => $value,
 			'data-state-key'          => $state_key,
 			'data-wp-href'            => add_query_arg( $taxonomy, $value ),
-			'data-wp-on-async--click' => 'actions.updateYear',
+			'data-wp-on-async--click' => 'actions.updateType',
 		);
-		if ( (int) $selected === (int) $value ) {
+		if ( $selected === $value ) {
 			$input_attrs['checked'] = true;
 		}
 
@@ -82,15 +82,15 @@ ob_start();
 
 			<input <?php echo $normalized_input_attrs; ?>>
 			<label 
-				for="<?php echo $input_id; ?>" 
-				class="option" 
+				for="<?php echo esc_attr( $input_id ); ?>" 
+				class="option"
 				aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $label ) ) ); ?>"
-			><?php echo $label; ?></label>
+			>
+				<?php echo $label; ?></label>
 
 		<?php
 	endforeach;
 	?>
-	
 </div>
 
 <?php

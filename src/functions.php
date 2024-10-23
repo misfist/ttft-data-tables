@@ -2,7 +2,7 @@
 /**
  * Helper Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables;
 
 /**
  * Get post that matches taxonomy term
@@ -62,7 +62,7 @@ function get_star_rating( $post_id = 0 ): string {
 		return '';
 	}
 
-	return convert_star_rating( $score );
+	return generate_star_rating( $score );
 }
 
 /**
@@ -81,7 +81,7 @@ function render_star_rating( $post_id = 0 ): void {
  * @param int $score The Transparency Score.
  * @return string The star rating.
  */
-function convert_star_rating( $score = 0 ): string {
+function generate_star_rating( $score = 0 ): string {
 	$score = (int) $score;
 	$max = 5;
 	ob_start();
