@@ -20,7 +20,7 @@ class Data_Tables {
 
 	const APP_ID = 'think-tank-funding';
 
-	const APP_NAMESPACE = 'ttft/data-tables';
+	const TTFT_APP_NAMESPACE = 'ttft/data-tables';
 
 	/**
 	 * Constructor to register AJAX actions.

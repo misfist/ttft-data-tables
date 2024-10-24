@@ -11,12 +11,13 @@
  */
 namespace Ttft\Data_Tables\Blocks;
 
-use function Ttft\Data_Tables\Data\render_top_ten_table;
+use Ttft\Data_Tables\Render as Render;
+$render = new Render();
 
 $donor_type = sanitize_text_field( $attributes['donorType'] ) ?? '';
 $donation_year = sanitize_text_field( $attributes['donationYear'] ) ?? '';
 $number_of_items = sanitize_text_field( $attributes['number'] ) ?? 10;
 ?>
 <div <?php echo get_block_wrapper_attributes(); ?>>
-	<?php render_top_ten_table( $donor_type, $donation_year, $number_of_items ); ?>
+	<?php $render->render_top_ten_table( $donor_type, $donation_year, $number_of_items ); ?>
 </div>

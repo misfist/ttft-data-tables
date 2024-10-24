@@ -69,8 +69,8 @@ function generate_table_top( $table_type, ?string $donation_year = null ): strin
 	$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
 	?>
 	<table
-		id="<?php echo TABLE_ID . '-' . $table_type; ?>"
-		data-wp-interactive="<?php echo APP_NAMESPACE; ?>"
+		id="<?php echo TTFT_TABLE_ID . '-' . $table_type; ?>"
+		data-wp-interactive="<?php echo TTFT_APP_NAMESPACE; ?>"
 		class="<?php echo $table_type; ?> display dataTable"
 		data-wp-bind--id='state.tableId'
 		data-wp-bind--table-type='state.tableType'

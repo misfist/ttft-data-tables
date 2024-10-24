@@ -24,7 +24,7 @@ class Blocks {
             'ttft-data-tables',
             TTFT_URL . 'src/assets/DataTables/datatables.min.js',
             array( 'jquery' ),
-            VERSION,
+            TTFT_VERSION,
             true
         );
     }
@@ -41,6 +41,24 @@ class Blocks {
         register_block_type_from_metadata( __DIR__ . '/build/data-filter-donor-type' );
         register_block_type_from_metadata( __DIR__ . '/build/data-filter-entity-type' );
         register_block_type_from_metadata( __DIR__ . '/build/top-ten' );
+    }
+
+    /**
+     * Register block metadata collection.
+     * 
+     * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/
+     *
+     * @return void
+     */
+    public function register_block_metadata_collection(): void {
+        if ( ! function_exists( 'wp_register_block_metadata_collection' ) ) {
+            return;
+        }
+        wp_register_block_metadata_collection(
+            __DIR__ . '/build',
+            __DIR__ . '/build/blocks-manifest.php'
+        );
+        
     }
 
 }

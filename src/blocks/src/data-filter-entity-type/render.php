@@ -12,7 +12,7 @@
 
 namespace Ttft\Data_Tables\Blocks;
 
-$app_namespace = APP_NAMESPACE;
+$app_namespace = TTFT_APP_NAMESPACE;
 $state_key     = 'entityType';
 
 $entity_type = get_query_var( 'entity_type', 'think_tank' );

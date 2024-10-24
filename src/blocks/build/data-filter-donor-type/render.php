@@ -10,9 +10,9 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-namespace TTFT\Data_Tables\Blocks;
+namespace Ttft\Data_Tables\Blocks;
 
-$app_namespace = \TTFT\Data_Tables\APP_NAMESPACE;
+$app_namespace = TTFT_APP_NAMESPACE;
 $unique_id     = wp_unique_id( 'p-' );
 $taxonomy      = 'donor_type';
 $state_key     = 'donorType';

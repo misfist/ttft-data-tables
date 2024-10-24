@@ -37,6 +37,7 @@ if ( file_exists( $autoload ) ) {
 define( 'TTFT_BASENAME', plugin_basename( __FILE__ ) );
 define( 'TTFT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TTFT_URL', trailingslashit( plugins_url( plugin_basename( __DIR__ ) ) ) );
+define( 'TTFT_VERSION', VERSION );
 define( 'TTFT_APP_NAMESPACE', APP_NAMESPACE );
 define( 'TTFT_TABLE_ID', 'funding-data');
 

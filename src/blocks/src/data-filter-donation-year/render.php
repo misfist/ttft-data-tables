@@ -12,7 +12,7 @@
 
 namespace Ttft\Data_Tables\Blocks;
 
-$app_namespace = APP_NAMESPACE;
+$app_namespace = TTFT_APP_NAMESPACE;
 $unique_id     = wp_unique_id( 'p-' );
 $taxonomy      = 'donation_year';
 $state_key     = 'donationYear';

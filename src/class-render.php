@@ -4,8 +4,6 @@
  */
 namespace Ttft\Data_Tables;
 
-use Ttft\Data_Tables\Data;
-
 class Render {
 
     /**
@@ -81,8 +79,8 @@ class Render {
         $rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
         ?>
         <table
-            id="<?php echo TABLE_ID . '-' . $table_type; ?>"
-            data-wp-interactive="<?php echo APP_NAMESPACE; ?>"
+            id="<?php echo TTFT_TABLE_ID . '-' . $table_type; ?>"
+            data-wp-interactive="<?php echo TTFT_APP_NAMESPACE; ?>"
             class="<?php echo $table_type; ?> display dataTable"
             data-wp-bind--id='state.tableId'
             data-wp-bind--table-type='state.tableType'
@@ -329,6 +327,19 @@ class Render {
 
         return ob_get_clean();
     }
+
+    /**
+     * Render table for top ten
+     *
+     * @param  string  $donor_type
+     * @param  string  $donation_year
+     * @param  integer $number_of_items
+     * @return void
+     */
+    public function render_top_ten_table( $donor_type = '', $donation_year = '', $number_of_items = 10 ): void {
+        echo $this->generate_top_ten_table( $donor_type, $donation_year, $number_of_items );
+    }
+
 
     /**
      * Convert a transparency score to a star rating
