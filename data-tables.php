@@ -15,13 +15,10 @@
  */
 namespace Ttft\Data_Tables;
 
+use Ttft\Data_Tables\Data_Tables;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
-}
-
-$autoload = __DIR__ . '/vendor/autoload.php';
-if ( file_exists( $autoload ) ) {
-	require_once $autoload;
 }
 
 /**
@@ -32,9 +29,15 @@ if ( file_exists( $autoload ) ) {
 const VERSION       = '1.0.0';
 const APP_NAMESPACE = 'ttft/data-tables';
 
+$autoload = __DIR__ . '/vendor/autoload.php';
+if ( file_exists( $autoload ) ) {
+	require_once $autoload;
+}
+
 define( 'TTFT_BASENAME', plugin_basename( __FILE__ ) );
 define( 'TTFT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TTFT_URL', trailingslashit( plugins_url( plugin_basename( __DIR__ ) ) ) );
 define( 'TTFT_APP_NAMESPACE', APP_NAMESPACE );
 define( 'TTFT_TABLE_ID', 'funding-data');
 
+$data_tables = new Data_Tables();
