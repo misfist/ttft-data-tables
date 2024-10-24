@@ -12,6 +12,7 @@ use Ttft\Data_Tables\Data;
 use Ttft\Data_Tables\Render;
 use Ttft\Data_Tables\Filters;
 use Ttft\Data_Tables\API\API;
+use Ttft\Data_Tables\AJAX;
 use Ttft\Data_Tables\Blocks\Blocks;
 
 class Data_Tables {
@@ -42,6 +43,7 @@ class Data_Tables {
 		$filters = new Filters();
 		$api     = new API();
 		$blocks  = new Blocks();
+		$ajax    = new AJAX();
 	}
 
 	/**
