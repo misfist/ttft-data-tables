@@ -44,11 +44,11 @@ class API {
 			'namespace'   => 'data-tables/v1',
 			'endpoint'    => '/table-data',
 			'table_types' => array(
-				'think_tank_archive',
-				'donor_archive',
-				'single_think_tank',
-				'single_donor',
-				'full_data',
+				'think-tank-archive',
+				'donor-archive',
+				'single-think-tank',
+				'single-donor',
+				'full-data',
 			),
 		);
 
@@ -122,19 +122,19 @@ class API {
 		$search        = $request->get_param( 'search' );
 
 		switch ( $table_type ) {
-			case 'think_tank_archive':
+			case 'think-tank-archive':
 				$data = $this->get_think_tank_archive_json( $donation_year, $search );
 				break;
 
-			case 'donor_archive':
+			case 'donor-archive':
 				$data = $this->get_donor_archive_json( $donation_year, $donor_type, $search );
 				break;
 
-			case 'single_think_tank':
+			case 'single-think-tank':
 				$data = $this->get_single_think_tank_json( $think_tank, $donation_year, $donor_type );
 				break;
 
-			case 'single_donor':
+			case 'single-donor':
 				$data = $this->get_single_donor_json( $donor, $donation_year, $donor_type );
 				break;
 
