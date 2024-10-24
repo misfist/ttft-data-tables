@@ -7,13 +7,13 @@
 
 namespace Ttft\Data_Tables\API;
 
-use Ttft\Data_Tables\Data\Data;
+use Ttft\Data_Tables\Data;
 
-use function \Ttft\Data_Tables\Data\get_think_tank_archive_data;
-use function \Ttft\Data_Tables\Data\get_single_think_tank_data;
-use function \Ttft\Data_Tables\Data\get_donor_archive_data;
-use function \Ttft\Data_Tables\Data\get_single_donor_data;
-use function \Ttft\Data_Tables\Data\generate_star_rating;
+use function \Ttft\Data_Tables\get_think_tank_archive_data;
+use function \Ttft\Data_Tables\get_single_think_tank_data;
+use function \Ttft\Data_Tables\get_donor_archive_data;
+use function \Ttft\Data_Tables\get_single_donor_data;
+use function \Ttft\Data_Tables\generate_star_rating;
 
 /**
  * Class API
@@ -30,6 +30,13 @@ class API {
 	private $settings;
 
 	/**
+	 * Data object.
+	 *
+	 * @var Data
+	 */
+	protected $data;
+
+	/**
 	 * API constructor.
 	 */
 	public function __construct() {
@@ -41,8 +48,11 @@ class API {
 				'donor_archive',
 				'single_think_tank',
 				'single_donor',
+				'full_data',
 			),
 		);
+
+		$this->data = new Data();
 
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
@@ -61,28 +71,35 @@ class API {
 				'args'                => array(
 					'table_type'    => array(
 						'required'          => true,
+						'type'              => 'string',
+						'enum'              => $this->settings['table_types'],
 						'validate_callback' => function( $param ) {
 							return in_array( $param, $this->settings['table_types'], true );
 						},
 					),
 					'think_tank'    => array(
 						'required'          => false,
+						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'donor'         => array(
 						'required'          => false,
+						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'donation_year' => array(
 						'required'          => false,
+						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'donor_type'    => array(
 						'required'          => false,
+						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 					'search'        => array(
 						'required'          => false,
+						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
 				),
@@ -173,7 +190,7 @@ class API {
 		$search        = sanitize_text_field( $search );
 
 		// Custom function call to get think tank archive data.
-		$data = get_think_tank_archive_data( $donation_year, $search );
+		$data = $this->data->get_think_tank_archive_data( $donation_year, $search );
 
 		$response = array(
 			'columns' => array(
@@ -242,7 +259,7 @@ class API {
 		$donor_type    = sanitize_text_field( $donor_type );
 
 		// Custom function call to get data for a single think tank.
-		$data = get_single_think_tank_data( $think_tank, $donation_year, $donor_type );
+		$data = $this->data->get_single_think_tank_data( $think_tank, $donation_year, $donor_type );
 
 		$response = array(
 			'columns' => array(
@@ -308,7 +325,7 @@ class API {
 		$search        = sanitize_text_field( $search );
 
 		// Custom function call to get donor archive data.
-		$data = get_donor_archive_data( $donation_year, $donor_type, $search );
+		$data = $this->data->get_donor_archive_data( $donation_year, $donor_type, $search );
 
 		$response = array(
 			'columns' => array(
@@ -363,7 +380,7 @@ class API {
 		$donor_type    = sanitize_text_field( $donor_type );
 
 		// Custom function call to get data for a single donor.
-		$data = get_single_donor_data( $donor, $donation_year, $donor_type );
+		$data = $this->data->get_single_donor_data( $donor, $donation_year, $donor_type );
 
 		$response = array(
 			'columns' => array(
