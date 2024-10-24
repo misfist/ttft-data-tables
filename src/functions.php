@@ -135,3 +135,19 @@ function get_donation_accepted_key( $donor_type ): string {
 
 	return '';
 }
+
+/**
+ * Convert camelCase keys to lowercase separated by underscores.
+ *
+ * @param array $args The array with camelCase keys.
+ * @return array The array with keys converted to lowercase separated by underscores.
+ */
+function convert_camel_to_snake_keys( array $args ): array {
+	$converted_args = array();
+	foreach ( $args as $key => $value ) {
+		$new_key                    = strtolower( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $key ) );
+		$converted_args[ $new_key ] = $value;
+	}
+	return $converted_args;
+}
+
