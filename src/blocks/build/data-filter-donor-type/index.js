@@ -1,1 +1,374 @@
-(()=>{var e={"./src/blocks/src/data-filter-donor-type/edit.js":(e,t,a)=>{"use strict";a.r(t),a.d(t,{default:()=>l});var n=a("@wordpress/i18n"),s=a("@wordpress/block-editor"),p=a("@wordpress/components"),o=a("react/jsx-runtime");function l({attributes:e,setAttributes:t}){const a=(0,s.useBlockProps)({className:"data-filter data-filter--donor-type"});return(0,o.jsxs)("p",{...a,children:[(0,o.jsx)(p.Dashicon,{icon:"building"})," ",(0,n.__)("Donor Type Filter","ttft-data-tables")]})}},"./src/blocks/src/data-filter-donor-type/editor.scss":(e,t,a)=>{"use strict";a.r(t)},"./src/blocks/src/data-filter-donor-type/style.scss":()=>{throw new Error("Module build failed (from ./node_modules/mini-css-extract-plugin/dist/loader.js):\nHookWebpackError: Module build failed (from ./node_modules/sass-loader/dist/cjs.js):\nSassError: Can't find stylesheet to import.\n  ╷\n7 │  @import '../assets/config';\n  │          ^^^^^^^^^^^^^^^^^^\n  ╵\n  src/blocks/src/data-filter-donor-type/style.scss 7:10  root stylesheet\n    at tryRunOrWebpackError (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/HookWebpackError.js:86:9)\n    at __webpack_require_module__ (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5276:12)\n    at __webpack_require__ (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5233:18)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5305:20\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at done (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3527:9)\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5211:43\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3482:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5173:16\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5141:15\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at done (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3527:9)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5087:8\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3518:6\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/HookWebpackError.js:67:2\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)\n    at Cache.store (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:111:20)\n    at ItemCacheFacade.store (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/CacheFacade.js:141:15)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3517:11\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:95:34\n    at Array.<anonymous> (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/cache/MemoryCachePlugin.js:45:13)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:95:19\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:19:1)\n    at Cache.get (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:79:18)\n    at ItemCacheFacade.get (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/CacheFacade.js:115:15)\n    at Compilation._codeGenerationModule (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3485:9)\n    at codeGen (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5075:11)\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3482:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5105:14\n    at processQueue (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/util/processAsyncTree.js:61:4)\n    at processTicksAndRejections (node:internal/process/task_queues:77:11)\n    at runNextTicks (node:internal/process/task_queues:64:3)\n    at process.processImmediate (node:internal/timers:454:9)\n-- inner error --\nError: Module build failed (from ./node_modules/sass-loader/dist/cjs.js):\nSassError: Can't find stylesheet to import.\n  ╷\n7 │  @import '../assets/config';\n  │          ^^^^^^^^^^^^^^^^^^\n  ╵\n  src/blocks/src/data-filter-donor-type/style.scss 7:10  root stylesheet\n    at Object.<anonymous> (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/src/blocks/src/data-filter-donor-type/style.scss:1:7)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/javascript/JavascriptModulesPlugin.js:453:10\n    at Hook.eval [as call] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:19:10), <anonymous>:7:1)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5278:39\n    at tryRunOrWebpackError (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/HookWebpackError.js:81:7)\n    at __webpack_require_module__ (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5276:12)\n    at __webpack_require__ (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5233:18)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5305:20\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at done (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3527:9)\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5211:43\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3482:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5173:16\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5141:15\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3485:9)\n    at done (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3527:9)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5087:8\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3518:6\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/HookWebpackError.js:67:2\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:15:1)\n    at Cache.store (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:111:20)\n    at ItemCacheFacade.store (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/CacheFacade.js:141:15)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3517:11\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:95:34\n    at Array.<anonymous> (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/cache/MemoryCachePlugin.js:45:13)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:95:19\n    at Hook.eval [as callAsync] (eval at create (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:19:1)\n    at Cache.get (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Cache.js:79:18)\n    at ItemCacheFacade.get (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/CacheFacade.js:115:15)\n    at Compilation._codeGenerationModule (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:3485:9)\n    at codeGen (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5075:11)\n    at symbolIterator (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3482:9)\n    at timesSync (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:2297:7)\n    at Object.eachLimit (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/neo-async/async.js:3463:5)\n    at /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/Compilation.js:5105:14\n    at processQueue (/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/webpack/lib/util/processAsyncTree.js:61:4)\n    at processTicksAndRejections (node:internal/process/task_queues:77:11)\n    at runNextTicks (node:internal/process/task_queues:64:3)\n    at process.processImmediate (node:internal/timers:454:9)\n\nGenerated code for /Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!/Users/pea/Development/Sites/think-tank-transparency/app/public/wp-content/plugins/data-tables/src/blocks/src/data-filter-donor-type/style.scss\n1 | throw new Error(\"Module build failed (from ./node_modules/sass-loader/dist/cjs.js):\\nSassError: Can't find stylesheet to import.\\n  ╷\\n7 │  @import '../assets/config';\\n  │          ^^^^^^^^^^^^^^^^^^\\n  ╵\\n  src/blocks/src/data-filter-donor-type/style.scss 7:10  root stylesheet\");")},"react/jsx-runtime":e=>{"use strict";e.exports=window.ReactJSXRuntime},"@wordpress/block-editor":e=>{"use strict";e.exports=window.wp.blockEditor},"@wordpress/blocks":e=>{"use strict";e.exports=window.wp.blocks},"@wordpress/components":e=>{"use strict";e.exports=window.wp.components},"@wordpress/i18n":e=>{"use strict";e.exports=window.wp.i18n},"./src/blocks/src/data-filter-donor-type/block.json":e=>{"use strict";e.exports=JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"data-tables/data-filter-donor-type","version":"0.1.0","title":"Data Filter - Donor Type","description":"Display donor type filter.","category":"widgets","icon":"bank","attributes":{"donorType":{"type":"string"},"defaultDonorType":{"type":"string"}},"example":{},"supports":{"interactivity":true,"customClassName":true,"renaming":true},"providesContext":{"data-tables/donor-type":"donorType"},"textdomain":"data-tables","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScriptModule":"file:./view.js"}')}},t={};function a(n){var s=t[n];if(void 0!==s)return s.exports;var p=t[n]={exports:{}};return e[n](p,p.exports,a),p.exports}a.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return a.d(t,{a:t}),t},a.d=(e,t)=>{for(var n in t)a.o(t,n)&&!a.o(e,n)&&Object.defineProperty(e,n,{enumerable:!0,get:t[n]})},a.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),a.r=e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var n={};(()=>{"use strict";a.r(n);var e=a("@wordpress/blocks"),t=(a("./src/blocks/src/data-filter-donor-type/style.scss"),a("./src/blocks/src/data-filter-donor-type/editor.scss"),a("./src/blocks/src/data-filter-donor-type/edit.js")),s=a("./src/blocks/src/data-filter-donor-type/block.json");(0,e.registerBlockType)(s.name,{edit:t.default})})()})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/data-filter-donor-type/edit.js":
+/*!********************************************!*\
+  !*** ./src/data-filter-donor-type/edit.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Edit)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/**
+ * Retrieves the translation of text.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
+ */
+
+
+/**
+ * React hook that is used to mark the block wrapper element.
+ * It provides all the necessary props like the class name.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
+ */
+
+
+
+/**
+ * The edit function describes the structure of your block in the context of the
+ * editor. This represents what the editor will render when the block is used.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
+ *
+ * @param {Object}   props               Properties passed to the function.
+ * @param {Object}   props.attributes    Available block attributes.
+ * @param {Function} props.setAttributes Function that updates individual attributes.
+ *
+ * @return {Element} Element to render.
+ */
+
+function Edit({
+  attributes,
+  setAttributes
+}) {
+  const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)({
+    className: 'data-filter data-filter--donor-type'
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("p", {
+    ...blockProps,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Dashicon, {
+      icon: "building"
+    }), ' ', (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Donor Type Filter', 'ttft-data-tables')]
+  });
+}
+
+/***/ }),
+
+/***/ "./src/data-filter-donor-type/index.js":
+/*!*********************************************!*\
+  !*** ./src/data-filter-donor-type/index.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./style.scss */ "./src/data-filter-donor-type/style.scss");
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./src/data-filter-donor-type/editor.scss");
+/* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./edit */ "./src/data-filter-donor-type/edit.js");
+/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./block.json */ "./src/data-filter-donor-type/block.json");
+/**
+ * Registers a new block provided a unique name and an object defining its behavior.
+ *
+ * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+ */
+
+
+/**
+ * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
+ * All files containing `style` keyword are bundled together. The code used
+ * gets applied both to the front of your site and to the editor. All other files
+ * get applied to the editor only.
+ *
+ * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
+ */
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+/**
+ * Every block starts by registering a new block type definition.
+ *
+ * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+ */
+(0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.registerBlockType)(_block_json__WEBPACK_IMPORTED_MODULE_4__.name, {
+  /**
+   * @see ./edit.js
+   */
+  edit: _edit__WEBPACK_IMPORTED_MODULE_3__["default"]
+});
+
+/***/ }),
+
+/***/ "./src/data-filter-donor-type/editor.scss":
+/*!************************************************!*\
+  !*** ./src/data-filter-donor-type/editor.scss ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
+/***/ "./src/data-filter-donor-type/style.scss":
+/*!***********************************************!*\
+  !*** ./src/data-filter-donor-type/style.scss ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
+/***/ "react/jsx-runtime":
+/*!**********************************!*\
+  !*** external "ReactJSXRuntime" ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = window["ReactJSXRuntime"];
+
+/***/ }),
+
+/***/ "@wordpress/block-editor":
+/*!*************************************!*\
+  !*** external ["wp","blockEditor"] ***!
+  \*************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["blockEditor"];
+
+/***/ }),
+
+/***/ "@wordpress/blocks":
+/*!********************************!*\
+  !*** external ["wp","blocks"] ***!
+  \********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["blocks"];
+
+/***/ }),
+
+/***/ "@wordpress/components":
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["components"];
+
+/***/ }),
+
+/***/ "@wordpress/i18n":
+/*!******************************!*\
+  !*** external ["wp","i18n"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["i18n"];
+
+/***/ }),
+
+/***/ "./src/data-filter-donor-type/block.json":
+/*!***********************************************!*\
+  !*** ./src/data-filter-donor-type/block.json ***!
+  \***********************************************/
+/***/ ((module) => {
+
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"data-tables/data-filter-donor-type","version":"0.1.0","title":"Data Filter - Donor Type","description":"Display donor type filter.","category":"widgets","icon":"bank","attributes":{"donorType":{"type":"string"},"defaultDonorType":{"type":"string"}},"example":{},"supports":{"interactivity":true,"customClassName":true,"renaming":true},"providesContext":{"data-tables/donor-type":"donorType"},"textdomain":"data-tables","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScriptModule":"file:./view.js"}');
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/chunk loaded */
+/******/ 	(() => {
+/******/ 		var deferred = [];
+/******/ 		__webpack_require__.O = (result, chunkIds, fn, priority) => {
+/******/ 			if(chunkIds) {
+/******/ 				priority = priority || 0;
+/******/ 				for(var i = deferred.length; i > 0 && deferred[i - 1][2] > priority; i--) deferred[i] = deferred[i - 1];
+/******/ 				deferred[i] = [chunkIds, fn, priority];
+/******/ 				return;
+/******/ 			}
+/******/ 			var notFulfilled = Infinity;
+/******/ 			for (var i = 0; i < deferred.length; i++) {
+/******/ 				var chunkIds = deferred[i][0];
+/******/ 				var fn = deferred[i][1];
+/******/ 				var priority = deferred[i][2];
+/******/ 				var fulfilled = true;
+/******/ 				for (var j = 0; j < chunkIds.length; j++) {
+/******/ 					if ((priority & 1 === 0 || notFulfilled >= priority) && Object.keys(__webpack_require__.O).every((key) => (__webpack_require__.O[key](chunkIds[j])))) {
+/******/ 						chunkIds.splice(j--, 1);
+/******/ 					} else {
+/******/ 						fulfilled = false;
+/******/ 						if(priority < notFulfilled) notFulfilled = priority;
+/******/ 					}
+/******/ 				}
+/******/ 				if(fulfilled) {
+/******/ 					deferred.splice(i--, 1)
+/******/ 					var r = fn();
+/******/ 					if (r !== undefined) result = r;
+/******/ 				}
+/******/ 			}
+/******/ 			return result;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		// no baseURI
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = {
+/******/ 			"data-filter-donor-type/index": 0,
+/******/ 			"data-filter-donor-type/style-index": 0
+/******/ 		};
+/******/ 		
+/******/ 		// no chunk on demand loading
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		// no HMR
+/******/ 		
+/******/ 		// no HMR manifest
+/******/ 		
+/******/ 		__webpack_require__.O.j = (chunkId) => (installedChunks[chunkId] === 0);
+/******/ 		
+/******/ 		// install a JSONP callback for chunk loading
+/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 			var chunkIds = data[0];
+/******/ 			var moreModules = data[1];
+/******/ 			var runtime = data[2];
+/******/ 			// add "moreModules" to the modules object,
+/******/ 			// then flag all "chunkIds" as loaded and fire callback
+/******/ 			var moduleId, chunkId, i = 0;
+/******/ 			if(chunkIds.some((id) => (installedChunks[id] !== 0))) {
+/******/ 				for(moduleId in moreModules) {
+/******/ 					if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 						__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 					}
+/******/ 				}
+/******/ 				if(runtime) var result = runtime(__webpack_require__);
+/******/ 			}
+/******/ 			if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 			for(;i < chunkIds.length; i++) {
+/******/ 				chunkId = chunkIds[i];
+/******/ 				if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 					installedChunks[chunkId][0]();
+/******/ 				}
+/******/ 				installedChunks[chunkId] = 0;
+/******/ 			}
+/******/ 			return __webpack_require__.O(result);
+/******/ 		}
+/******/ 		
+/******/ 		var chunkLoadingGlobal = self["webpackChunkdata_tables"] = self["webpackChunkdata_tables"] || [];
+/******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["data-filter-donor-type/style-index"], () => (__webpack_require__("./src/data-filter-donor-type/index.js")))
+/******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
+/******/ 	
+/******/ })()
+;
+//# sourceMappingURL=index.js.map

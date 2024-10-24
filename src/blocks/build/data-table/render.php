@@ -14,7 +14,6 @@ namespace Ttft\Data_Tables\Blocks;
 
 use Ttft\Data_Tables\Data as Data;
 use Ttft\Data_Tables\Render as Render;
-
 $render = new Render();
 
 global $wp_query;

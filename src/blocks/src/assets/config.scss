@@ -1,0 +1,46 @@
+/* Breakpoints */
+$breakpoints: (
+  mobile: 480px,
+  small: 600px,
+  medium: 782px,
+  large: 960px,
+  xlarge: 1080px,
+  wide: 1280px,
+  huge: 1440px,
+  xhuge: 1920px
+);
+
+@function breakpoint( $name ) {
+  @return map-get( $breakpoints, $name );
+}
+
+$break-xhuge: breakpoint( xhuge );
+$break-huge: breakpoint( huge );
+$break-wide: breakpoint( wide );
+$break-xlarge: breakpoint( xlarge );
+$break-large: breakpoint( large );	// admin sidebar auto folds
+$break-medium: breakpoint( medium );	// adminbar goes big
+$break-mobile: breakpoint( mobile );
+$break-small: breakpoint( small );
+$break-zoomed-in: 280px;
+
+// Define mixin for media queries with min width
+@mixin responsive-min($min-width) {
+	@media only screen and (min-width: $min-width) {
+		@content;
+	}
+}
+
+// Define mixin for media queries with max width
+@mixin responsive-max($max-width) {
+	@media only screen and (max-width: $max-width) {
+		@content;
+	}
+}
+
+
+@include responsive-min( $break-small + 1px ) {
+		.mobile-only {
+      display: none;
+    }
+}
