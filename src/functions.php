@@ -12,7 +12,7 @@ namespace Ttft\Data_Tables;
  * @return array $post_id
  */
 function get_post_from_term( $slug, $type ) {
-	$args = array(
+	$args  = array(
 		'post_type'      => $type,
 		'posts_per_page' => 1,
 		'name'           => $slug,
@@ -83,7 +83,7 @@ function render_star_rating( $post_id = 0 ): void {
  */
 function generate_star_rating( $score = 0 ): string {
 	$score = (int) $score;
-	$max = 5;
+	$max   = 5;
 	ob_start();
 	?>
 	
@@ -123,12 +123,12 @@ function get_donation_accepted_key( $donor_type ): string {
 	$donor_type = strtolower( $donor_type );
 	$us_pattern = '/[uU][\.\-]?[sS]/';
 
-	if( $donor_type ) {
-		if( strpos( $donor_type, 'foreign' ) !== false ) {
+	if ( $donor_type ) {
+		if ( strpos( $donor_type, 'foreign' ) !== false ) {
 			return 'no_foreign_accepted';
-		} elseif( ( strpos( $donor_type, 'pentagon' ) !== false ) || strpos( $donor_type, 'defense' ) !== false ) {
+		} elseif ( ( strpos( $donor_type, 'pentagon' ) !== false ) || strpos( $donor_type, 'defense' ) !== false ) {
 			return 'no_defense_accepted';
-		} elseif( preg_match( $us_pattern, $donor_type ) ) {
+		} elseif ( preg_match( $us_pattern, $donor_type ) ) {
 			return 'no_domestic_accepted';
 		}
 	}
