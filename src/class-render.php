@@ -8,6 +8,11 @@ use Ttft\Data_Tables\Data;
 
 class Render {
 
+    /**
+     * Data class instance.
+     *
+     * @var Data
+     */
     protected $data;
 
     /**
