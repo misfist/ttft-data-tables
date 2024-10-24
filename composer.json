@@ -31,7 +31,8 @@
         },
         "files": [
             "src/functions.php"
-        ]
+        ],
+        "exclude-from-classmap": ["/src/blocks/node_modules/"]
     },
     "require": {},
     "require-dev": {
