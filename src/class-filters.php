@@ -94,7 +94,7 @@ class Filters {
         if ( $years ) {
             wp_interactivity_state( TTFT_APP_NAMESPACE, array( 'donationYear', 'all' ) );
 
-            $all    = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
+            $all    = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Years', 'data-tables' ) ) );
             $years  = $all + $years;
             $context = array(
                 'donationYears' => array( $years )
@@ -121,7 +121,7 @@ class Filters {
                     <label 
                         for="filter-year-<?php echo esc_attr( $year ); ?>" 
                         class="option"
-                        aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $year ) ) ); ?>"
+                        aria-label="<?php printf( esc_attr( 'Filter by %s', 'data-tables' ), esc_attr( wp_strip_all_tags( $year ) ) ); ?>"
                     >
                         <?php echo esc_html( $year ); ?>
                     </label>
@@ -144,7 +144,7 @@ class Filters {
 
         if ( $types ) {
             wp_interactivity_state( TTFT_APP_NAMESPACE, array( 'donorType', 'all' ) );
-            $all    = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Donor Types', 'ttft-data-tables' ) ) );
+            $all    = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Donor Types', 'data-tables' ) ) );
             $types  = $all + $types;
             $context = array(
                 'donationTypes' => array( $types )
@@ -171,7 +171,7 @@ class Filters {
                     <label 
                         for="filter-<?php echo esc_attr( $type->slug ); ?>" 
                         class="option"
-                        aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $type->name ) ) ); ?>"
+                        aria-label="<?php printf( esc_attr( 'Filter by %s', 'data-tables' ), esc_attr( wp_strip_all_tags( $type->name ) ) ); ?>"
                     >
                         <?php echo esc_html( $type->name ); ?>
                     </label>

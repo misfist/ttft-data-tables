@@ -21,7 +21,7 @@ class Blocks {
      */
     public function enqueue_scripts(): void {
         wp_enqueue_script(
-            'ttft-data-tables',
+            'data-tables',
             TTFT_URL . 'src/assets/DataTables/datatables.min.js',
             array( 'jquery' ),
             TTFT_VERSION,

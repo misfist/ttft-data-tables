@@ -32,7 +32,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<Dashicon icon="forms" />{ ' ' }
-			{ __( 'Entity Type Filter', 'ttft-data-tables' ) }
+			{ __( 'Entity Type Filter', 'data-tables' ) }
 		</div>
 	);
 }

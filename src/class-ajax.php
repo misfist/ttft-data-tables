@@ -53,7 +53,7 @@ class AJAX {
 		} else {
 			wp_send_json_error(
 				array(
-					'message' => __( 'No data found.', 'ttft-data-tables' ),
+					'message' => __( 'No data found.', 'data-tables' ),
 				)
 			);
 		}
@@ -71,7 +71,7 @@ class AJAX {
 		$args = $this->convert_camel_to_snake_keys( $args );
 
 		if ( empty( $args['table_type'] ) ) {
-			return __( 'Table Type attribute is required.', 'ttft-data-tables' );
+			return __( 'Table Type attribute is required.', 'data-tables' );
 		}
 
 		$data = new Data();

@@ -26,7 +26,7 @@ $terms     = get_terms(
 	)
 );
 $term_list = wp_list_pluck( $terms, 'name', 'slug' );
-$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'ttft-data-tables' ), __( 'Years', 'ttft-data-tables' ) ) );
+$all       = array( 'all' => sprintf( __( 'All <span class="mobile-only">%s</span>', 'data-tables' ), __( 'Years', 'data-tables' ) ) );
 $options   = $all + $term_list;
 
 wp_interactivity_state(
@@ -84,7 +84,7 @@ ob_start();
 			<label 
 				for="<?php echo $input_id; ?>" 
 				class="option" 
-				aria-label="<?php printf( esc_attr( 'Filter by %s', 'ttft-data-tables' ), esc_attr( wp_strip_all_tags( $label ) ) ); ?>"
+				aria-label="<?php printf( esc_attr( 'Filter by %s', 'data-tables' ), esc_attr( wp_strip_all_tags( $label ) ) ); ?>"
 			><?php echo $label; ?></label>
 
 		<?php
