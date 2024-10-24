@@ -4,6 +4,8 @@
  */
 namespace Ttft\Data_Tables;
 
+use Ttft\Data_Tables\Render;
+
 class AJAX {
     /**
 	 * The action name for the AJAX request.
@@ -68,15 +70,15 @@ class AJAX {
 	 * @return string string.
 	 */
 	public function get_table( $args ) {
-		$args = $this->convert_camel_to_snake_keys( $args );
+		$args = convert_camel_to_snake_keys( $args );
 
 		if ( empty( $args['table_type'] ) ) {
 			return __( 'Table Type attribute is required.', 'data-tables' );
 		}
 
-		$data = new Data();
+		$render = new Render();
 
-		$output = $data->generate_data_table( $args['table_type'], $args );
+		$output = $render->generate_data_table( sanitize_text_field( $args['table_type'] ), $args );
 
 		return $output;
 	}
