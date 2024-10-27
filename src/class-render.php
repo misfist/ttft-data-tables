@@ -189,17 +189,38 @@ class Render {
                                 <th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                        <th class="column-numeric column-transparency-score noExport" scope="col"><?php esc_html_e( 'Score', 'data-tables' ); ?></th>
+                        <th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'data-tables' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ( $data as $think_tank_slug => $data ) : ?>
                         <tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
                             <td class="column-think-tank"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $data['think_tank'] ); ?></a></td>
-                            <?php foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
-                                <td class="column-numeric column-min-amount"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></td>
-                            <?php endforeach; ?>
-                            <td class="column-numeric column-transparency-score"><?php echo $this->generate_star_rating( intval( $data['transparency_score'] ) ); ?></td>
+                            <?php 
+                            foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
+                                <td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
+                                    <?php
+                                    $key = get_donation_accepted_key( $donor_type );
+                                    if ( $data[ $key ] && 0 == $amount ) :
+                                        ?>
+                                        <span class="screen-reader-text" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'data-tables' ), $donor_type ) ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
+                                        <span class="not-accepted"></span>
+                                        <?php
+                                    elseif ( $data['limited_info'] && 0 == $amount ) :
+                                        ?>
+                                        <span class="screen-reader-text"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
+                                        <span class="not-disclosed no-export" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t disclose funding from %s', 'data-tables' ), $donor_type ) ); ?>"></span>
+                                        <?php
+                                    else :
+                                        ?>
+                                        <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+                                        <?php
+                                    endif;
+                                    ?>
+                                </td>
+                            <?php 
+                            endforeach; ?>
+                            <td class="column-numeric column-transparency-score"><span class="screen-reader-text"><?php echo intval( $data['transparency_score'] ); ?></span><?php echo generate_star_rating( intval( $data['transparency_score'] ) ); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
