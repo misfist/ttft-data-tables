@@ -1,0 +1,52 @@
+/*!**************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/data-filter-donor-type/style.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+/* Breakpoints */
+@media only screen and (min-width: 601px) {
+  .mobile-only {
+    display: none;
+  }
+}
+@media only screen and (min-width: 601px) {
+  .wp-block-data-tables-data-filter-donor-type {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    -moz-column-gap: var(--wp--preset--spacing--20);
+         column-gap: var(--wp--preset--spacing--20);
+    row-gap: var(--wp--preset--spacing--10);
+    background-color: var(--wp--preset--color--gray-200);
+    padding: var(--wp--preset--spacing--10);
+  }
+  .wp-block-data-tables-data-filter-donor-type input[type=radio] {
+    display: none;
+  }
+  .wp-block-data-tables-data-filter-donor-type label {
+    display: inline-block;
+    margin-right: 5px;
+    cursor: pointer;
+    background-color: var(--wp--preset--color--gray-200);
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    font-size: var(--wp--preset--font-size--small);
+    font-weight: 400;
+    padding: calc(var(--wp--preset--spacing--10) / 2);
+    border-radius: var(--wp--custom--border--radius--sm);
+  }
+  .wp-block-data-tables-data-filter-donor-type label:hover, .wp-block-data-tables-data-filter-donor-type label:focus {
+    background-color: var(--wp--custom--color--hover);
+  }
+  .wp-block-data-tables-data-filter-donor-type input[type=radio]:checked + label {
+    background-color: var(--wp--preset--color--contrast-2);
+    color: var(--wp--preset--color--white);
+  }
+}
+
+/*# sourceMappingURL=style-index.css.map*/

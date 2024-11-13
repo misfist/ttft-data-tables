@@ -2,7 +2,7 @@
 /**
  * Shortcode Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
 
 /**
  * Shortcode to display the top ten table.
@@ -159,7 +159,7 @@ function data_table( $atts ): string {
     );
 
     if ( empty( $atts['table_type'] ) ) {
-        return __( 'Table Type attribute is required.', 'ttft-data-tables' );
+        return __( 'Table Type attribute is required.', 'data-tables' );
     }
 
     $output = generate_data_table( $atts['table_type'], $atts );

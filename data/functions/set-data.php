@@ -2,4 +2,4 @@
 /**
  * Set Data Functions
  */
-namespace TTFT\Data_Tables\Data;
+namespace Ttft\Data_Tables\Data;
