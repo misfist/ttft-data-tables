@@ -531,16 +531,28 @@ class Data {
 				foreach ( wp_get_post_terms( $transaction_id, 'donor_type' ) as $donor_type_term ) {
 					$donor_type = $donor_type_term->name;
 	
-					$disclosed = get_post_meta( get_the_ID(), 'disclosed', true );
-					$amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
+					if ( ! isset( $transactions[ $think_tank_slug ][ $donor_type ] ) ) {
+						$transactions[ $think_tank_slug ][ $donor_type ] = array();
+					}
 	
-					if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
-						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'ttft-data-tables' );
-					} else {
-						$amount_calc = floatval( $amount_calc );
-						if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
-							$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+					$transactions[ $think_tank_slug ][ $donor_type ][] = $transaction_id;
+				}
+			}
+	
+			// Process grouped transactions.
+			foreach ( $transactions as $think_tank_slug => $donor_types ) {
+				foreach ( $donor_types as $donor_type => $transaction_ids ) {
+					if ( $this->is_disclosed( $transaction_ids ) ) {
+						// Calculate the cumulative value for disclosed transactions.
+						foreach ( $transaction_ids as $transaction_id ) {
+							$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
+							if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
+								$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+							}
 						}
+					} else {
+						// Mark as 'unknown' if all transactions are undisclosed.
+						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
 					}
 				}
 			}
