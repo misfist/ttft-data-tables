@@ -10,6 +10,19 @@ use function Ttft\Data_Tables\get_transparency_score_from_slug;
 class Data {
 
 	/**
+	 * Array of settings.
+	 *
+	 * @var array
+	 */
+	public $settings = array();
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->settings = get_option( 'site_settings' );
+	}
+
+	/**
 	 * Get Raw Table Data
 	 *
 	 * @param string $donor_type Optional. The slug of the donor_type taxonomy term. Default empty.
