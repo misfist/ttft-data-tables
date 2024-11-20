@@ -182,6 +182,7 @@ class Data {
 					'donor_type'  => get_the_term_list( $post_id, 'donor_type' ),
 					'donor_link'  => get_term_link( $donor_slugs[0], 'donor' ),
 					'donor_slug'  => $donor_slug,
+					'disclosed'   => get_post_meta( $post_id, 'disclosed', true ),
 					'source'      => get_post_meta( $post_id, 'source', true ),
 				);
 			}
@@ -263,6 +264,7 @@ class Data {
 				$think_tank      = $think_tanks[0];
 				$think_tank_slug = $think_tank->slug;
 				$source          = get_post_meta( $post_id, 'source', true );
+				$disclosed       = get_post_meta( $post_id, 'disclosed', true );
 
 				$amount_calc = get_post_meta( $post_id, 'amount_calc', true );
 				if ( empty( $amount_calc ) ) {
@@ -285,6 +287,7 @@ class Data {
 					'amount_calc'     => (int) $amount_calc,
 					'donor_type'      => $donor_type,
 					'source'          => $source,
+					'disclosed'       => $disclosed,
 					'think_tank_slug' => $think_tank_slug,
 				);
 			}
@@ -380,11 +383,14 @@ class Data {
 				$amount = get_post_meta( $post_id, 'amount_calc', true );
 				$amount = intval( $amount );
 
+				$disclosed = get_post_meta( $post_id, 'disclosed', true );
+
 				$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
 
 				$data[] = array(
 					'donor'       => $donor_name,
 					'amount_calc' => $amount,
+					'disclosed'   => $disclosed,
 					'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
 					'donor_slug'  => $donor_slug,
 					'donor_link'  => get_term_link( $donor_slug, 'donor' ),
