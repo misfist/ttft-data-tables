@@ -452,14 +452,14 @@ class Data {
 	public function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
 		$donation_year = sanitize_text_field( $donation_year );
 		$search        = sanitize_text_field( $search );
-	
+
 		$transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
 		$data          = get_transient( $transient_key );
-	
+
 		if ( false !== $data ) {
 			return $data;
 		}
-	
+
 		// Get all donor types.
 		$donor_types = get_terms(
 			array(
@@ -469,30 +469,30 @@ class Data {
 				'hide_empty' => false,
 			)
 		);
-	
+
 		// Initialize donor types with default values.
 		$default_donor_types = array();
 		foreach ( $donor_types as $term ) {
 			$default_donor_types[ $term->name ] = 0;
 		}
-	
+
 		$think_tank_args = array(
 			'post_type'      => 'think_tank',
 			'posts_per_page' => -1,
 			'post_status'    => 'publish',
 			'fields'         => 'ids',
 		);
-	
+
 		if ( ! empty( $search ) ) {
 			$think_tank_args['s'] = $search;
 		}
-	
+
 		$think_tank_query = new \WP_Query( $think_tank_args );
 		$data             = array();
-	
+
 		if ( $think_tank_query->have_posts() ) {
 			foreach ( $think_tank_query->posts as $think_tank_id ) {
-				$slug                = get_post_field( 'post_name', $think_tank_id );
+				$slug          = get_post_field( 'post_name', $think_tank_id );
 				$data[ $slug ] = array(
 					'think_tank'           => get_the_title( $think_tank_id ),
 					'donor_types'          => $default_donor_types, // Initialize donor types with default values.
@@ -505,14 +505,14 @@ class Data {
 			}
 		}
 		wp_reset_postdata();
-	
+
 		$transaction_args = array(
 			'post_type'      => 'transaction',
 			'posts_per_page' => -1,
 			'post_status'    => 'publish',
 			'fields'         => 'ids',
 		);
-	
+
 		if ( ! empty( $donation_year ) ) {
 			$transaction_args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
@@ -520,31 +520,31 @@ class Data {
 				'terms'    => $donation_year,
 			);
 		}
-	
+
 		$transaction_query = new \WP_Query( $transaction_args );
 		$transactions      = array();
-	
+
 		if ( $transaction_query->have_posts() ) {
 			foreach ( $transaction_query->posts as $transaction_id ) {
 				$think_tank_terms = wp_get_post_terms( $transaction_id, 'think_tank' );
-	
+
 				if ( ! $think_tank_terms ) {
 					continue;
 				}
-	
+
 				$think_tank_slug = $think_tank_terms[0]->slug;
-	
+
 				foreach ( wp_get_post_terms( $transaction_id, 'donor_type' ) as $donor_type_term ) {
 					$donor_type = $donor_type_term->name;
-	
+
 					if ( ! isset( $transactions[ $think_tank_slug ][ $donor_type ] ) ) {
 						$transactions[ $think_tank_slug ][ $donor_type ] = array();
 					}
-	
+
 					$transactions[ $think_tank_slug ][ $donor_type ][] = $transaction_id;
 				}
 			}
-	
+
 			// Process grouped transactions.
 			foreach ( $transactions as $think_tank_slug => $donor_types ) {
 				foreach ( $donor_types as $donor_type => $transaction_ids ) {
@@ -564,121 +564,121 @@ class Data {
 			}
 		}
 		wp_reset_postdata();
-	
+
 		ksort( $data );
-	
+
 		set_transient( $transient_key, $data, $this->cache_expiration );
-	
+
 		return $data;
 	}
 	// public function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
-	// 	$donation_year = sanitize_text_field( $donation_year );
-	// 	$search        = sanitize_text_field( $search );
+	// $donation_year = sanitize_text_field( $donation_year );
+	// $search        = sanitize_text_field( $search );
 
-	// 	$transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
-	// 	$data          = get_transient( $transient_key );
+	// $transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
+	// $data          = get_transient( $transient_key );
 
-	// 	if ( false !== $data ) {
-	// 		return $data;
-	// 	}
+	// if ( false !== $data ) {
+	// return $data;
+	// }
 
-	// 	// Get all donor types.
-	// 	$donor_type_terms = get_terms(
-	// 		array(
-	// 			'taxonomy'   => 'donor_type',
-	// 			'orderby'    => 'term_id',
-	// 			'order'      => 'ASC',
-	// 			'hide_empty' => false,
-	// 		)
-	// 	);
+	// Get all donor types.
+	// $donor_type_terms = get_terms(
+	// array(
+	// 'taxonomy'   => 'donor_type',
+	// 'orderby'    => 'term_id',
+	// 'order'      => 'ASC',
+	// 'hide_empty' => false,
+	// )
+	// );
 
-	// 	// Initialize donor_types with default values.
-	// 	$default_donor_types = array();
-	// 	foreach ( $donor_type_terms as $term ) {
-	// 		$default_donor_types[ $term->name ] = 0;
-	// 	}
+	// Initialize donor_types with default values.
+	// $default_donor_types = array();
+	// foreach ( $donor_type_terms as $term ) {
+	// $default_donor_types[ $term->name ] = 0;
+	// }
 
-	// 	$think_tank_args = array(
-	// 		'post_type'      => 'think_tank',
-	// 		'posts_per_page' => -1,
-	// 		'post_status'    => 'publish',
-	// 		'fields'         => 'ids',
-	// 	);
+	// $think_tank_args = array(
+	// 'post_type'      => 'think_tank',
+	// 'posts_per_page' => -1,
+	// 'post_status'    => 'publish',
+	// 'fields'         => 'ids',
+	// );
 
-	// 	if ( ! empty( $search ) ) {
-	// 		$think_tank_args['s'] = $search;
-	// 	}
+	// if ( ! empty( $search ) ) {
+	// $think_tank_args['s'] = $search;
+	// }
 
-	// 	$think_tank_query = new \WP_Query( $think_tank_args );
-	// 	$data             = array();
+	// $think_tank_query = new \WP_Query( $think_tank_args );
+	// $data             = array();
 
-	// 	if ( $think_tank_query->have_posts() ) {
-	// 		foreach ( $think_tank_query->posts as $think_tank_id ) {
-	// 			$think_tank_slug          = get_post_field( 'post_name', $think_tank_id );
-	// 			$data[ $think_tank_slug ] = array(
-	// 				'think_tank'           => get_the_title( $think_tank_id ),
-	// 				'donor_types'          => $default_donor_types, // Initialize donor_types with default values.
-	// 				'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
-	// 				'no_defense_accepted'  => get_post_meta( $think_tank_id, 'no_defense_accepted', true ),
-	// 				'no_domestic_accepted' => get_post_meta( $think_tank_id, 'no_domestic_accepted', true ),
-	// 				'no_foreign_accepted'  => get_post_meta( $think_tank_id, 'no_foreign_accepted', true ),
-	// 				'limited_info'         => get_post_meta( $think_tank_id, 'limited_info', true ),
-	// 			);
-	// 		}
-	// 	}
-	// 	wp_reset_postdata();
+	// if ( $think_tank_query->have_posts() ) {
+	// foreach ( $think_tank_query->posts as $think_tank_id ) {
+	// $think_tank_slug          = get_post_field( 'post_name', $think_tank_id );
+	// $data[ $think_tank_slug ] = array(
+	// 'think_tank'           => get_the_title( $think_tank_id ),
+	// 'donor_types'          => $default_donor_types, // Initialize donor_types with default values.
+	// 'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
+	// 'no_defense_accepted'  => get_post_meta( $think_tank_id, 'no_defense_accepted', true ),
+	// 'no_domestic_accepted' => get_post_meta( $think_tank_id, 'no_domestic_accepted', true ),
+	// 'no_foreign_accepted'  => get_post_meta( $think_tank_id, 'no_foreign_accepted', true ),
+	// 'limited_info'         => get_post_meta( $think_tank_id, 'limited_info', true ),
+	// );
+	// }
+	// }
+	// wp_reset_postdata();
 
-	// 	$transaction_args = array(
-	// 		'post_type'      => 'transaction',
-	// 		'posts_per_page' => -1,
-	// 		'post_status'    => 'publish',
-	// 	);
+	// $transaction_args = array(
+	// 'post_type'      => 'transaction',
+	// 'posts_per_page' => -1,
+	// 'post_status'    => 'publish',
+	// );
 
-	// 	if ( ! empty( $donation_year ) ) {
-	// 		$transaction_args['tax_query'][] = array(
-	// 			'taxonomy' => 'donation_year',
-	// 			'field'    => 'slug',
-	// 			'terms'    => $donation_year,
-	// 		);
-	// 	}
+	// if ( ! empty( $donation_year ) ) {
+	// $transaction_args['tax_query'][] = array(
+	// 'taxonomy' => 'donation_year',
+	// 'field'    => 'slug',
+	// 'terms'    => $donation_year,
+	// );
+	// }
 
-	// 	$transaction_query = new \WP_Query( $transaction_args );
+	// $transaction_query = new \WP_Query( $transaction_args );
 
-	// 	if ( $transaction_query->have_posts() ) {
-	// 		while ( $transaction_query->have_posts() ) {
-	// 			$transaction_query->the_post();
-	// 			$think_tank_terms = wp_get_post_terms( get_the_ID(), 'think_tank' );
+	// if ( $transaction_query->have_posts() ) {
+	// while ( $transaction_query->have_posts() ) {
+	// $transaction_query->the_post();
+	// $think_tank_terms = wp_get_post_terms( get_the_ID(), 'think_tank' );
 
-	// 			if ( ! $think_tank_terms ) {
-	// 				continue;
-	// 			}
+	// if ( ! $think_tank_terms ) {
+	// continue;
+	// }
 
-	// 			$think_tank_slug = $think_tank_terms[0]->slug;
+	// $think_tank_slug = $think_tank_terms[0]->slug;
 
-	// 			foreach ( wp_get_post_terms( get_the_ID(), 'donor_type' ) as $donor_type_term ) {
-	// 				$donor_type = $donor_type_term->name;
+	// foreach ( wp_get_post_terms( get_the_ID(), 'donor_type' ) as $donor_type_term ) {
+	// $donor_type = $donor_type_term->name;
 
-	// 				$disclosed   = get_post_meta( get_the_ID(), 'disclosed', true );
-	// 				$amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
+	// $disclosed   = get_post_meta( get_the_ID(), 'disclosed', true );
+	// $amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
 
-	// 				if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
-	// 					$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
-	// 				} else {
-	// 					$amount_calc = floatval( $amount_calc );
-	// 					if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
-	// 						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	wp_reset_postdata();
+	// if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
+	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
+	// } else {
+	// $amount_calc = floatval( $amount_calc );
+	// if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
+	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+	// }
+	// }
+	// }
+	// }
+	// }
+	// wp_reset_postdata();
 
-	// 	ksort( $data );
+	// ksort( $data );
 
-	// 	set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+	// set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
-	// 	return $data;
+	// return $data;
 	// }
 
 	/**
