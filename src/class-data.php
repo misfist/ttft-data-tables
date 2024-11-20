@@ -706,4 +706,25 @@ class Data {
 		$terms = get_terms( $args );
 		return ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? $terms : array();
 	}
+
+	/**
+	 * Check if all transactions for the given post IDs are not disclosed.
+	 *
+	 * @param array $post_ids Array of transaction post IDs.
+	 * @return bool True if any transaction is disclosed, false if all are undisclosed.
+	 */
+	public function is_disclosed( array $post_ids ): bool {
+		$meta_values = $this->get_meta_values_for_records( $post_ids, 'disclosed' );
+
+		$undisclosed = array_filter(
+			$meta_values,
+			function ( $value ) {
+				return strtolower( $value ) !== 'no';
+			}
+		);
+
+		// If all values are 'no', return false. Otherwise, return true.
+		return ! empty( $undisclosed );
+	}
+
 }
