@@ -185,7 +185,8 @@ class Render {
                         <th class="column-think-tank" scope="col"><?php esc_html_e( 'Think Tank', 'data-tables' ); ?></th>
                         <?php if ( ! empty( $data ) ) :
                             $first_entry = reset( $data );
-                            foreach ( $first_entry['donor_types'] as $donor_type => $amount ) : ?>
+                            $donor_types = array_keys( $first_entry['donor_types'] );
+                            foreach ( $donor_types as $donor_type ) : ?>
                                 <th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -193,23 +194,26 @@ class Render {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $data as $think_tank_slug => $data ) : ?>
+                    <?php foreach ( $data as $think_tank_slug => $data ) : 
+                        ?>
                         <tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
                             <td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $data['think_tank'] ); ?></a></td>
                             <?php 
                             foreach ( $data['donor_types'] as $donor_type => $amount ) : ?>
-                                <td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
+                                <td class="<?php echo is_numeric( $amount ) ? 'column-numeric' : 'column-text'; ?> column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>">
                                     <?php
                                     $key = get_donation_accepted_key( $donor_type );
                                     if ( $data[ $key ] && 0 == $amount ) :
                                         ?>
-                                        <span class="screen-reader-text" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'data-tables' ), $donor_type ) ); ?>"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
-                                        <span class="not-accepted"></span>
+                                        <span class="not-accepted" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Not Accepted', 'data-tables' ); ?>"></span>
                                         <?php
                                     elseif ( $data['limited_info'] && 0 == $amount ) :
                                         ?>
-                                        <span class="screen-reader-text"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span>
-                                        <span class="not-disclosed no-export" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t disclose funding from %s', 'data-tables' ), $donor_type ) ); ?>"></span>
+                                        <span class="no-data" aria-label="<?php echo esc_attr( sprintf( __( 'Little or no %s funding data is available for this think tank.', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Not Available', 'data-tables' ); ?>"></span>
+                                        <?php
+                                    elseif ( strcasecmp( $amount, 'unknown' ) === 0 ) :
+                                        ?>
+                                        <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount received from %s is unknown', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Unknown', 'data-tables' ); ?>"></span>
                                         <?php
                                     else :
                                         ?>
