@@ -15,6 +15,14 @@ class Data {
 	 * @var array
 	 */
 	public $settings = array();
+
+	/**
+	 * Time for cache expiration.
+	 *
+	 * @var string
+	 */
+	public $cache_expiration = 12 * HOUR_IN_SECONDS;
+
 	/**
 	 * Constructor
 	 */
@@ -90,7 +98,7 @@ class Data {
 				}
 			);
 
-			set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+			set_transient( $transient_key, $data, $this->cache_expiration );
 		}
 
 		return $data;
@@ -179,7 +187,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 		return $data;
 	}
 
@@ -283,7 +291,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 
 		return $data;
 	}
@@ -387,7 +395,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 
 		return $data;
 	}
@@ -540,7 +548,7 @@ class Data {
 	
 		ksort( $data );
 	
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 	
 		return $data;
 	}
