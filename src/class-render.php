@@ -204,16 +204,19 @@ class Render {
                                     <?php
                                     $key = get_donation_accepted_key( $donor_type );
                                     if ( $data[ $key ] && 0 == $amount ) :
+                                        $amount = $this->data->settings['not_accepted'] ?? 'Not Accepted';
                                         ?>
-                                        <span class="not-accepted" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Not Accepted', 'data-tables' ); ?>"></span>
+                                        <span class="not-accepted" aria-label="<?php echo esc_attr( sprintf( __( 'This think tank didn\'t accept funding from %s', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
                                         <?php
                                     elseif ( $data['limited_info'] && 0 == $amount ) :
+                                        $amount = $this->data->settings['no_data'] ?? 'Not Available';
                                         ?>
-                                        <span class="no-data" aria-label="<?php echo esc_attr( sprintf( __( 'Little or no %s funding data is available for this think tank.', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Not Available', 'data-tables' ); ?>"></span>
+                                        <span class="no-data" aria-label="<?php echo esc_attr( sprintf( __( 'Little or no %s funding data is available for this think tank.', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
                                         <?php
                                     elseif ( strcasecmp( $amount, 'unknown' ) === 0 ) :
+                                        $amount = $this->data->settings['unknown_amount'] ?? 'Unknown';
                                         ?>
-                                        <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount received from %s is unknown', 'data-tables' ), $donor_type ) ); ?>" data-label="<?php esc_attr_e( 'Unknown', 'data-tables' ); ?>"></span>
+                                        <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount received from %s is unknown', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
                                         <?php
                                     else :
                                         ?>
