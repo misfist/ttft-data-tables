@@ -88,7 +88,7 @@ function generate_star_rating( $score = 0 ): string {
 	?>
 	
 	<!-- wp:group {"metadata":{"name":"Transparency Stars"},"className":"star-group stars-<?php echo $score; ?> no-export noExport","layout":{"type":"default"}} -->
-	<div class="wp-block-group star-group stars-<?php echo $score; ?>" aria-label="<?php echo $score; ?> stars no-export noExport">
+	<div class="wp-block-group star-group stars-<?php echo $score; ?> no-export noExport" aria-label="<?php echo $score; ?> stars">
 		<?php
         $star_rating = '';
 

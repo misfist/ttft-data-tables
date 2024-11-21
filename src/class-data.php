@@ -10,6 +10,27 @@ use function Ttft\Data_Tables\get_transparency_score_from_slug;
 class Data {
 
 	/**
+	 * Array of settings.
+	 *
+	 * @var array
+	 */
+	public $settings = array();
+
+	/**
+	 * Time for cache expiration.
+	 *
+	 * @var string
+	 */
+	public $cache_expiration = 12 * HOUR_IN_SECONDS;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->settings = get_option( 'site_settings' );
+	}
+
+	/**
 	 * Get Raw Table Data
 	 *
 	 * @param string $donor_type Optional. The slug of the donor_type taxonomy term. Default empty.
@@ -77,7 +98,7 @@ class Data {
 				}
 			);
 
-			set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+			set_transient( $transient_key, $data, $this->cache_expiration );
 		}
 
 		return $data;
@@ -161,12 +182,13 @@ class Data {
 					'donor_type'  => get_the_term_list( $post_id, 'donor_type' ),
 					'donor_link'  => get_term_link( $donor_slugs[0], 'donor' ),
 					'donor_slug'  => $donor_slug,
+					'disclosed'   => get_post_meta( $post_id, 'disclosed', true ),
 					'source'      => get_post_meta( $post_id, 'source', true ),
 				);
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 		return $data;
 	}
 
@@ -242,6 +264,7 @@ class Data {
 				$think_tank      = $think_tanks[0];
 				$think_tank_slug = $think_tank->slug;
 				$source          = get_post_meta( $post_id, 'source', true );
+				$disclosed       = get_post_meta( $post_id, 'disclosed', true );
 
 				$amount_calc = get_post_meta( $post_id, 'amount_calc', true );
 				if ( empty( $amount_calc ) ) {
@@ -264,13 +287,14 @@ class Data {
 					'amount_calc'     => (int) $amount_calc,
 					'donor_type'      => $donor_type,
 					'source'          => $source,
+					'disclosed'       => $disclosed,
 					'think_tank_slug' => $think_tank_slug,
 				);
 			}
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 
 		return $data;
 	}
@@ -359,11 +383,14 @@ class Data {
 				$amount = get_post_meta( $post_id, 'amount_calc', true );
 				$amount = intval( $amount );
 
+				$disclosed = get_post_meta( $post_id, 'disclosed', true );
+
 				$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
 
 				$data[] = array(
 					'donor'       => $donor_name,
 					'amount_calc' => $amount,
+					'disclosed'   => $disclosed,
 					'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
 					'donor_slug'  => $donor_slug,
 					'donor_link'  => get_term_link( $donor_slug, 'donor' ),
@@ -374,7 +401,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $data, $this->cache_expiration );
 
 		return $data;
 	}
@@ -425,16 +452,16 @@ class Data {
 	public function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
 		$donation_year = sanitize_text_field( $donation_year );
 		$search        = sanitize_text_field( $search );
-	
+
 		$transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
-		$data = get_transient( $transient_key );
-	
+		$data          = get_transient( $transient_key );
+
 		if ( false !== $data ) {
 			return $data;
 		}
-	
+
 		// Get all donor types.
-		$donor_type_terms = get_terms(
+		$donor_types = get_terms(
 			array(
 				'taxonomy'   => 'donor_type',
 				'orderby'    => 'term_id',
@@ -442,34 +469,34 @@ class Data {
 				'hide_empty' => false,
 			)
 		);
-	
-		// Initialize donor_types with default values.
+
+		// Initialize donor types with default values.
 		$default_donor_types = array();
-		foreach ( $donor_type_terms as $term ) {
+		foreach ( $donor_types as $term ) {
 			$default_donor_types[ $term->name ] = 0;
 		}
-	
+
 		$think_tank_args = array(
 			'post_type'      => 'think_tank',
 			'posts_per_page' => -1,
 			'post_status'    => 'publish',
 			'fields'         => 'ids',
 		);
-	
+
 		if ( ! empty( $search ) ) {
 			$think_tank_args['s'] = $search;
 		}
-	
+
 		$think_tank_query = new \WP_Query( $think_tank_args );
-		$data = array();
-	
+		$data             = array();
+
 		if ( $think_tank_query->have_posts() ) {
 			foreach ( $think_tank_query->posts as $think_tank_id ) {
-				$think_tank_slug = get_post_field( 'post_name', $think_tank_id );
-				$data[ $think_tank_slug ] = array(
+				$slug          = get_post_field( 'post_name', $think_tank_id );
+				$data[ $slug ] = array(
 					'think_tank'           => get_the_title( $think_tank_id ),
-					'donor_types'          => $default_donor_types, // Initialize donor_types with default values.
-					'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
+					'donor_types'          => $default_donor_types, // Initialize donor types with default values.
+					'transparency_score'   => get_transparency_score_from_slug( $slug ),
 					'no_defense_accepted'  => get_post_meta( $think_tank_id, 'no_defense_accepted', true ),
 					'no_domestic_accepted' => get_post_meta( $think_tank_id, 'no_domestic_accepted', true ),
 					'no_foreign_accepted'  => get_post_meta( $think_tank_id, 'no_foreign_accepted', true ),
@@ -478,13 +505,14 @@ class Data {
 			}
 		}
 		wp_reset_postdata();
-	
+
 		$transaction_args = array(
 			'post_type'      => 'transaction',
 			'posts_per_page' => -1,
 			'post_status'    => 'publish',
+			'fields'         => 'ids',
 		);
-	
+
 		if ( ! empty( $donation_year ) ) {
 			$transaction_args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
@@ -492,47 +520,167 @@ class Data {
 				'terms'    => $donation_year,
 			);
 		}
-	
+
 		$transaction_query = new \WP_Query( $transaction_args );
-	
+		$transactions      = array();
+
 		if ( $transaction_query->have_posts() ) {
-			while ( $transaction_query->have_posts() ) {
-				$transaction_query->the_post();
-				$think_tank_terms = wp_get_post_terms( get_the_ID(), 'think_tank' );
-	
+			foreach ( $transaction_query->posts as $transaction_id ) {
+				$think_tank_terms = wp_get_post_terms( $transaction_id, 'think_tank' );
+
 				if ( ! $think_tank_terms ) {
 					continue;
 				}
-	
+
 				$think_tank_slug = $think_tank_terms[0]->slug;
-	
-				foreach ( wp_get_post_terms( get_the_ID(), 'donor_type' ) as $donor_type_term ) {
+
+				foreach ( wp_get_post_terms( $transaction_id, 'donor_type' ) as $donor_type_term ) {
 					$donor_type = $donor_type_term->name;
-	
-					$disclosed = get_post_meta( get_the_ID(), 'disclosed', true );
-					$amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
-	
-					if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
-						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'ttft-data-tables' );
-					} else {
-						$amount_calc = floatval( $amount_calc );
-						if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
-							$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+
+					if ( ! isset( $transactions[ $think_tank_slug ][ $donor_type ] ) ) {
+						$transactions[ $think_tank_slug ][ $donor_type ] = array();
+					}
+
+					$transactions[ $think_tank_slug ][ $donor_type ][] = $transaction_id;
+				}
+			}
+
+			// Process grouped transactions.
+			foreach ( $transactions as $think_tank_slug => $donor_types ) {
+				foreach ( $donor_types as $donor_type => $transaction_ids ) {
+					if ( $this->is_disclosed( $transaction_ids ) ) {
+						// Calculate the cumulative value for disclosed transactions.
+						foreach ( $transaction_ids as $transaction_id ) {
+							$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
+							if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
+								$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+							}
 						}
+					} else {
+						// Mark as 'unknown' if all transactions are undisclosed.
+						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
 					}
 				}
 			}
 		}
 		wp_reset_postdata();
-	
+
 		ksort( $data );
-	
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-	
+
+		set_transient( $transient_key, $data, $this->cache_expiration );
+
 		return $data;
 	}
-	
-	
+	// public function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
+	// $donation_year = sanitize_text_field( $donation_year );
+	// $search        = sanitize_text_field( $search );
+
+	// $transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
+	// $data          = get_transient( $transient_key );
+
+	// if ( false !== $data ) {
+	// return $data;
+	// }
+
+	// Get all donor types.
+	// $donor_type_terms = get_terms(
+	// array(
+	// 'taxonomy'   => 'donor_type',
+	// 'orderby'    => 'term_id',
+	// 'order'      => 'ASC',
+	// 'hide_empty' => false,
+	// )
+	// );
+
+	// Initialize donor_types with default values.
+	// $default_donor_types = array();
+	// foreach ( $donor_type_terms as $term ) {
+	// $default_donor_types[ $term->name ] = 0;
+	// }
+
+	// $think_tank_args = array(
+	// 'post_type'      => 'think_tank',
+	// 'posts_per_page' => -1,
+	// 'post_status'    => 'publish',
+	// 'fields'         => 'ids',
+	// );
+
+	// if ( ! empty( $search ) ) {
+	// $think_tank_args['s'] = $search;
+	// }
+
+	// $think_tank_query = new \WP_Query( $think_tank_args );
+	// $data             = array();
+
+	// if ( $think_tank_query->have_posts() ) {
+	// foreach ( $think_tank_query->posts as $think_tank_id ) {
+	// $think_tank_slug          = get_post_field( 'post_name', $think_tank_id );
+	// $data[ $think_tank_slug ] = array(
+	// 'think_tank'           => get_the_title( $think_tank_id ),
+	// 'donor_types'          => $default_donor_types, // Initialize donor_types with default values.
+	// 'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
+	// 'no_defense_accepted'  => get_post_meta( $think_tank_id, 'no_defense_accepted', true ),
+	// 'no_domestic_accepted' => get_post_meta( $think_tank_id, 'no_domestic_accepted', true ),
+	// 'no_foreign_accepted'  => get_post_meta( $think_tank_id, 'no_foreign_accepted', true ),
+	// 'limited_info'         => get_post_meta( $think_tank_id, 'limited_info', true ),
+	// );
+	// }
+	// }
+	// wp_reset_postdata();
+
+	// $transaction_args = array(
+	// 'post_type'      => 'transaction',
+	// 'posts_per_page' => -1,
+	// 'post_status'    => 'publish',
+	// );
+
+	// if ( ! empty( $donation_year ) ) {
+	// $transaction_args['tax_query'][] = array(
+	// 'taxonomy' => 'donation_year',
+	// 'field'    => 'slug',
+	// 'terms'    => $donation_year,
+	// );
+	// }
+
+	// $transaction_query = new \WP_Query( $transaction_args );
+
+	// if ( $transaction_query->have_posts() ) {
+	// while ( $transaction_query->have_posts() ) {
+	// $transaction_query->the_post();
+	// $think_tank_terms = wp_get_post_terms( get_the_ID(), 'think_tank' );
+
+	// if ( ! $think_tank_terms ) {
+	// continue;
+	// }
+
+	// $think_tank_slug = $think_tank_terms[0]->slug;
+
+	// foreach ( wp_get_post_terms( get_the_ID(), 'donor_type' ) as $donor_type_term ) {
+	// $donor_type = $donor_type_term->name;
+
+	// $disclosed   = get_post_meta( get_the_ID(), 'disclosed', true );
+	// $amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
+
+	// if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
+	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
+	// } else {
+	// $amount_calc = floatval( $amount_calc );
+	// if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
+	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+	// }
+	// }
+	// }
+	// }
+	// }
+	// wp_reset_postdata();
+
+	// ksort( $data );
+
+	// set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+
+	// return $data;
+	// }
+
 	/**
 	 * Get data for donors
 	 *
@@ -706,4 +854,25 @@ class Data {
 		$terms = get_terms( $args );
 		return ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? $terms : array();
 	}
+
+	/**
+	 * Check if all transactions for the given post IDs are not disclosed.
+	 *
+	 * @param array $post_ids Array of transaction post IDs.
+	 * @return bool True if any transaction is disclosed, false if all are undisclosed.
+	 */
+	public function is_disclosed( array $post_ids ): bool {
+		$meta_values = $this->get_meta_values_for_records( $post_ids, 'disclosed' );
+
+		$undisclosed = array_filter(
+			$meta_values,
+			function ( $value ) {
+				return strtolower( $value ) !== 'no';
+			}
+		);
+
+		// If all values are 'no', return false. Otherwise, return true.
+		return ! empty( $undisclosed );
+	}
+
 }
