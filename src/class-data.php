@@ -28,6 +28,10 @@ class Data {
 	 */
 	public function __construct() {
 		$this->settings = get_option( 'site_settings' );
+
+		if ( 'local' === wp_get_environment_type() ) {
+			$this->cache_expiration = 0;
+		}
 	}
 
 	/**
