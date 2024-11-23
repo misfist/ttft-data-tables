@@ -581,31 +581,33 @@ class Data {
 	 * @return array
 	 */
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
-		$donor_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
+		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
 		$data = array_reduce(
-			$donor_data,
+			$raw_data,
 			function( $carry, $item ) {
-				$donor_slug  = $item['donor_slug'];
+				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
 
-				if ( ! isset( $carry[ $donor_slug ] ) ) {
-					$carry[ $donor_slug ] = array(
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
 						'amount_calc' => $amount_calc,
 						'donor_type'  => $item['donor_type'],
-						'donor_slug'  => $donor_slug,
+						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'year'        => $year,
+						'disclosed'   => array(), // Collect disclosed values for later checks.
 					);
 				} else {
-					$carry[ $donor_slug ]['amount_calc'] += $amount_calc;
+					$carry[ $slug ]['amount_calc'] += $amount_calc;
+					$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
 
-					$years = explode( ', ', $carry[ $donor_slug ]['year'] );
+					$years = explode( ', ', $carry[ $slug ]['year'] );
 					if ( ! in_array( $year, $years ) ) {
-						$years[]                      = $year;
-						$carry[ $donor_slug ]['year'] = implode( ', ', $years );
+						$years[]                = $year;
+						$carry[ $slug ]['year'] = implode( ', ', $years );
 					}
 				}
 				return $carry;
@@ -631,20 +633,21 @@ class Data {
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
-				$donor_slug = $item['donor_slug'];
+				$slug = $item['donor_slug'];
 
-				if ( ! isset( $carry[ $donor_slug ] ) ) {
-					$carry[ $donor_slug ] = array(
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
 						'amount_calc' => 0,
 						'donor_type'  => $item['donor_type'],
-						'donor_slug'  => $donor_slug,
+						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'source'      => $item['source'],
 					);
 				}
 
 				$carry[ $donor_slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
 				return $carry;
 			},
 			array()
@@ -667,18 +670,18 @@ class Data {
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
-				$think_tank_slug = $item['think_tank_slug'];
-				if ( ! isset( $carry[ $think_tank_slug ] ) ) {
-					$carry[ $think_tank_slug ] = array(
+				$slug = $item['think_tank_slug'];
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'think_tank'      => $item['think_tank'],
 						'donor'           => $item['donor'],
 						'amount_calc'     => 0,
 						'donor_type'      => $item['donor_type'],
 						'source'          => $item['source'],
-						'think_tank_slug' => $think_tank_slug,
+						'think_tank_slug' => $slug,
 					);
 				}
-				$carry[ $think_tank_slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
 				return $carry;
 			},
 			array()
