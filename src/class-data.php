@@ -744,6 +744,27 @@ class Data {
 	}
 
 	/**
+	 * Get the total amount for a single donor, excluding undisclosed amounts.
+	 *
+	 * @param string $donor         The donor slug or identifier.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 * @return int The total calculated amount.
+	 */
+	public function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ): int {
+		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
+
+		$total = 0;
+		foreach ( $raw_data as $item ) {
+			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
+				$total += $item['amount_calc'];
+			}
+		}
+
+		return $total;
+	}
+
+	/**
 	 * Get meta values for a set of post IDs.
 	 *
 	 * @param array  $post_ids Array of post IDs.
