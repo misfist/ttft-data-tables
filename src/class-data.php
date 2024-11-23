@@ -252,7 +252,7 @@ class Data {
 		$data = array();
 
 		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
+			foreach ( $query->posts as $post_id  ) {
 				$query->the_post();
 				$post_id     = get_the_ID();
 				$think_tanks = get_the_terms( $post_id, 'think_tank' );
@@ -615,6 +615,13 @@ class Data {
 			array()
 		);
 
+		foreach ( $data as &$think_tank_data ) {
+			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
+
 		ksort( $data );
 		return $data;
 	}
@@ -643,15 +650,24 @@ class Data {
 						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'source'      => $item['source'],
+						'disclosed'   => array(), // Collect disclosed values for later checks.
 					);
 				}
 
-				$carry[ $donor_slug ]['amount_calc'] += $item['amount_calc'];
 				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
 				return $carry;
 			},
 			array()
 		);
+
+		foreach ( $data as &$donor_data ) {
+			if ( array_unique( $donor_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$donor_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
 
 		ksort( $data );
 		return $data;
@@ -679,16 +695,48 @@ class Data {
 						'donor_type'      => $item['donor_type'],
 						'source'          => $item['source'],
 						'think_tank_slug' => $slug,
+						'disclosed'       => array(), // Collect disclosed values for later checks.
+
 					);
 				}
 				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
 				return $carry;
 			},
 			array()
 		);
 
+		foreach ( $data as &$think_tank_data ) {
+			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
+
 		ksort( $data );
 		return $data;
+	}
+
+	/**
+	 * Get the total amount for a single think tank, excluding undisclosed amounts.
+	 *
+	 * @param string $think_tank    The think tank slug or identifier.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 * @return int The total calculated amount.
+	 */
+	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ): int {
+		$raw_data = self::get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
+
+		$total = 0;
+		foreach ( $raw_data as $item ) {
+			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
+				$total += $item['amount_calc'];
+			}
+		}
+
+		return $total;
 	}
 
 	/**
