@@ -102,7 +102,7 @@ class Data {
 				}
 			);
 
-			set_transient( $transient_key, $data, $this->cache_expiration );
+			set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 		}
 
 		return $data;
@@ -192,7 +192,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 		return $data;
 	}
 
@@ -298,7 +298,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
@@ -405,7 +405,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
@@ -571,7 +571,7 @@ class Data {
 
 		ksort( $data );
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
