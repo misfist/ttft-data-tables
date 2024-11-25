@@ -372,9 +372,9 @@ class Render {
                 <tbody>
                     <?php foreach ( $data as $row ) : 
                         $amount = $row['amount_calc'];
-                        echo '<pre>';
-                        var_dump( $row );
-                        echo  '</pre>';
+                        // echo '<pre>';
+                        // var_dump( $row );
+                        // echo  '</pre>';
                         ?>
                         <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
                             <td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $row['think_tank_slug'], 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
