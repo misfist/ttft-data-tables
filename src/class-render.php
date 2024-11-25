@@ -262,10 +262,25 @@ class Render {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $data as $row ) : ?>
+                    <?php foreach ( $data as $row ) : 
+                        $amount = $row['amount_calc'];
+                        ?>
                         <tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
                             <td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
-                            <td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="<?php echo is_numeric( $amount ) ? 'column-numeric' : 'column-text'; ?> column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+                                <?php
+                                if ( strcasecmp( $amount, 'unknown' ) === 0 ) :
+                                    $amount = $this->data->settings['unknown_amount'] ?? 'Unknown';
+                                    ?>
+                                    <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount received from %s is unknown', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
+                                    <?php
+                                else :
+                                    ?>
+                                    <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+                                    <?php
+                                endif;
+                                ?>
+                            </td>
                             <td class="column-source"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
                             <td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
                         </tr>
@@ -301,10 +316,25 @@ class Render {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $data as $row ) : ?>
+                    <?php foreach ( $data as $row ) : 
+                        $amount = $row['amount_calc'];
+                        ?>
                         <tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
                             <td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
-                            <td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="<?php echo is_numeric( $amount ) ? 'column-numeric' : 'column-text'; ?> column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+                                <?php
+                                if ( strcasecmp( $amount, 'unknown' ) === 0 ) :
+                                    $amount = $this->data->settings['unknown_amount'] ?? 'Unknown';
+                                    ?>
+                                    <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount donated is unknown', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
+                                    <?php
+                                else :
+                                    ?>
+                                    <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+                                    <?php
+                                endif;
+                                ?>
+                            </td>
                             <td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
                         </tr>
                     <?php endforeach; ?>
@@ -340,11 +370,29 @@ class Render {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $data as $row ) : ?>
+                    <?php foreach ( $data as $row ) : 
+                        $amount = $row['amount_calc'];
+                        // echo '<pre>';
+                        // var_dump( $row );
+                        // echo  '</pre>';
+                        ?>
                         <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
                             <td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $row['think_tank_slug'], 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
                             <td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
-                            <td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>"><?php echo esc_html( number_format( $row['amount_calc'], 0, '.', ',' ) ); ?></td>
+                            <td class="<?php echo is_numeric( $amount ) ? 'column-numeric' : 'column-text'; ?>  column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+                            <?php
+                                if ( strcasecmp( $amount, 'unknown' ) === 0 ) :
+                                    $amount = $this->data->settings['unknown_amount'] ?? 'Unknown';
+                                    ?>
+                                    <span class="not-disclosed" aria-label="<?php echo esc_attr( sprintf( __( 'The amount received from %s is unknown', 'data-tables' ), $donor_type ) ); ?>"><?php esc_attr_e( $amount, 'data-tables' ); ?></span>
+                                    <?php
+                                else :
+                                    ?>
+                                    <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
+                                    <?php
+                                endif;
+                                ?>
+                            </td>
                             <td class="column-source" data-heading="<?php esc_attr_e( 'Source', 'data-tables' ); ?>"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
                         </tr>
                     <?php endforeach; ?>

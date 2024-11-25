@@ -28,6 +28,10 @@ class Data {
 	 */
 	public function __construct() {
 		$this->settings = get_option( 'site_settings' );
+
+		if ( 'local' === wp_get_environment_type() ) {
+			$this->cache_expiration = 0;
+		}
 	}
 
 	/**
@@ -98,7 +102,7 @@ class Data {
 				}
 			);
 
-			set_transient( $transient_key, $data, $this->cache_expiration );
+			set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 		}
 
 		return $data;
@@ -188,7 +192,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 		return $data;
 	}
 
@@ -252,7 +256,7 @@ class Data {
 		$data = array();
 
 		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
+			foreach ( $query->posts as $post_id  ) {
 				$query->the_post();
 				$post_id     = get_the_ID();
 				$think_tanks = get_the_terms( $post_id, 'think_tank' );
@@ -294,7 +298,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
@@ -401,7 +405,7 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
@@ -567,119 +571,10 @@ class Data {
 
 		ksort( $data );
 
-		set_transient( $transient_key, $data, $this->cache_expiration );
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
-	// public function get_think_tank_archive_data( $donation_year = '', $search = '' ): array {
-	// $donation_year = sanitize_text_field( $donation_year );
-	// $search        = sanitize_text_field( $search );
-
-	// $transient_key = 'think_tank_archive_data_' . md5( $donation_year . '_' . $search );
-	// $data          = get_transient( $transient_key );
-
-	// if ( false !== $data ) {
-	// return $data;
-	// }
-
-	// Get all donor types.
-	// $donor_type_terms = get_terms(
-	// array(
-	// 'taxonomy'   => 'donor_type',
-	// 'orderby'    => 'term_id',
-	// 'order'      => 'ASC',
-	// 'hide_empty' => false,
-	// )
-	// );
-
-	// Initialize donor_types with default values.
-	// $default_donor_types = array();
-	// foreach ( $donor_type_terms as $term ) {
-	// $default_donor_types[ $term->name ] = 0;
-	// }
-
-	// $think_tank_args = array(
-	// 'post_type'      => 'think_tank',
-	// 'posts_per_page' => -1,
-	// 'post_status'    => 'publish',
-	// 'fields'         => 'ids',
-	// );
-
-	// if ( ! empty( $search ) ) {
-	// $think_tank_args['s'] = $search;
-	// }
-
-	// $think_tank_query = new \WP_Query( $think_tank_args );
-	// $data             = array();
-
-	// if ( $think_tank_query->have_posts() ) {
-	// foreach ( $think_tank_query->posts as $think_tank_id ) {
-	// $think_tank_slug          = get_post_field( 'post_name', $think_tank_id );
-	// $data[ $think_tank_slug ] = array(
-	// 'think_tank'           => get_the_title( $think_tank_id ),
-	// 'donor_types'          => $default_donor_types, // Initialize donor_types with default values.
-	// 'transparency_score'   => get_transparency_score_from_slug( $think_tank_slug ),
-	// 'no_defense_accepted'  => get_post_meta( $think_tank_id, 'no_defense_accepted', true ),
-	// 'no_domestic_accepted' => get_post_meta( $think_tank_id, 'no_domestic_accepted', true ),
-	// 'no_foreign_accepted'  => get_post_meta( $think_tank_id, 'no_foreign_accepted', true ),
-	// 'limited_info'         => get_post_meta( $think_tank_id, 'limited_info', true ),
-	// );
-	// }
-	// }
-	// wp_reset_postdata();
-
-	// $transaction_args = array(
-	// 'post_type'      => 'transaction',
-	// 'posts_per_page' => -1,
-	// 'post_status'    => 'publish',
-	// );
-
-	// if ( ! empty( $donation_year ) ) {
-	// $transaction_args['tax_query'][] = array(
-	// 'taxonomy' => 'donation_year',
-	// 'field'    => 'slug',
-	// 'terms'    => $donation_year,
-	// );
-	// }
-
-	// $transaction_query = new \WP_Query( $transaction_args );
-
-	// if ( $transaction_query->have_posts() ) {
-	// while ( $transaction_query->have_posts() ) {
-	// $transaction_query->the_post();
-	// $think_tank_terms = wp_get_post_terms( get_the_ID(), 'think_tank' );
-
-	// if ( ! $think_tank_terms ) {
-	// continue;
-	// }
-
-	// $think_tank_slug = $think_tank_terms[0]->slug;
-
-	// foreach ( wp_get_post_terms( get_the_ID(), 'donor_type' ) as $donor_type_term ) {
-	// $donor_type = $donor_type_term->name;
-
-	// $disclosed   = get_post_meta( get_the_ID(), 'disclosed', true );
-	// $amount_calc = get_post_meta( get_the_ID(), 'amount_calc', true );
-
-	// if ( strcasecmp( $disclosed, 'no' ) === 0 ) {
-	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
-	// } else {
-	// $amount_calc = floatval( $amount_calc );
-	// if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
-	// $data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
-	// }
-	// }
-	// }
-	// }
-	// }
-	// wp_reset_postdata();
-
-	// ksort( $data );
-
-	// set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-
-	// return $data;
-	// }
 
 	/**
 	 * Get data for donors
@@ -690,37 +585,46 @@ class Data {
 	 * @return array
 	 */
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
-		$donor_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
+		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
 		$data = array_reduce(
-			$donor_data,
+			$raw_data,
 			function( $carry, $item ) {
-				$donor_slug  = $item['donor_slug'];
+				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
 
-				if ( ! isset( $carry[ $donor_slug ] ) ) {
-					$carry[ $donor_slug ] = array(
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
 						'amount_calc' => $amount_calc,
 						'donor_type'  => $item['donor_type'],
-						'donor_slug'  => $donor_slug,
+						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'year'        => $year,
+						'disclosed'   => array(), // Collect disclosed values for later checks.
 					);
 				} else {
-					$carry[ $donor_slug ]['amount_calc'] += $amount_calc;
+					$carry[ $slug ]['amount_calc'] += $amount_calc;
+					$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
 
-					$years = explode( ', ', $carry[ $donor_slug ]['year'] );
+					$years = explode( ', ', $carry[ $slug ]['year'] );
 					if ( ! in_array( $year, $years ) ) {
-						$years[]                      = $year;
-						$carry[ $donor_slug ]['year'] = implode( ', ', $years );
+						$years[]                = $year;
+						$carry[ $slug ]['year'] = implode( ', ', $years );
 					}
 				}
 				return $carry;
 			},
 			array()
 		);
+
+		foreach ( $data as &$think_tank_data ) {
+			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
 
 		ksort( $data );
 		return $data;
@@ -740,24 +644,34 @@ class Data {
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
-				$donor_slug = $item['donor_slug'];
+				$slug = $item['donor_slug'];
 
-				if ( ! isset( $carry[ $donor_slug ] ) ) {
-					$carry[ $donor_slug ] = array(
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
 						'amount_calc' => 0,
 						'donor_type'  => $item['donor_type'],
-						'donor_slug'  => $donor_slug,
+						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'source'      => $item['source'],
+						'disclosed'   => array(), // Collect disclosed values for later checks.
 					);
 				}
 
-				$carry[ $donor_slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
 				return $carry;
 			},
 			array()
 		);
+
+		foreach ( $data as &$donor_data ) {
+			if ( array_unique( $donor_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$donor_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
 
 		ksort( $data );
 		return $data;
@@ -776,25 +690,78 @@ class Data {
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
-				$think_tank_slug = $item['think_tank_slug'];
-				if ( ! isset( $carry[ $think_tank_slug ] ) ) {
-					$carry[ $think_tank_slug ] = array(
+				$slug = $item['think_tank_slug'];
+				if ( ! isset( $carry[ $slug ] ) ) {
+					$carry[ $slug ] = array(
 						'think_tank'      => $item['think_tank'],
 						'donor'           => $item['donor'],
 						'amount_calc'     => 0,
 						'donor_type'      => $item['donor_type'],
 						'source'          => $item['source'],
-						'think_tank_slug' => $think_tank_slug,
+						'think_tank_slug' => $slug,
+						'disclosed'       => array(), // Collect disclosed values for later checks.
+
 					);
 				}
-				$carry[ $think_tank_slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
+				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
 				return $carry;
 			},
 			array()
 		);
 
+		foreach ( $data as &$think_tank_data ) {
+			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
+				// All transactions explicitly have 'no'; mark as 'unknown'.
+				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
+			}
+		}
+
 		ksort( $data );
 		return $data;
+	}
+
+	/**
+	 * Get the total amount for a single think tank, excluding undisclosed amounts.
+	 *
+	 * @param string $think_tank    The think tank slug or identifier.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 * @return int The total calculated amount.
+	 */
+	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ) {
+		$raw_data = ( new self() )->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
+
+		$total = 0;
+		foreach ( $raw_data as $item ) {
+			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
+				$total += $item['amount_calc'];
+			}
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Get the total amount for a single donor, excluding undisclosed amounts.
+	 *
+	 * @param string $donor         The donor slug or identifier.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 * @return int The total calculated amount.
+	 */
+	public static function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ) {
+		$raw_data = ( new self() )->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
+
+		$total = 0;
+		foreach ( $raw_data as $item ) {
+			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
+				$total += $item['amount_calc'];
+			}
+		}
+
+		return $total;
 	}
 
 	/**
