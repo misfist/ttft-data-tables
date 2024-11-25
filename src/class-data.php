@@ -730,8 +730,8 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ): int {
-		$raw_data = self::get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
+	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ) {
+		$raw_data = ( new self() )->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 		$total = 0;
 		foreach ( $raw_data as $item ) {
@@ -751,8 +751,8 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ): int {
-		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
+	public static function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ) {
+		$raw_data = ( new self() )->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 		$total = 0;
 		foreach ( $raw_data as $item ) {
