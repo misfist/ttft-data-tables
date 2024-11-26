@@ -552,18 +552,29 @@ class Data {
 			// Process grouped transactions.
 			foreach ( $transactions as $think_tank_slug => $donor_types ) {
 				foreach ( $donor_types as $donor_type => $transaction_ids ) {
-					if ( $this->is_disclosed( $transaction_ids ) ) {
-						// Calculate the cumulative value for disclosed transactions.
-						foreach ( $transaction_ids as $transaction_id ) {
-							$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
-							if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
-								$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
-							}
+					// Calculate the cumulative value for all transactions.
+					foreach ( $transaction_ids as $transaction_id ) {
+						$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
+						if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
+							$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
 						}
-					} else {
-						// Mark as 'unknown' if all transactions are undisclosed.
-						$data[ $think_tank_slug ]['donor_types'][ $donor_type ] = esc_attr__( 'unknown', 'data-tables' );
 					}
+	
+					// Add disclosed information for each donor type.
+					$data[ $think_tank_slug ]['disclosed'][ $donor_type ] = array_unique(
+						array_map(
+							'strtolower',
+							array_column(
+								array_map(
+									function ( $transaction_id ) {
+										return get_post_meta( $transaction_id, 'disclosed', true );
+									},
+									$transaction_ids
+								),
+								0
+							)
+						)
+					);
 				}
 			}
 		}
@@ -602,7 +613,7 @@ class Data {
 						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'year'        => $year,
-						'disclosed'   => array(), // Collect disclosed values for later checks.
+						'disclosed'   => array(), // Collect disclosed values for reference.
 					);
 				} else {
 					$carry[ $slug ]['amount_calc'] += $amount_calc;
@@ -619,11 +630,9 @@ class Data {
 			array()
 		);
 
-		foreach ( $data as &$think_tank_data ) {
-			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
-				// All transactions explicitly have 'no'; mark as 'unknown'.
-				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
-			}
+		// Normalize disclosed values for each donor.
+		foreach ( $data as &$donor_data ) {
+			$donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
 		}
 
 		ksort( $data );
@@ -654,7 +663,7 @@ class Data {
 						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'source'      => $item['source'],
-						'disclosed'   => array(), // Collect disclosed values for later checks.
+						'disclosed'   => array(), // Collect disclosed values for reference.
 					);
 				}
 
@@ -666,11 +675,9 @@ class Data {
 			array()
 		);
 
+		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
-			if ( array_unique( $donor_data['disclosed'] ) === array( 'no' ) ) {
-				// All transactions explicitly have 'no'; mark as 'unknown'.
-				$donor_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
-			}
+			$donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
 		}
 
 		ksort( $data );
@@ -699,8 +706,7 @@ class Data {
 						'donor_type'      => $item['donor_type'],
 						'source'          => $item['source'],
 						'think_tank_slug' => $slug,
-						'disclosed'       => array(), // Collect disclosed values for later checks.
-
+						'disclosed'       => array(), // Collect disclosed values for reference.
 					);
 				}
 				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
@@ -711,11 +717,9 @@ class Data {
 			array()
 		);
 
+		// Normalize disclosed values for each think tank.
 		foreach ( $data as &$think_tank_data ) {
-			if ( array_unique( $think_tank_data['disclosed'] ) === array( 'no' ) ) {
-				// All transactions explicitly have 'no'; mark as 'unknown'.
-				$think_tank_data['amount_calc'] = esc_attr__( 'unknown', 'data-tables' );
-			}
+			$think_tank_data['disclosed'] = array_unique( $think_tank_data['disclosed'] );
 		}
 
 		ksort( $data );
@@ -735,9 +739,7 @@ class Data {
 
 		$total = 0;
 		foreach ( $raw_data as $item ) {
-			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
-				$total += $item['amount_calc'];
-			}
+			$total += $item['amount_calc'];
 		}
 
 		return $total;
@@ -756,9 +758,7 @@ class Data {
 
 		$total = 0;
 		foreach ( $raw_data as $item ) {
-			if ( 'no' !== strtolower( $item['disclosed'] ) ) {
-				$total += $item['amount_calc'];
-			}
+			$total += $item['amount_calc'];
 		}
 
 		return $total;
