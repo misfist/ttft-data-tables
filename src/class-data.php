@@ -588,12 +588,13 @@ class Data {
 	}
 
 	/**
-	 * Get data for donors
+	 * Retrieves donor archive data with aggregated amounts.
 	 *
-	 * @param string $donation_year
-	 * @param string $donor_type
-	 * @param string $search
-	 * @return array
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 * @param string $search        Search term.
+	 *
+	 * @return array The aggregated donor archive data.
 	 */
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
@@ -640,12 +641,13 @@ class Data {
 	}
 
 	/**
-	 * Aggregates donor data for think tank.
+	 * Retrieves single think tank data with aggregated amounts.
 	 *
-	 * @param string $think_tank    Optional. Slug of the think tank.
-	 * @param string $donation_year Optional. Slug of the donation year.
-	 * @param string $donor_type    Optional. Slug of the donor type.
-	 * @return array
+	 * @param string $think_tank    The think tank slug.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 *
+	 * @return array The aggregated think tank data.
 	 */
 	public function get_single_think_tank_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
 		$raw_data = $this->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
@@ -685,11 +687,13 @@ class Data {
 	}
 
 	/**
-	 * Aggregate 'amount_calc' values for individual donor
+	 * Retrieves single donor data with aggregated amounts.
 	 *
-	 * @param string $donor Optional. Slug of the donor taxonomy term to filter by.
-	 * @param string $donation_year Optional. Slug of the donation_year taxonomy term to filter by.
-	 * @return array Aggregated data with summed 'amount_calc' values.
+	 * @param string $donor        The donor slug.
+	 * @param string $donation_year The donation year.
+	 * @param string $donor_type    The donor type.
+	 *
+	 * @return array The aggregated donor data.
 	 */
 	public function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
 		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
