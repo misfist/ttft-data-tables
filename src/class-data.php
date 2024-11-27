@@ -309,42 +309,149 @@ class Data {
 	 * @param string $donation_year The slug of the donation year to filter transactions by (optional).
 	 * @return array
 	 */
+	// public function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+	// 	$donation_year = sanitize_text_field( $donation_year );
+	// 	$donor_type    = sanitize_text_field( $donor_type );
+	// 	$search        = sanitize_text_field( $search );
+
+	// 	$transient_key = 'donor_archive_raw_' . md5( $donation_year . $donor_type . $search );
+	// 	$data          = get_transient( $transient_key );
+	// 	if ( false !== $data || ! empty( $data ) ) {
+	// 		return $data;
+	// 	}
+
+	// 	$args = array(
+	// 		'post_type'      => 'transaction',
+	// 		'posts_per_page' => -1,
+	// 	);
+
+	// 	if ( $donation_year ) {
+	// 		$args['tax_query'] = array(
+	// 			array(
+	// 				'taxonomy' => 'donation_year',
+	// 				'field'    => 'slug',
+	// 				'terms'    => sanitize_title( $donation_year ),
+	// 			),
+	// 		);
+	// 	}
+
+	// 	if ( $donor_type ) {
+	// 		$args['tax_query'] = array(
+	// 			array(
+	// 				'taxonomy' => 'donor_type',
+	// 				'field'    => 'slug',
+	// 				'terms'    => sanitize_title( $donor_type ),
+	// 			),
+	// 		);
+	// 	}
+
+	// 	if ( ! empty( $search ) ) {
+	// 		$taxonomy = 'donor';
+	// 		$terms    = $this->get_search_term_ids( $search, $taxonomy );
+	// 		if ( $terms ) {
+	// 			$args['tax_query'][] = array(
+	// 				'taxonomy' => $taxonomy,
+	// 				'field'    => 'id',
+	// 				'terms'    => (array) $terms,
+	// 			);
+	// 		}
+	// 	}
+
+	// 	$query = new \WP_Query( $args );
+
+	// 	$data = array();
+
+	// 	if ( $query->have_posts() ) {
+	// 		while ( $query->have_posts() ) {
+	// 			$query->the_post();
+	// 			$post_id = get_the_ID();
+
+	// 			echo '<pre>';
+	// 			var_dump( get_post_meta( $post_id, 'disclosed', true ) );
+	// 			echo '</pre>';
+
+	// 			/**
+	// 			* Limit to "top level" donors
+	// 			*/
+	// 			$tax_args = array(
+	// 				'parent'  => 0,
+	// 				'orderby' => 'slug',
+	// 			);
+
+	// 			$donors = wp_get_object_terms( $post_id, 'donor', $tax_args );
+	// 			if ( empty( $donors ) || is_wp_error( $donors ) ) {
+	// 				continue;
+	// 			}
+
+	// 			$donor_names = wp_list_pluck( $donors, 'name' );
+	// 			$donor_slugs = wp_list_pluck( $donors, 'slug' );
+	// 			$donor_name  = implode( ' > ', $donor_names );
+	// 			$donor_slug  = implode( '-', $donor_slugs );
+
+	// 			$amount = get_post_meta( $post_id, 'amount_calc', true );
+	// 			$amount = intval( $amount );
+
+	// 			$disclosed = get_post_meta( $post_id, 'disclosed', true );
+
+	// 			$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
+
+	// 			$data[] = array(
+	// 				'donor'       => $donor_name,
+	// 				'amount_calc' => $amount,
+	// 				'disclosed'   => array(),
+	// 				'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
+	// 				'donor_slug'  => $donor_slug,
+	// 				'donor_link'  => get_term_link( $donor_slug, 'donor' ),
+	// 				'year'        => get_the_term_list( $post_id, 'donation_year' ),
+	// 			);
+
+	// 			$data[]['disclosed'][]  = $disclosed;
+
+	// 			wp_reset_postdata();
+	// 		}
+	// 	}
+
+	// 	foreach ( $data as &$donor_data ) {
+	// 		$donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+	// 	}
+
+	// 	set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+
+	// 	return $data;
+	// }
+
 	public function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		$donation_year = sanitize_text_field( $donation_year );
 		$donor_type    = sanitize_text_field( $donor_type );
 		$search        = sanitize_text_field( $search );
-
+	
 		$transient_key = 'donor_archive_raw_' . md5( $donation_year . $donor_type . $search );
 		$data          = get_transient( $transient_key );
-		if ( false !== $data || ! empty( $data ) ) {
+		if ( false !== $data ) {
 			return $data;
 		}
-
+	
 		$args = array(
 			'post_type'      => 'transaction',
 			'posts_per_page' => -1,
 		);
-
+	
 		if ( $donation_year ) {
-			$args['tax_query'] = array(
-				array(
-					'taxonomy' => 'donation_year',
-					'field'    => 'slug',
-					'terms'    => sanitize_title( $donation_year ),
-				),
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donation_year',
+				'field'    => 'slug',
+				'terms'    => sanitize_title( $donation_year ),
 			);
 		}
-
+	
 		if ( $donor_type ) {
-			$args['tax_query'] = array(
-				array(
-					'taxonomy' => 'donor_type',
-					'field'    => 'slug',
-					'terms'    => sanitize_title( $donor_type ),
-				),
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donor_type',
+				'field'    => 'slug',
+				'terms'    => sanitize_title( $donor_type ),
 			);
 		}
-
+	
 		if ( ! empty( $search ) ) {
 			$taxonomy = 'donor';
 			$terms    = $this->get_search_term_ids( $search, $taxonomy );
@@ -598,16 +705,65 @@ class Data {
 	 *
 	 * @return array The aggregated donor archive data.
 	 */
+	// public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+	// 	$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
+
+	// 	// echo '<pre>';
+	// 	// var_dump( $raw_data );
+	// 	// echo '</pre>';
+
+	// 	$data = array_reduce(
+	// 		$raw_data,
+	// 		function( $carry, $item ) {
+	// 			$slug        = $item['donor_slug'];
+	// 			$amount_calc = $item['amount_calc'];
+	// 			$year        = $item['year'];
+
+	// 			if ( ! isset( $carry[ $slug ] ) ) {
+	// 				$carry[ $slug ] = array(
+	// 					'donor'       => $item['donor'],
+	// 					'amount_calc' => $amount_calc,
+	// 					'donor_type'  => $item['donor_type'],
+	// 					'donor_slug'  => $slug,
+	// 					'donor_link'  => $item['donor_link'],
+	// 					'year'        => $year,
+	// 					'disclosed'   => array(), // Collect disclosed values for reference.
+	// 				);
+	// 			} else {
+	// 				$carry[ $slug ]['amount_calc'] += $amount_calc;
+	// 				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
+	// 				$years = explode( ', ', $carry[ $slug ]['year'] );
+	// 				if ( ! in_array( $year, $years ) ) {
+	// 					$years[]                = $year;
+	// 					$carry[ $slug ]['year'] = implode( ', ', $years );
+	// 				}
+	// 			}
+	// 			return $carry;
+	// 		},
+	// 		array()
+	// 	);
+
+	// 	// Normalize disclosed values for each donor.
+	// 	foreach ( $data as &$donor_data ) {
+	// 		// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+	// 		$donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+	// 	}
+
+	// 	ksort( $data );
+	// 	return $data;
+	// }
+
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
-
+	
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
 				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
-
+	
 				if ( ! isset( $carry[ $slug ] ) ) {
 					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
