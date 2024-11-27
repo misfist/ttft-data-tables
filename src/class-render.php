@@ -279,6 +279,11 @@ class Render {
                                     <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
                                     <?php
                                 endif;
+            $count = count( $data );
+				<tbody
+                    data-found="<?php echo intval( $count ); ?>"
+                    data-wp-bind--records-found='state.recordsFound'
+                >
 								/**
 								 * Check:
 								 * - Think tank didn't accept funding from donor type - display $this->data->settings['not_accepted']
@@ -459,18 +464,34 @@ class Render {
         return $converted_args;
     }
 									<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+            $count = count( $data );
+				<tbody
+                    data-found="<?php echo intval( $count ); ?>"
+                    data-wp-bind--records-found='state.recordsFound'
+                >
                         $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
                         /**
                          * Check:
                          * - Think tank has disclosed == 'no' - display $this->data->settings['unknown_amount']
                          */
                                 <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+            $count = count( $data );
+				<tbody
+                    data-found="<?php echo intval( $count ); ?>"
+                    data-wp-bind--records-found='state.recordsFound'
+
+                >
                         $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
                         /**
                          * Check:
                          * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
                          */
                                 <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+            $count = count( $data );
+				<tbody
+                    data-found="<?php echo intval( $count ); ?>"
+                    data-wp-bind--records-found='state.recordsFound'
+                >
                         $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
                         /**
                          * Check:
