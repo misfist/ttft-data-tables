@@ -24,6 +24,26 @@ function get_post_from_term( $slug, $type ) {
 }
 
 /**
+ * Get a post by its slug.
+ *
+ * @param string $slug      The post slug.
+ * @param string $post_type The post type. Default is 'think_tank'.
+ * @return int|null The post->ID, or null if not.
+ */
+function get_post_id_by_slug( $slug, $post_type = 'think_tank' ) {
+	$args = array(
+		'name'           => $slug,
+		'post_type'      => $post_type,
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+	);
+
+	$posts = get_posts( $args );
+
+	return ( ! empty( $posts ) && ! is_wp_error( $posts ) ) ? (int) $posts[0] : null;
+}
+
+/**
  * Retrieves the Transparency Score for a given think tank slug.
  *
  * @param string $think_tank_slug The think tank slug.
