@@ -73,7 +73,7 @@ class Render {
 	 * @param string|null $donation_year Optional. The year of the donations to be displayed in the caption. Default is null.
 	 * @return string The generated HTML string for the top portion of the table.
 	 */
-	public function generate_table_top( string $table_type, ?string $donation_year = null ): string {
+	public function generate_table_top( string $table_type, ?string $donation_year = null, $count = 0 ): string {
 		ob_start();
 		$settings      = get_option( 'site_settings' );
 		$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
@@ -89,7 +89,7 @@ class Render {
 			data-wp-bind--type='state.donorType'
 			data-wp-bind--data-search-label='state.searchLabel'
 			data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
-			data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page ) ); ?>'
+			data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page, 'foundRecords' => $count ) ); ?>'
 		>
 		<?php
 		if ( $donation_year ) :
@@ -108,8 +108,8 @@ class Render {
 	 * @param string|null $donation_year Optional. The year of the donations to be displayed in the caption.
 	 * @return void
 	 */
-	public function render_table_top( string $table_type, ?string $donation_year = null ): void {
-		echo $this->generate_table_top( $table_type, $donation_year );
+	public function render_table_top( string $table_type, ?string $donation_year = null, $count = 0 ): void {
+		echo $this->generate_table_top( $table_type, $donation_year, $count );
 	}
 
 	/**
@@ -178,8 +178,8 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-			$this->render_table_top( 'think-tank-archive', $donation_year );
             $count = count( $data );
+			$this->render_table_top( 'think-tank-archive', $donation_year, $count );
 			?>
 				<thead>
 					<tr>
@@ -227,6 +227,12 @@ class Render {
 				</tbody>
 			</table>
 			<?php
+		else :
+			?>
+			<div class="no-data">
+				<p><?php esc_html_e( 'No data found.', 'data-tables' ); ?></p>
+			</div>
+			<?php
 		endif;
 
 		return ob_get_clean();
@@ -245,8 +251,8 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-			$this->render_table_top( 'single-think-tank', $donation_year );
             $count = count( $data );
+			$this->render_table_top( 'single-think-tank', $donation_year, $count );
 			?>
 				<thead>
 					<tr>
@@ -281,6 +287,12 @@ class Render {
 				</tbody>
 			</table>
 			<?php
+		else :
+			?>
+			<div class="no-data">
+				<p><?php esc_html_e( 'No data found.', 'data-tables' ); ?></p>
+			</div>
+			<?php
 		endif;
 
 		return ob_get_clean();
@@ -299,8 +311,8 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-			$this->render_table_top( 'donor-archive', $donation_year );
             $count = count( $data );
+			$this->render_table_top( 'donor-archive', $donation_year, $count );
 			?>
 				<thead>
 					<tr>
@@ -333,6 +345,12 @@ class Render {
 				</tbody>
 			</table>
 			<?php
+		else :
+			?>
+			<div class="no-data">
+				<p><?php esc_html_e( 'No data found.', 'data-tables' ); ?></p>
+			</div>
+			<?php
 		endif;
 
 		return ob_get_clean();
@@ -352,7 +370,7 @@ class Render {
 		ob_start();
 		if ( $data ) :
             $count = count( $data );
-			$this->render_table_top( 'single-donor', $donation_year );
+			$this->render_table_top( 'single-donor', $donation_year, $count );
 			?>
 				<thead>
 					<tr>
@@ -378,7 +396,7 @@ class Render {
                         <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
 							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo get_term_link( $row['think_tank_slug'], 'think_tank' ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
-							<td class="column-numeric  column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
                                 <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-source" data-heading="<?php esc_attr_e( 'Source', 'data-tables' ); ?>"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
@@ -387,6 +405,12 @@ class Render {
 					<?php endforeach; ?>
 				</tbody>
 			</table>
+			<?php
+		else :
+			?>
+			<div class="no-data">
+				<p><?php esc_html_e( 'No data found.', 'data-tables' ); ?></p>
+			</div>
 			<?php
 		endif;
 
