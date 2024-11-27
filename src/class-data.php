@@ -994,40 +994,82 @@ class Data {
 	 *
 	 * @return array The aggregated donor data.
 	 */
+	// public function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
+	// $raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
+
+	// $data = array_reduce(
+	// $raw_data,
+	// function( $carry, $item ) {
+	// $slug = $item['think_tank_slug'];
+	// if ( ! isset( $carry[ $slug ] ) ) {
+	// $carry[ $slug ] = array(
+	// 'think_tank'      => $item['think_tank'],
+	// 'donor'           => $item['donor'],
+	// 'donor_parent'    => $item['donor_parent'],
+	// 'slug'            => $item['donor_slug'],
+	// 'amount_calc'     => 0,
+	// 'donor_type'      => $item['donor_type'],
+	// 'source'          => $item['source'],
+	// 'think_tank_slug' => $slug,
+	// 'disclosed'       => array(), // Collect disclosed values for reference.
+	// );
+	// }
+	// $carry[ $slug ]['amount_calc'] += $item['amount_calc'];
+	// $carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+
+	// return $carry;
+	// },
+	// array()
+	// );
+
+	// Normalize disclosed values for each think tank.
+	// foreach ( $data as &$think_tank_data ) {
+	// $think_tank_data['disclosed'] = array_unique( $think_tank_data['disclosed'] );
+	// $think_tank_data['disclosed'] = ( count( array_unique( $think_tank_data['disclosed'] ) ) === 1 && $think_tank_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+	// }
+
+	// ksort( $data );
+
+	// echo '<pre>';
+	// var_dump( $data );
+	// echo '</pre>';
+
+	// return $data;
+	// }
 	public function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
 		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
-		$data = array_reduce(
-			$raw_data,
-			function( $carry, $item ) {
-				$slug = $item['think_tank_slug'];
-				if ( ! isset( $carry[ $slug ] ) ) {
-					$carry[ $slug ] = array(
-						'think_tank'      => $item['think_tank'],
-						'donor'           => $item['donor'],
-						'amount_calc'     => 0,
-						'donor_type'      => $item['donor_type'],
-						'source'          => $item['source'],
-						'think_tank_slug' => $slug,
-						'disclosed'       => array(), // Collect disclosed values for reference.
-					);
+		$data = array();
+		foreach ( $raw_data as $item ) {
+			// Use think_tank_slug and donor as the unique key.
+			$key = $item['think_tank_slug'] . '|' . $item['donor'];
+
+			if ( ! isset( $data[ $key ] ) ) {
+				$data[ $key ] = array(
+					'think_tank'      => $item['think_tank'],
+					'think_tank_slug' => $item['think_tank_slug'],
+					'donor'           => $item['donor'],
+					'donor_parent'    => $item['parent_donor'] ?? '',
+					'slug'            => $item['slug'],
+					'amount_calc'     => $item['amount_calc'],
+					'donor_type'      => $item['donor_type'],
+					'source'          => $item['source'],
+					'disclosed'       => strtolower( $item['disclosed'] ), // Collect the disclosed value as 'yes' or 'no'.
+				);
+			} else {
+				// If the key already exists, sum the amount_calc.
+				$data[ $key ]['amount_calc'] += $item['amount_calc'];
+
+				if ( $data[ $key ]['disclosed'] !== 'yes' && strtolower( $item['disclosed'] ) === 'yes' ) {
+					$data[ $key ]['disclosed'] = 'yes';
 				}
-				$carry[ $slug ]['amount_calc'] += $item['amount_calc'];
-				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
-
-				return $carry;
-			},
-			array()
-		);
-
-		// Normalize disclosed values for each think tank.
-		foreach ( $data as &$think_tank_data ) {
-			// $think_tank_data['disclosed'] = array_unique( $think_tank_data['disclosed'] );
-			$think_tank_data['disclosed'] = ( count( array_unique( $think_tank_data['disclosed'] ) ) === 1 && $think_tank_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+			}
 		}
 
-		ksort( $data );
-		return $data;
+		// Convert the keys back to numeric indexing.
+		$return_data = array_values( $data );
+
+		return $return_data;
 	}
 
 	/**
