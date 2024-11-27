@@ -188,6 +188,32 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 		'class' => $class,
 	);
 }
+
+/**
+ * Get label and class for amount display.
+ *
+ * @param array  $row        Data row for the entity.
+ * @param array  $settings   Settings for default labels.
+ * @return array Contains 'label' and 'class' keys.
+ */
+function get_label_and_class_disclosed( $row, $settings ): array {
+	$label = '';
+	$class = '';
+
+	if (
+		isset( $row['disclosed'] ) &&
+		'no' == $row['disclosed']
+	) {
+		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
+		$class = 'not-disclosed';
+	}
+
+	return array(
+		'label' => $label,
+		'class' => $class,
+	);
+}
+
 /**
  * Convert camelCase keys to lowercase separated by underscores.
  *
