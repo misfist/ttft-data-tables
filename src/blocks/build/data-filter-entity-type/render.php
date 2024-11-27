@@ -15,14 +15,14 @@ namespace Ttft\Data_Tables\Blocks;
 $app_namespace = TTFT_APP_NAMESPACE;
 $state_key     = 'entityType';
 
-$entity_type = get_query_var( 'entity_type', 'think_tank' );
+$entity_type = get_query_var( 'entity_type', sanitize_text_field( $_GET['entity_type'] ?? 'think_tank' ) );
 
 wp_interactivity_state(
 	$app_namespace,
 	array(
 		$state_key          => $entity_type,
-		'thinkTankSelected' => true,
-		'donorSelected'     => false,
+		'thinkTankSelected' => 'think_tank' === $entity_type,
+		'donorSelected'     => 'donor' === $entity_type,
 	),
 );
 
@@ -53,6 +53,7 @@ ob_start();
 			data-entity-type="think_tank"
 		 >
 			<a href="<?php echo add_query_arg( 'entity_type', 'think_tank' ); ?>" data-entity-type="think_tank"><?php esc_html_e( 'Think Tanks', 'data-table' ); ?></a>
+			<span class="found-records" data-wp-text="state.foundRecords[state.tableId]">
 		</li>
 		<li 
 			class="tab-link"
@@ -62,6 +63,7 @@ ob_start();
 			data-entity-type="donor"
 		>
 			<a href="<?php echo add_query_arg( 'entity_type', 'donor' ); ?>" data-entity-type="donor"><?php esc_html_e( 'Donors', 'data-table' ); ?></a>
+			<span class="found-records" data-wp-text="state.foundRecords[state.tableId]">
 		</li>
 	</ul>
 	
