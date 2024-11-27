@@ -110,19 +110,19 @@ function generate_star_rating( $score = 0 ): string {
 	<!-- wp:group {"metadata":{"name":"Transparency Stars"},"className":"star-group stars-<?php echo $score; ?> no-export noExport","layout":{"type":"default"}} -->
 	<div class="wp-block-group star-group stars-<?php echo $score; ?> no-export noExport" aria-label="<?php echo $score; ?> stars">
 		<?php
-        $star_rating = '';
+		$star_rating = '';
 
-        for ( $i = 1; $i <= 5; $i++ ) :
-            if ( $i <= $score ) :
+		for ( $i = 1; $i <= 5; $i++ ) :
+			if ( $i <= $score ) :
 				?>
-                <span class="star filled">&#9733;</span>
+				<span class="star filled">&#9733;</span>
 				<?php
-            else :
+			else :
 				?>
-                <span class="star">&#9734;</span>
+				<span class="star">&#9734;</span>
 				<?php
-            endif;
-        endfor;
+			endif;
+		endfor;
 		?>
 	</div>
 	<!-- /wp:group -->
