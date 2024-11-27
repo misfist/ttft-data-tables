@@ -675,6 +675,8 @@ class Data {
 						'donor_link'  => $item['donor_link'],
 						'source'      => $item['source'],
 						'disclosed'   => array(), // Collect disclosed values for reference.
+						'think_tank'    => $item['think_tank_slug'],
+						'think_tank_id' => get_post_id_by_slug( $item['think_tank_slug'] ),
 					);
 				}
 
