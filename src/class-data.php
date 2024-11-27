@@ -837,64 +837,64 @@ class Data {
 	 * @return array The aggregated donor archive data.
 	 */
 	// public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
-	// 	$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
+	// $raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
-	// 	// echo '<pre>';
-	// 	// var_dump( $raw_data );
-	// 	// echo '</pre>';
+	// echo '<pre>';
+	// var_dump( $raw_data );
+	// echo '</pre>';
 
-	// 	$data = array_reduce(
-	// 		$raw_data,
-	// 		function( $carry, $item ) {
-	// 			$slug        = $item['donor_slug'];
-	// 			$amount_calc = $item['amount_calc'];
-	// 			$year        = $item['year'];
+	// $data = array_reduce(
+	// $raw_data,
+	// function( $carry, $item ) {
+	// $slug        = $item['donor_slug'];
+	// $amount_calc = $item['amount_calc'];
+	// $year        = $item['year'];
 
-	// 			if ( ! isset( $carry[ $slug ] ) ) {
-	// 				$carry[ $slug ] = array(
-	// 					'donor'       => $item['donor'],
-	// 					'amount_calc' => $amount_calc,
-	// 					'donor_type'  => $item['donor_type'],
-	// 					'donor_slug'  => $slug,
-	// 					'donor_link'  => $item['donor_link'],
-	// 					'year'        => $year,
-	// 					'disclosed'   => array(), // Collect disclosed values for reference.
-	// 				);
-	// 			} else {
-	// 				$carry[ $slug ]['amount_calc'] += $amount_calc;
-	// 				$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
+	// if ( ! isset( $carry[ $slug ] ) ) {
+	// $carry[ $slug ] = array(
+	// 'donor'       => $item['donor'],
+	// 'amount_calc' => $amount_calc,
+	// 'donor_type'  => $item['donor_type'],
+	// 'donor_slug'  => $slug,
+	// 'donor_link'  => $item['donor_link'],
+	// 'year'        => $year,
+	// 'disclosed'   => array(), // Collect disclosed values for reference.
+	// );
+	// } else {
+	// $carry[ $slug ]['amount_calc'] += $amount_calc;
+	// $carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
 
-	// 				$years = explode( ', ', $carry[ $slug ]['year'] );
-	// 				if ( ! in_array( $year, $years ) ) {
-	// 					$years[]                = $year;
-	// 					$carry[ $slug ]['year'] = implode( ', ', $years );
-	// 				}
-	// 			}
-	// 			return $carry;
-	// 		},
-	// 		array()
-	// 	);
+	// $years = explode( ', ', $carry[ $slug ]['year'] );
+	// if ( ! in_array( $year, $years ) ) {
+	// $years[]                = $year;
+	// $carry[ $slug ]['year'] = implode( ', ', $years );
+	// }
+	// }
+	// return $carry;
+	// },
+	// array()
+	// );
 
-	// 	// Normalize disclosed values for each donor.
-	// 	foreach ( $data as &$donor_data ) {
-	// 		// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
-	// 		$donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
-	// 	}
+	// Normalize disclosed values for each donor.
+	// foreach ( $data as &$donor_data ) {
+	// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+	// $donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+	// }
 
-	// 	ksort( $data );
-	// 	return $data;
+	// ksort( $data );
+	// return $data;
 	// }
 
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
-	
+
 		$data = array_reduce(
 			$raw_data,
 			function( $carry, $item ) {
 				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
-	
+
 				if ( ! isset( $carry[ $slug ] ) ) {
 					$carry[ $slug ] = array(
 						'donor'       => $item['donor'],
