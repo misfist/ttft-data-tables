@@ -91,6 +91,7 @@ const initTable = ( tableId ) => {
 		},
 		drawCallback: function ( settings ) {
 			// console.log( `drawCallback: `, settings );
+			// console.log( `drawCallback: `, state.uniqueId );
 		},
 		initComplete: function ( settings, json ) {
 			// console.log( `initComplete: `, settings );
@@ -160,7 +161,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 				formData.append( 'donor', donor );
 				formData.append( 'search', search || '' );
 
-				console.log( `formData: `, formData );
+				// console.log( `formData: `, formData );
 
 				state.isLoading = true;
 				context.isLoaded = false;
@@ -172,7 +173,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 
 				const responseText = await response.text();
 
-				console.log( `responseText: `, responseText );
+				// console.log( `responseText: `, responseText );
 
 				if ( ! response.ok ) {
 					throw new Error(
@@ -269,22 +270,6 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 					}
 				}
 			}, [ state.isLoading ] );
-		},
-		initLog: () => {
-			// console.log( `Initial State: `, JSON.stringify( state, undefined, 2 )  );
-			// const { tableType, donationYear, donorType, isLoaded } = getContext();
-			// console.log( `Initial Context: ${tableType}, isLoaded: ${isLoaded}, ${donationYear}, ${donorType}` );
-		},
-		logTable: () => {
-			const { tableType, thinkTank, donor, donationYear, donorType, search, isLoading } = state;
-			console.log( `State: `, tableType, thinkTank, donor, donationYear, donorType, isLoading );
-		},
-		logState: ( key ) => {
-			console.log( `key: `, state.key );
-		},
-		logLoading: () => {
-			const context = getContext();
-			console.log( `IS LOADING: `, state.isLoading, context.isLoaded );
-		},
+		}
 	},
 } );
