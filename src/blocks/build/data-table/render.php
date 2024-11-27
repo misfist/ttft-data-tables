@@ -20,7 +20,7 @@ global $wp_query;
 
 $app_namespace = TTFT_APP_NAMESPACE;
 
-$unique_id = wp_unique_id( 'p-' );
+$unique_id = wp_unique_id( 'Id' );
 
 $table_type           = sanitize_text_field( get_query_var( 'table_type', $attributes['tableType'] ?? '' ) );
 $table_id             = TTFT_TABLE_ID . '-' . $table_type;
@@ -35,6 +35,7 @@ $search               = get_search_query();
 
 $args = array(
 	'tableId'     => $table_id,
+	'unqiueId'    => $unique_id,
 	'tableType'   => $table_type,
 	'searchLabel' => $search_label,
 	'pageLength'  => $rows_per_page,
@@ -64,20 +65,21 @@ $context = array(
 );
 
 $block_wrapper_attributes = array(
-	'data-wp-interactive'       => $app_namespace,
-	'data-wp-run'               => 'callbacks.renderTable',
-	'data-wp-run--animate'      => 'callbacks.loadAnimation',
-	'data-wp-bind--table_type'  => 'state.tableType',
-	'data-wp-bind--think_tank'  => 'state.thinkTank',
-	'data-wp-bind--donor'       => 'state.donor',
-	'data-wp-bind--year'        => 'state.donationYear',
-	'data-wp-bind--type'        => 'state.donorType',
-	'data-wp-init'              => 'actions.initTable',
-	'data-wp-init-set-context'  => 'actions.setContext',
-	'data-wp-init--initLog'     => 'callbacks.initLog',
-	'data-wp-watch--log'        => 'callbacks.initLog',
-	'data-wp-class--is-loading' => 'state.isLoading,',
-	'data-wp-class--is-loaded'  => '!state.isLoading',
+	'data-wp-interactive'              => $app_namespace,
+	'data-wp-run'                      => 'callbacks.renderTable',
+	'data-wp-run--animate'             => 'callbacks.loadAnimation',
+	'data-wp-bind--table_type'         => 'state.tableType',
+	'data-wp-bind--think_tank'         => 'state.thinkTank',
+	'data-wp-bind--donor'              => 'state.donor',
+	'data-wp-bind--year'               => 'state.donationYear',
+	'data-wp-bind--type'               => 'state.donorType',
+	'data-wp-init'                     => 'actions.initTable',
+	'data-wp-init-set-context'         => 'actions.setContext',
+	'data-wp-watch--log'               => 'callbacks.initLog',
+	'data-wp-class--is-loading'        => 'state.isLoading,',
+	'data-wp-class--is-loaded'         => '!state.isLoading',
+	'data-wp-bind--data-found-records' => 'state.foundRecords' . $unique_id,
+	'data-unique-id'                   => $unique_id,
 );
 
 ob_start();

@@ -24,6 +24,26 @@ function get_post_from_term( $slug, $type ) {
 }
 
 /**
+ * Get a post by its slug.
+ *
+ * @param string $slug      The post slug.
+ * @param string $post_type The post type. Default is 'think_tank'.
+ * @return int|null The post->ID, or null if not.
+ */
+function get_post_id_by_slug( $slug, $post_type = 'think_tank' ) {
+	$args = array(
+		'name'           => $slug,
+		'post_type'      => $post_type,
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+	);
+
+	$posts = get_posts( $args );
+
+	return ( ! empty( $posts ) && ! is_wp_error( $posts ) ) ? (int) $posts[0] : null;
+}
+
+/**
  * Retrieves the Transparency Score for a given think tank slug.
  *
  * @param string $think_tank_slug The think tank slug.
@@ -90,19 +110,19 @@ function generate_star_rating( $score = 0 ): string {
 	<!-- wp:group {"metadata":{"name":"Transparency Stars"},"className":"star-group stars-<?php echo $score; ?> no-export noExport","layout":{"type":"default"}} -->
 	<div class="wp-block-group star-group stars-<?php echo $score; ?> no-export noExport" aria-label="<?php echo $score; ?> stars">
 		<?php
-        $star_rating = '';
+		$star_rating = '';
 
-        for ( $i = 1; $i <= 5; $i++ ) :
-            if ( $i <= $score ) :
+		for ( $i = 1; $i <= 5; $i++ ) :
+			if ( $i <= $score ) :
 				?>
-                <span class="star filled">&#9733;</span>
+				<span class="star filled">&#9733;</span>
 				<?php
-            else :
+			else :
 				?>
-                <span class="star">&#9734;</span>
+				<span class="star">&#9734;</span>
 				<?php
-            endif;
-        endfor;
+			endif;
+		endfor;
 		?>
 	</div>
 	<!-- /wp:group -->
@@ -132,6 +152,66 @@ function get_donation_accepted_key( $donor_type ): string {
 	}
 
 	return '';
+}
+
+/**
+ * Get label and class for amount display.
+ *
+ * @param array  $row        Data row for the think tank.
+ * @param string $donor_type Donor type key.
+ * @param array  $settings   Settings for default labels.
+ * @return array Contains 'label' and 'class' keys.
+ */
+function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ): array {
+	$key   = get_donation_accepted_key( $donor_type );
+	$label = '';
+	$class = '';
+
+	if ( ! empty( $row[ $key ] ) ) {
+		$label = $settings['not_accepted'] ?? esc_attr__( 'Not Accepted', 'data-tables' );
+		$class = 'not-accepted';
+	} elseif ( ! empty( $row['limited_info'] ) && 0 == $row['donor_types'][ $donor_type ] ) {
+		$label = $settings['no_data'] ?? esc_attr__( 'Not Available', 'data-tables' );
+		$class = 'no-data';
+	} elseif (
+		isset( $row['disclosed'] ) &&
+		is_array( $row['disclosed'] ) &&
+		array_key_exists( $donor_type, $row['disclosed'] ) &&
+		0 == $row['donor_types'][ $donor_type ]
+	) {
+		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
+		$class = 'not-disclosed';
+	}
+
+	return array(
+		'label' => $label,
+		'class' => $class,
+	);
+}
+
+/**
+ * Get label and class for amount display.
+ *
+ * @param array  $row        Data row for the entity.
+ * @param array  $settings   Settings for default labels.
+ * @return array Contains 'label' and 'class' keys.
+ */
+function get_label_and_class_disclosed( $row, $settings ): array {
+	$label = '';
+	$class = '';
+
+	if (
+		isset( $row['disclosed'] ) &&
+		'no' == $row['disclosed']
+	) {
+		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
+		$class = 'not-disclosed';
+	}
+
+	return array(
+		'label' => $label,
+		'class' => $class,
+	);
 }
 
 /**
