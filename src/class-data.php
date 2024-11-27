@@ -474,14 +474,16 @@ class Data {
 				$query->the_post();
 				$post_id = get_the_ID();
 	
+				$tax_args = array(
+					'orderby' => 'slug',
+				);
 				/**
 				 * Limit to "top level" donors
 				 */
-				$tax_args = array(
-					'parent'  => 0,
-					'orderby' => 'slug',
-				);
-	
+				if( empty( $search ) ) {
+					$tax_args['parent'] = 0;
+				}
+
 				$donors = wp_get_object_terms( $post_id, 'donor', $tax_args );
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
 					continue;
