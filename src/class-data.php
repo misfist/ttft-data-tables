@@ -181,13 +181,13 @@ class Data {
 				}
 
 				$data[] = array(
-					'donor'       => $donor_name,
-					'amount_calc' => $amount_calc,
-					'donor_type'  => get_the_term_list( $post_id, 'donor_type' ),
-					'donor_link'  => get_term_link( $donor_slugs[0], 'donor' ),
-					'donor_slug'  => $donor_slug,
-					'disclosed'   => get_post_meta( $post_id, 'disclosed', true ),
-					'source'      => get_post_meta( $post_id, 'source', true ),
+					'donor'           => $donor_name,
+					'amount_calc'     => $amount_calc,
+					'donor_type'      => get_the_term_list( $post_id, 'donor_type' ),
+					'donor_link'      => get_term_link( $donor_slugs[0], 'donor' ),
+					'donor_slug'      => $donor_slug,
+					'disclosed'       => get_post_meta( $post_id, 'disclosed', true ),
+					'source'          => get_post_meta( $post_id, 'source', true ),
 					'think_tank_slug' => $think_tank,
 				);
 			}
@@ -257,7 +257,7 @@ class Data {
 		$data = array();
 
 		if ( $query->have_posts() ) {
-			foreach ( $query->posts as $post_id  ) {
+			foreach ( $query->posts as $post_id ) {
 				$query->the_post();
 				$post_id     = get_the_ID();
 				$think_tanks = get_the_terms( $post_id, 'think_tank' );
@@ -464,29 +464,29 @@ class Data {
 				);
 			}
 		}
-
+	
 		$query = new \WP_Query( $args );
-
+	
 		$data = array();
-
+	
 		if ( $query->have_posts() ) {
 			while ( $query->have_posts() ) {
 				$query->the_post();
 				$post_id = get_the_ID();
-
+	
 				/**
-				* Limit to "top level" donors
-				*/
+				 * Limit to "top level" donors
+				 */
 				$tax_args = array(
 					'parent'  => 0,
 					'orderby' => 'slug',
 				);
-
+	
 				$donors = wp_get_object_terms( $post_id, 'donor', $tax_args );
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
 					continue;
 				}
-
+	
 				$donor_names = wp_list_pluck( $donors, 'name' );
 				$donor_slugs = wp_list_pluck( $donors, 'slug' );
 				$donor_name  = implode( ' > ', $donor_names );
@@ -669,7 +669,7 @@ class Data {
 							$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
 						}
 					}
-	
+
 					// Add disclosed information for each donor type.
 					$data[ $think_tank_slug ]['disclosed'][ $donor_type ] = array_unique(
 						array_map(
@@ -795,17 +795,17 @@ class Data {
 			},
 			array()
 		);
-
+	
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
 			$disclosed_values = array_unique( $donor_data['disclosed'] );
 			$donor_data['disclosed'] = ( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
 		}
-
+	
 		ksort( $data );
 		return $data;
 	}
-
+	
 	/**
 	 * Retrieves single think tank data with aggregated amounts.
 	 *
@@ -825,13 +825,13 @@ class Data {
 
 				if ( ! isset( $carry[ $slug ] ) ) {
 					$carry[ $slug ] = array(
-						'donor'       => $item['donor'],
-						'amount_calc' => 0,
-						'donor_type'  => $item['donor_type'],
-						'donor_slug'  => $slug,
-						'donor_link'  => $item['donor_link'],
-						'source'      => $item['source'],
-						'disclosed'   => array(), // Collect disclosed values for reference.
+						'donor'         => $item['donor'],
+						'amount_calc'   => 0,
+						'donor_type'    => $item['donor_type'],
+						'donor_slug'    => $slug,
+						'donor_link'    => $item['donor_link'],
+						'source'        => $item['source'],
+						'disclosed'     => array(), // Collect disclosed values for reference.
 						'think_tank'    => $item['think_tank_slug'],
 						'think_tank_id' => get_post_id_by_slug( $item['think_tank_slug'] ),
 					);
