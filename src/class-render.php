@@ -279,6 +279,13 @@ class Render {
                                     <?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?>
                                     <?php
                                 endif;
+								/**
+								 * Check:
+								 * - Think tank didn't accept funding from donor type - display $this->data->settings['not_accepted']
+								 * - Think tank has limited info - display $this->data->settings['no_data']
+								 * - Think tank has disclosed === 'no' - display $this->data->settings['unknown_amount']
+								 */
+								$attrs = get_label_and_class_archive_think_tank( $row, $donor_type, $this->data->settings );
                                 ?>
                             </td>
                             <td class="column-source"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
@@ -451,4 +458,23 @@ class Render {
         }
         return $converted_args;
     }
+									<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
+                        /**
+                         * Check:
+                         * - Think tank has disclosed == 'no' - display $this->data->settings['unknown_amount']
+                         */
+                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
+                        /**
+                         * Check:
+                         * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
+                         */
+                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
+                        /**
+                         * Check:
+                         * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
+                         */
+                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 }
