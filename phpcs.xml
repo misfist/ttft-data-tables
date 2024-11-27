@@ -61,14 +61,14 @@
 	<!-- The minimum supported WordPress version. This should match what's listed in style.css. -->
 	<rule ref="WordPress.WP.DeprecatedFunctions">
 		<properties>
-			<property name="minimum_wp_version" value="6.4"/>
+			<property name="minimum_wp_version" value="6.6"/>
 		</properties>
 	</rule>
 
 	<!-- Allow for theme specific exceptions to the file name rules based on the theme hierarchy. -->
 	<rule ref="WordPress.Files.FileName">
 		<properties>
-			<property name="is_theme" value="true"/>
+			<property name="is_theme" value="false"/>
 		</properties>
 	</rule>
 
@@ -76,7 +76,7 @@
 		 Multiple valid prefixes can be provided as a comma-delimited list. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
-			<property name="prefixes" type="array" value="WebDevStudios\wdsbt,wds" />
+			<property name="prefixes" type="array" value="Ttft\Data_Tables" />
 		</properties>
 	</rule>
 
@@ -84,7 +84,7 @@
 		 Multiple valid text domains can be provided as a comma-delimited list. -->
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="wdsbt"/>
+			<property name="text_domain" type="array" value="data-tables"/>
 		</properties>
 	</rule>
 
