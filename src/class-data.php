@@ -188,6 +188,7 @@ class Data {
 					'donor_slug'  => $donor_slug,
 					'disclosed'   => get_post_meta( $post_id, 'disclosed', true ),
 					'source'      => get_post_meta( $post_id, 'source', true ),
+					'think_tank_slug' => $think_tank,
 				);
 			}
 		}
