@@ -599,6 +599,7 @@ class Data {
 
 		if ( ! empty( $search ) ) {
 			$think_tank_args['s'] = $search;
+			$think_tank_args['search_columns'] = [ 'post_title' ];
 		}
 
 		$think_tank_query = new \WP_Query( $think_tank_args );
@@ -656,6 +657,13 @@ class Data {
 					}
 
 					$transactions[ $think_tank_slug ][ $donor_type ][] = $transaction_id;
+					'tax_query'      => array(
+						array(
+							'taxonomy' => 'think_tank',
+							'field'    => 'slug',
+							'terms'    => $slug,
+						),
+					),
 				}
 			}
 
@@ -667,6 +675,19 @@ class Data {
 						$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
 						if ( is_numeric( $data[ $think_tank_slug ]['donor_types'][ $donor_type ] ) ) {
 							$data[ $think_tank_slug ]['donor_types'][ $donor_type ] += $amount_calc;
+	
+				$transaction_query = new \WP_Query( $transaction_args );
+	
+				if ( $transaction_query->have_posts() ) {
+					foreach ( $transaction_query->posts as $transaction_id ) {
+						foreach ( wp_get_post_terms( $transaction_id, 'donor_type' ) as $donor_type_term ) {
+							$donor_type = $donor_type_term->name;
+	
+							$amount_calc = floatval( get_post_meta( $transaction_id, 'amount_calc', true ) );
+							$data[ $slug ]['donor_types'][ $donor_type ] += $amount_calc;
+	
+							$disclosed_value = strtolower( get_post_meta( $transaction_id, 'disclosed', true ) );
+							$data[ $slug ]['disclosed'][ $donor_type ][] = $disclosed_value;
 						}
 					}
 
@@ -686,6 +707,7 @@ class Data {
 						)
 					);
 				}
+				wp_reset_postdata();
 			}
 		}
 		wp_reset_postdata();
