@@ -383,33 +383,35 @@ class Data {
 				$donor_slugs = wp_list_pluck( $donors, 'slug' );
 				$donor_name  = implode( ' > ', $donor_names );
 				$donor_slug  = implode( '-', $donor_slugs );
-
-				$amount = get_post_meta( $post_id, 'amount_calc', true );
-				$amount = intval( $amount );
-
-				$disclosed = get_post_meta( $post_id, 'disclosed', true );
-
+	
+				$amount     = intval( get_post_meta( $post_id, 'amount_calc', true ) );
+				$disclosed  = strtolower( get_post_meta( $post_id, 'disclosed', true ) );
 				$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
-
-				$data[] = array(
-					'donor'       => $donor_name,
-					'amount_calc' => $amount,
-					'disclosed'   => $disclosed,
-					'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
-					'donor_slug'  => $donor_slug,
-					'donor_link'  => get_term_link( $donor_slug, 'donor' ),
-					'year'        => get_the_term_list( $post_id, 'donation_year' ),
-				);
-
-				wp_reset_postdata();
+	
+				if ( ! isset( $data[ $donor_slug ] ) ) {
+					$data[ $donor_slug ] = array(
+						'donor'       => $donor_name,
+						'amount_calc' => 0,
+						'disclosed'   => array(),
+						'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
+						'donor_slug'  => $donor_slug,
+						'donor_link'  => get_term_link( $donor_slug, 'donor' ),
+						'year'        => get_the_term_list( $post_id, 'donation_year' ),
+					);
+				}
+	
+				$data[ $donor_slug ]['amount_calc'] += $amount;
+				$data[ $donor_slug ]['disclosed'][]  = $disclosed;
 			}
+	
+			wp_reset_postdata();
 		}
-
+	
 		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-
+	
 		return $data;
 	}
-
+	
 	/**
 	 * Get data for top ten
 	 *
@@ -614,12 +616,18 @@ class Data {
 						'donor_slug'  => $slug,
 						'donor_link'  => $item['donor_link'],
 						'year'        => $year,
-						'disclosed'   => array(), // Collect disclosed values for reference.
+						'disclosed'   => $item['disclosed'],
 					);
 				} else {
 					$carry[ $slug ]['amount_calc'] += $amount_calc;
-					$carry[ $slug ]['disclosed'][]  = strtolower( $item['disclosed'] );
-
+	
+					// Aggregate disclosed values
+					$carry[ $slug ]['disclosed'] = array_merge(
+						$carry[ $slug ]['disclosed'],
+						$item['disclosed']
+					);
+	
+					// Handle year aggregation
 					$years = explode( ', ', $carry[ $slug ]['year'] );
 					if ( ! in_array( $year, $years ) ) {
 						$years[]                = $year;
@@ -633,7 +641,8 @@ class Data {
 
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
-			$donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+			$disclosed_values = array_unique( $donor_data['disclosed'] );
+			$donor_data['disclosed'] = ( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
@@ -679,7 +688,8 @@ class Data {
 
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
-			$donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+			// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
+			$donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
@@ -723,7 +733,8 @@ class Data {
 
 		// Normalize disclosed values for each think tank.
 		foreach ( $data as &$think_tank_data ) {
-			$think_tank_data['disclosed'] = array_unique( $think_tank_data['disclosed'] );
+			// $think_tank_data['disclosed'] = array_unique( $think_tank_data['disclosed'] );
+			$think_tank_data['disclosed'] = ( count( array_unique( $think_tank_data['disclosed'] ) ) === 1 && $think_tank_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
