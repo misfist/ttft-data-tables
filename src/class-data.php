@@ -294,6 +294,7 @@ class Data {
 					'source'          => $source,
 					'disclosed'       => $disclosed,
 					'think_tank_slug' => $think_tank_slug,
+					'transaction_id'  => $post_id,
 				);
 			}
 			wp_reset_postdata();
