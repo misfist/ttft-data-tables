@@ -885,7 +885,6 @@ class Data {
 	// ksort( $data );
 	// return $data;
 	// }
-
 	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
