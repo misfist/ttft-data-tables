@@ -269,7 +269,7 @@ class Data {
 				$think_tank      = $think_tanks[0];
 				$think_tank_slug = $think_tank->slug;
 				$source          = get_post_meta( $post_id, 'source', true );
-				$disclosed       = get_post_meta( $post_id, 'disclosed', true );
+				$disclosed       = strtolower( get_post_meta( $post_id, 'disclosed', true ) );
 
 				$amount_calc = get_post_meta( $post_id, 'amount_calc', true );
 				if ( empty( $amount_calc ) ) {
