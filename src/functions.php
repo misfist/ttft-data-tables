@@ -155,6 +155,40 @@ function get_donation_accepted_key( $donor_type ): string {
 }
 
 /**
+ * Get label and class for amount display.
+ *
+ * @param array  $row        Data row for the think tank.
+ * @param string $donor_type Donor type key.
+ * @param array  $settings   Settings for default labels.
+ * @return array Contains 'label' and 'class' keys.
+ */
+function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ): array {
+	$key   = get_donation_accepted_key( $donor_type );
+	$label = '';
+	$class = '';
+
+	if ( ! empty( $row[ $key ] ) ) {
+		$label = $settings['not_accepted'] ?? esc_attr__( 'Not Accepted', 'data-tables' );
+		$class = 'not-accepted';
+	} elseif ( ! empty( $row['limited_info'] ) && 0 == $row['donor_types'][ $donor_type ] ) {
+		$label = $settings['no_data'] ?? esc_attr__( 'Not Available', 'data-tables' );
+		$class = 'no-data';
+	} elseif (
+		isset( $row['disclosed'] ) &&
+		is_array( $row['disclosed'] ) &&
+		array_key_exists( $donor_type, $row['disclosed'] ) &&
+		0 == $row['donor_types'][ $donor_type ]
+	) {
+		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
+		$class = 'not-disclosed';
+	}
+
+	return array(
+		'label' => $label,
+		'class' => $class,
+	);
+}
+/**
  * Convert camelCase keys to lowercase separated by underscores.
  *
  * @param array $args The array with camelCase keys.
