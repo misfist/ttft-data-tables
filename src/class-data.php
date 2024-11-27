@@ -492,7 +492,7 @@ class Data {
 				$donor_names = wp_list_pluck( $donors, 'name' );
 				$donor_slugs = wp_list_pluck( $donors, 'slug' );
 				$donor_name  = implode( ' > ', $donor_names );
-				$donor_slug  = implode( '-', $donor_slugs );
+				$donor_slug  = is_array( $donor_slugs ) ? $donor_slugs[0] : $donor_slugs;
 	
 				$amount     = intval( get_post_meta( $post_id, 'amount_calc', true ) );
 				$disclosed  = strtolower( get_post_meta( $post_id, 'disclosed', true ) );
