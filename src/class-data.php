@@ -713,7 +713,19 @@ class Data {
 			}
 		}
 		wp_reset_postdata();
-
+	
+		// Normalize disclosed values.
+		foreach ( $data as &$think_tank_data ) {
+			foreach ( $think_tank_data['disclosed'] as $donor_type => $disclosed_values ) {
+				$disclosed_values = array_unique( $disclosed_values );
+				$think_tank_data['disclosed'][ $donor_type ] =
+					( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
+			}
+	
+			// Ensure donor types remain in the correct order.
+			$think_tank_data['donor_types'] = array_merge( $default_donor_types, $think_tank_data['donor_types'] );
+		}
+	
 		ksort( $data );
 
 		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
