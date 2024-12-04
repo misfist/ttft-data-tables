@@ -223,7 +223,7 @@ class Render {
 								 */
 								$attrs = get_label_and_class_archive_think_tank( $row, $donor_type, $this->data->settings );
                                 ?>
-								<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>" >
+								<td class="column-numeric column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>" data-order="<?php echo $amount;?><?php echo $attrs['label']; ?>">
 									<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 								</td>
 								<?php
@@ -285,8 +285,8 @@ class Render {
 						?>
 						<tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
-							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
-                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo $amount;?><?php echo $attrs['label']; ?>">
+                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>" data-order="<?php echo $amount;?><?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-source"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
 							<td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
@@ -344,7 +344,7 @@ class Render {
 						?>
 						<tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
-							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo $amount;?><?php echo $attrs['label']; ?>">
                                 <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
@@ -390,7 +390,6 @@ class Render {
 				</thead>
 				<tbody
                     data-found="<?php echo intval( $count ); ?>"
-                    data-wp-bind--records-found='state.recordsFound'
                 >
 					<?php
 					foreach ( $data as $row ) :
@@ -404,7 +403,7 @@ class Render {
                         <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
 							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo get_term_link( $row['think_tank_slug'], 'think_tank' ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
-							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>">
+							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo $amount;?><?php echo $attrs['label']; ?>">
                                 <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-source" data-heading="<?php esc_attr_e( 'Source', 'data-tables' ); ?>"><?php echo ( $row['source'] ) ? sprintf( '<a href="%1$s" aria-label="%2$s" target="_blank"><span class="material-symbols-outlined" style="font-family:var(--wp--preset--font-family--icon);" role="img" aria-label="%2$s">link</span></a>', esc_url( $row['source'] ), esc_attr__( 'Link to source', 'data-tables' ) ) : ''; ?></td>
@@ -436,7 +435,6 @@ class Render {
 	public function render_top_ten_table( $donor_type = '', $donation_year = '', $number_of_items = 10 ): void {
 		echo $this->generate_top_ten_table( $donor_type, $donation_year, $number_of_items );
 	}
-
 
 	/**
 	 * Convert a transparency score to a star rating
