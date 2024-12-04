@@ -348,13 +348,19 @@ class Data {
 		if ( ! empty( $search ) ) {
 			$taxonomy = 'donor';
 			$terms    = $this->get_search_term_ids( $search, $taxonomy );
-			if ( $terms ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => $taxonomy,
-					'field'    => 'id',
-					'terms'    => (array) $terms,
-				);
-			}
+
+			if( ! $terms ) {
+				/**
+				 * If no terms are found, search produces no results, return an empty array.
+				 */
+				return array();
+			} 
+
+			$args['tax_query'][] = array(
+				'taxonomy' => $taxonomy,
+				'field'    => 'id',
+				'terms'    => (array) $terms,
+			);
 		}
 
 		$query = new \WP_Query( $args );
@@ -367,7 +373,7 @@ class Data {
 				$post_id = get_the_ID();
 
 				$tax_args = array(
-					'orderby' => 'slug',
+					'orderby' => 'term_id',
 				);
 				/**
 				 * Limit to "top level" donors
