@@ -16,6 +16,10 @@ $app_namespace = TTFT_APP_NAMESPACE;
 $state_key     = 'entityType';
 
 $entity_type = get_query_var( 'entity_type', sanitize_text_field( $_GET['entity_type'] ?? 'think_tank' ) );
+if ( ! $entity_type ) {
+	$entity_type = 'think_tank';
+
+}
 
 wp_interactivity_state(
 	$app_namespace,
@@ -28,17 +32,18 @@ wp_interactivity_state(
 );
 
 $context = array(
-	$state_key => $entity_type,
+	$state_key          => $entity_type,
+	'thinkTankSelected' => 'think_tank' === $entity_type || ! $entity_type,
+	'donorSelected'     => 'donor' === $entity_type,
 );
 
 $block_wrapper_attributes = get_block_wrapper_attributes(
 	array(
-		'class'               => 'transaction-results-tabs',
-		'data-wp-interactive' => $app_namespace,
-		'data-wp-watch'       => 'callbacks.updateEntityType',
-		'data-wp-bind--type'  => 'state.entityType',
-		'thinkTankSelected'   => 'think_tank' === $entity_type,
-		'donorSelected'       => 'donor' === $entity_type,
+		'class'                             => 'transaction-results-tabs',
+		'data-wp-interactive'               => $app_namespace,
+		'data-wp-bind--type'                => 'state.entityType',
+		'data-wp-bind--think-tank-selected' => 'think_tank' === $entity_type || ! $entity_type,
+		'data-wp-bind--donor-selected'      => 'donor' === $entity_type,
 	)
 );
 
