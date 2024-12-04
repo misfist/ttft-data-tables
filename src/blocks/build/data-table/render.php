@@ -65,21 +65,21 @@ $context = array(
 );
 
 $block_wrapper_attributes = array(
-	'data-wp-interactive'              => $app_namespace,
-	'data-wp-run'                      => 'callbacks.renderTable',
-	'data-wp-run--animate'             => 'callbacks.loadAnimation',
-	'data-wp-bind--table_type'         => 'state.tableType',
-	'data-wp-bind--think_tank'         => 'state.thinkTank',
-	'data-wp-bind--donor'              => 'state.donor',
-	'data-wp-bind--year'               => 'state.donationYear',
-	'data-wp-bind--type'               => 'state.donorType',
-	'data-wp-init'                     => 'actions.initTable',
-	'data-wp-init-set-context'         => 'actions.setContext',
-	'data-wp-watch--log'               => 'callbacks.initLog',
-	'data-wp-class--is-loading'        => 'state.isLoading,',
-	'data-wp-class--is-loaded'         => '!state.isLoading',
-	'data-wp-bind--data-found-records' => 'state.foundRecords' . $unique_id,
-	'data-unique-id'                   => $unique_id,
+	'data-wp-interactive'                             => $app_namespace,
+	'data-wp-run'                                     => 'callbacks.renderTable',
+	'data-wp-run--animate'                            => 'callbacks.loadAnimation',
+	'data-wp-bind--table_type'                        => 'state.tableType',
+	'data-wp-bind--think_tank'                        => 'state.thinkTank',
+	'data-wp-bind--donor'                             => 'state.donor',
+	'data-wp-bind--year'                              => 'state.donationYear',
+	'data-wp-bind--type'                              => 'state.donorType',
+	'data-wp-init'                                    => 'actions.initTable',
+	'data-wp-init-set-context'                        => 'actions.setContext',
+	'data-wp-watch--log'                              => 'callbacks.initLog',
+	'data-wp-class--is-loading'                       => 'state.isLoading,',
+	'data-wp-class--is-loaded'                        => '!state.isLoading',
+	'data-wp-bind--data-found-records-' . $table_type => 'state.foundRecords_' . $table_type,
+	'data-unique-id'                                  => $unique_id,
 );
 
 ob_start();
