@@ -1,0 +1,156 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+@import '../assets/config';
+
+.wp-block-data-tables-data-filter-donation-year {
+	@include responsive-min( $break-small + 1px ) {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+		column-gap: var( --wp--preset--spacing--20 );
+		row-gap: var( --wp--preset--spacing--10 );
+	
+		input[type='radio'] {
+			display: none;
+		}
+		
+		label {
+			display: inline-block;
+			padding: var( --wp--preset--spacing--10 ) var( --wp--preset--spacing--20 );
+			margin-right: 5px;
+			cursor: pointer;
+			background-color: var(--wp--preset--color--gray-200);
+			transition: background-color 0.3s, color 0.3s;
+			text-align: center;
+		
+			&:hover,
+			&:focus {
+				background-color: var( --wp--custom--color--hover );
+			}
+		}
+		
+		.year {
+			label {
+				background-color: var( --wp--preset--color--gray-200 );
+				padding: var( --wp--preset--spacing--10 ) var( --wp--preset--spacing--20 );
+		
+				&:hover,
+				&:focus {
+					background-color: var( --wp--custom--color--hover );
+				}
+			}
+		
+		}
+		
+		input[type='radio']:checked + label {
+			background-color: var( --wp--preset--color--contrast-2 );
+			color: var( --wp--preset--color--white );
+		}
+	}
+}
+
+/* Mobile <= #{$break-small}*/
+.wp-block-data-tables-data-filter-donation-year,
+.wp-block-data-tables-data-filter-donor-type {
+	$height: 46px;
+
+	@include responsive-max( $break-small ) {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		width: 100%;
+		height: $height;
+		// z-index: 10;
+		background-color: var( --wp--preset--color--white );
+		
+		&:hover,
+		&:focus {
+			.option {
+				position: relative;
+				pointer-events: all;
+
+				&::after {
+					transform: rotate( 180deg );
+				}
+			}
+		}
+
+		input[type='radio'] {
+			display: none;
+		}
+		
+		label {
+			display: inline-block;
+			padding: var( --wp--preset--spacing--10 ) var( --wp--preset--spacing--20 );
+			margin-right: 5px;
+			cursor: pointer;
+			background-color: var(--wp--preset--color--gray-200);
+			transition: background-color 0.3s;
+			transition: order 0.3s;
+			text-align: left;
+			height: $height;
+
+			&:hover,
+			&:focus {
+				background-color: var( --wp--custom--color--hover );
+			}
+		}
+
+		input[type='radio']:not( :checked ) + label {
+			transition: 0.2ms all ease-out;
+			transform: rotateX(-90deg) translateX(-50%);
+			transform-origin: top center;
+			opacity: 0.3;
+			z-index: 10;
+		}
+
+		&:hover,
+		&:focus-within {
+			input[type='radio'] + label,
+			input[type='radio']:checked + label {
+				opacity: 1;
+				transform: rotateX(0) translateX(0);
+				visibility: visible;
+			}
+		}
+
+		input[type='radio']:checked + label {
+			background-color: var( --wp--preset--color--contrast-2 );
+			color: var( --wp--preset--color--white );
+			position: relative;
+			opacity: 1;
+			order: -1;
+
+			&::after {
+				content: '\e313';
+				transition: transform 0.3s ease-in-out;
+				// transform: rotate( 180deg );
+				font-weight: 300;
+				font-size: 40px;
+				font-family: var( --wp--preset--font-family--icon );
+				color: var( --wp--preset--color--white );
+				right: 0;
+				top: 0;
+				bottom: 0;
+				margin: auto 0;
+				position: absolute;
+				height: 46px;
+				width: 46px;
+			}
+			&::before {
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: $height;
+				width: $height;
+				content: '';
+				background: var( --wp--preset--color--accent-7 );
+			}
+		}
+	}
+}

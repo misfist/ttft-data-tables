@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "data-tables/data-filter-donor-type",
+	"version": "0.1.0",
+	"title": "Data Filter - Donor Type",
+	"description": "Display donor type filter.",
+	"category": "widgets",
+	"icon": "bank",
+	"attributes": {
+		"donorType": {
+			"type": "string"
+		},
+		"defaultDonorType": {
+			"type": "string"
+		}
+	},
+	"example": {},
+	"supports": {
+		"interactivity": true,
+		"customClassName": true,
+		"renaming": true
+	},
+	"providesContext": {
+		"data-tables/donor-type": "donorType"
+	},
+	"textdomain": "data-tables",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScriptModule": "file:./view.js"
+}

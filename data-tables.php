@@ -9,10 +9,13 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       data-tables
+ * Update URI:        ttft-data-tables
  *
- * @package           data-tables
+ * @package           ttft-data-tables
  */
-namespace TTFT\Data_Tables;
+namespace Ttft\Data_Tables;
+
+use Ttft\Data_Tables\Data_Tables;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -26,67 +29,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 const VERSION       = '1.0.0';
 const APP_NAMESPACE = 'ttft/data-tables';
 
+$autoload = __DIR__ . '/vendor/autoload.php';
+if ( file_exists( $autoload ) ) {
+	require_once $autoload;
+}
+
 define( 'TTFT_BASENAME', plugin_basename( __FILE__ ) );
 define( 'TTFT_PATH', plugin_dir_path( __FILE__ ) );
 define( 'TTFT_URL', trailingslashit( plugins_url( plugin_basename( __DIR__ ) ) ) );
+define( 'TTFT_VERSION', VERSION );
+define( 'TTFT_APP_NAMESPACE', APP_NAMESPACE );
+define( 'TTFT_TABLE_ID', 'funding-data');
 
-/**
- * Enqueue scripts and styles.
- *
- * @author Quincy
- *
- * @return void
- */
-function scripts(): void {
-	// wp_enqueue_style(
-	// 	'ttft-data-tables',
-	// 	TTFT_URL . 'src/assets/DataTables/datatables.min.css',
-	// 	array(),
-	// 	VERSION
-	// );
-	wp_enqueue_script(
-		'ttft-data-tables',
-		TTFT_URL . 'src/assets/DataTables/datatables.min.js',
-		array( 'jquery' ),
-		VERSION,
-		true
-	);
-}
-add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\scripts' );
-
-
-$file = TTFT_PATH . '/data/class-data-handler.php';
-if ( file_exists( $file ) ) {
-	require_once $file;
-}
-
-/**
- * Registers the block using the metadata loaded from the `block.json` file.
- * Behind the scenes, it registers also all assets so they can be enqueued
- * through the block editor in the corresponding context.
- *
- * @see https://developer.wordpress.org/reference/functions/register_block_type/
- */
-function init() {
-	register_block_type_from_metadata( __DIR__ . '/build/data-table' );
-	register_block_type_from_metadata( __DIR__ . '/build/data-test' );
-	register_block_type_from_metadata( __DIR__ . '/build/data-filter-donation-year' );
-	register_block_type_from_metadata( __DIR__ . '/build/data-filter-donor-type' );
-}
-add_action( 'init', __NAMESPACE__ . '\init' );
-
-/**
- * Register query vars
- *
- * @link https://developer.wordpress.org/reference/hooks/query_vars/
- *
- * @param  array $query_vars
- * @return array
- */
-function register_query_vars( array $query_vars ) : array {
-	$query_vars[] = 'table_type';
-	return $query_vars;
-}
-\add_filter( 'query_vars', __NAMESPACE__ . '\register_query_vars' );
-
-
+$data_tables = new Data_Tables();
