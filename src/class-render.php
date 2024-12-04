@@ -77,6 +77,13 @@ class Render {
 		ob_start();
 		$settings      = get_option( 'site_settings' );
 		$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
+		
+		wp_interactivity_state(
+			TTFT_APP_NAMESPACE,
+			array(
+				'foundRecords_' . $table_type => $count
+			)
+		);
 		?>
 		<table
 			id="<?php echo TTFT_TABLE_ID . '-' . $table_type; ?>"
@@ -89,6 +96,7 @@ class Render {
 			data-wp-bind--type='state.donorType'
 			data-wp-bind--data-search-label='state.searchLabel'
 			data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
+			data-wp-bind--found-records-<?php echo $table_type; ?>='state.foundRecords_<?php echo $table_type; ?>'
 			data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page, 'foundRecords' => $count ) ); ?>'
 		>
 		<?php
