@@ -201,7 +201,7 @@ class Render {
 								<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 							<?php endforeach; ?>
 						<?php endif; ?>
-						<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'data-tables' ); ?></th>
+						<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Transparency Score', 'data-tables' ); ?></th>
 					</tr>
 				</thead>
 				<tbody
@@ -229,7 +229,7 @@ class Render {
 								<?php
 							endforeach;
 							?>
-							<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Score', 'data-tables' ); ?>"><span class="screen-reader-text"><?php echo intval( $row['transparency_score'] ); ?></span><?php echo generate_star_rating( intval( $row['transparency_score'] ) ); ?></td>
+							<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'data-tables' ); ?>"><span class="screen-reader-text"><?php echo intval( $row['transparency_score'] ); ?></span><?php echo generate_star_rating( intval( $row['transparency_score'] ) ); ?></td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
