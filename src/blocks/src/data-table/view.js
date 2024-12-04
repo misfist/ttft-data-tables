@@ -148,6 +148,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 					ajaxUrl,
 					action,
 					nonce,
+					entityType
 				} = state;
 
 				const formData = new FormData();
@@ -160,6 +161,7 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 				formData.append( 'think_tank', thinkTank );
 				formData.append( 'donor', donor );
 				formData.append( 'search', search || '' );
+				formData.append( 'entity_type', entityType || 'think_tank' );
 
 				// console.log( `formData: `, formData );
 
@@ -230,9 +232,6 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 		},
 		setContext: () => {
 			const context = getContext();
-			// context.tableType && ( context.tableType = state.tableType );
-			// context.donationYear && ( context.donationYear = state.donationYear );
-			// context.donorType && ( context.donorType = state.donorType );
 			context.searchLabel && ( context.searchLabel = state.searchLabel );
 		},
 		generateSkeletonTable: ( columns ) => {
