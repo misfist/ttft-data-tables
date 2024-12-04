@@ -198,7 +198,7 @@ class Render {
 							$donor_types = array_keys( $first_entry['donor_types'] );
 							foreach ( $donor_types as $donor_type ) :
 								?>
-								<th class="column-numeric column-min-amount" data-type="currency" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
+								<th class="column-numeric column-min-amount" data-summed="true" scope="col"><?php echo esc_html( $donor_type ); ?></th>
 							<?php endforeach; ?>
 						<?php endif; ?>
 						<th class="column-numeric column-transparency-score" scope="col"><?php esc_html_e( 'Score', 'data-tables' ); ?></th>
