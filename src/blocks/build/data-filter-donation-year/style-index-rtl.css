@@ -1,1 +1,150 @@
-@media only screen and (min-width:601px){.mobile-only{display:none}.wp-block-data-tables-data-filter-donation-year{align-items:center;-moz-column-gap:var(--wp--preset--spacing--20);column-gap:var(--wp--preset--spacing--20);display:flex;flex-direction:row;flex-wrap:wrap;row-gap:var(--wp--preset--spacing--10)}.wp-block-data-tables-data-filter-donation-year input[type=radio]{display:none}.wp-block-data-tables-data-filter-donation-year label{background-color:var(--wp--preset--color--gray-200);cursor:pointer;display:inline-block;margin-left:5px;padding:var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);text-align:center;transition:background-color .3s,color .3s}.wp-block-data-tables-data-filter-donation-year label:focus,.wp-block-data-tables-data-filter-donation-year label:hover{background-color:var(--wp--custom--color--hover)}.wp-block-data-tables-data-filter-donation-year .year label{background-color:var(--wp--preset--color--gray-200);padding:var(--wp--preset--spacing--10) var(--wp--preset--spacing--20)}.wp-block-data-tables-data-filter-donation-year .year label:focus,.wp-block-data-tables-data-filter-donation-year .year label:hover{background-color:var(--wp--custom--color--hover)}.wp-block-data-tables-data-filter-donation-year input[type=radio]:checked+label{background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--white)}}@media only screen and (max-width:600px){.wp-block-data-tables-data-filter-donation-year,.wp-block-data-tables-data-filter-donor-type{background-color:var(--wp--preset--color--white);display:flex;flex-direction:column;height:46px;position:relative;width:100%}.wp-block-data-tables-data-filter-donation-year:focus .option,.wp-block-data-tables-data-filter-donation-year:hover .option,.wp-block-data-tables-data-filter-donor-type:focus .option,.wp-block-data-tables-data-filter-donor-type:hover .option{pointer-events:all;position:relative}.wp-block-data-tables-data-filter-donation-year:focus .option:after,.wp-block-data-tables-data-filter-donation-year:hover .option:after,.wp-block-data-tables-data-filter-donor-type:focus .option:after,.wp-block-data-tables-data-filter-donor-type:hover .option:after{transform:rotate(-180deg)}.wp-block-data-tables-data-filter-donation-year input[type=radio],.wp-block-data-tables-data-filter-donor-type input[type=radio]{display:none}.wp-block-data-tables-data-filter-donation-year label,.wp-block-data-tables-data-filter-donor-type label{background-color:var(--wp--preset--color--gray-200);cursor:pointer;display:inline-block;height:46px;margin-left:5px;padding:var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);text-align:right;transition:background-color .3s;transition:order .3s}.wp-block-data-tables-data-filter-donation-year label:focus,.wp-block-data-tables-data-filter-donation-year label:hover,.wp-block-data-tables-data-filter-donor-type label:focus,.wp-block-data-tables-data-filter-donor-type label:hover{background-color:var(--wp--custom--color--hover)}.wp-block-data-tables-data-filter-donation-year input[type=radio]:not(:checked)+label,.wp-block-data-tables-data-filter-donor-type input[type=radio]:not(:checked)+label{opacity:.3;transform:rotateX(-90deg) translateX(50%);transform-origin:top center;transition:all .2ms ease-out;z-index:10}.wp-block-data-tables-data-filter-donation-year:focus-within input[type=radio]+label,.wp-block-data-tables-data-filter-donation-year:focus-within input[type=radio]:checked+label,.wp-block-data-tables-data-filter-donation-year:hover input[type=radio]+label,.wp-block-data-tables-data-filter-donation-year:hover input[type=radio]:checked+label,.wp-block-data-tables-data-filter-donor-type:focus-within input[type=radio]+label,.wp-block-data-tables-data-filter-donor-type:focus-within input[type=radio]:checked+label,.wp-block-data-tables-data-filter-donor-type:hover input[type=radio]+label,.wp-block-data-tables-data-filter-donor-type:hover input[type=radio]:checked+label{opacity:1;transform:rotateX(0) translateX(0);visibility:visible}.wp-block-data-tables-data-filter-donation-year input[type=radio]:checked+label,.wp-block-data-tables-data-filter-donor-type input[type=radio]:checked+label{background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--white);opacity:1;order:-1;position:relative}.wp-block-data-tables-data-filter-donation-year input[type=radio]:checked+label:after,.wp-block-data-tables-data-filter-donor-type input[type=radio]:checked+label:after{bottom:0;color:var(--wp--preset--color--white);content:"";font-family:var(--wp--preset--font-family--icon);font-size:40px;font-weight:300;height:46px;margin:auto 0;position:absolute;left:0;top:0;transition:transform .3s ease-in-out;width:46px}.wp-block-data-tables-data-filter-donation-year input[type=radio]:checked+label:before,.wp-block-data-tables-data-filter-donor-type input[type=radio]:checked+label:before{background:var(--wp--preset--color--accent-7);content:"";height:46px;position:absolute;left:0;top:0;width:46px}}
+/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/data-filter-donation-year/style.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+/* Breakpoints */
+@media only screen and (min-width: 601px) {
+  .mobile-only {
+    display: none;
+  }
+}
+@media only screen and (min-width: 601px) {
+  .wp-block-data-tables-data-filter-donation-year {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    -moz-column-gap: var(--wp--preset--spacing--20);
+         column-gap: var(--wp--preset--spacing--20);
+    row-gap: var(--wp--preset--spacing--10);
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio] {
+    display: none;
+  }
+  .wp-block-data-tables-data-filter-donation-year label {
+    display: inline-block;
+    padding: var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);
+    margin-left: 5px;
+    cursor: pointer;
+    background-color: var(--wp--preset--color--gray-200);
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+  }
+  .wp-block-data-tables-data-filter-donation-year label:hover, .wp-block-data-tables-data-filter-donation-year label:focus {
+    background-color: var(--wp--custom--color--hover);
+  }
+  .wp-block-data-tables-data-filter-donation-year .year label {
+    background-color: var(--wp--preset--color--gray-200);
+    padding: var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);
+  }
+  .wp-block-data-tables-data-filter-donation-year .year label:hover, .wp-block-data-tables-data-filter-donation-year .year label:focus {
+    background-color: var(--wp--custom--color--hover);
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio]:checked + label {
+    background-color: var(--wp--preset--color--contrast-2);
+    color: var(--wp--preset--color--white);
+  }
+}
+
+/* Mobile <= 600px*/
+@media only screen and (max-width: 600px) {
+  .wp-block-data-tables-data-filter-donation-year,
+  .wp-block-data-tables-data-filter-donor-type {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    height: 46px;
+    background-color: var(--wp--preset--color--white);
+  }
+  .wp-block-data-tables-data-filter-donation-year:hover .option, .wp-block-data-tables-data-filter-donation-year:focus .option,
+  .wp-block-data-tables-data-filter-donor-type:hover .option,
+  .wp-block-data-tables-data-filter-donor-type:focus .option {
+    position: relative;
+    pointer-events: all;
+  }
+  .wp-block-data-tables-data-filter-donation-year:hover .option::after, .wp-block-data-tables-data-filter-donation-year:focus .option::after,
+  .wp-block-data-tables-data-filter-donor-type:hover .option::after,
+  .wp-block-data-tables-data-filter-donor-type:focus .option::after {
+    transform: rotate(-180deg);
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio],
+  .wp-block-data-tables-data-filter-donor-type input[type=radio] {
+    display: none;
+  }
+  .wp-block-data-tables-data-filter-donation-year label,
+  .wp-block-data-tables-data-filter-donor-type label {
+    display: inline-block;
+    padding: var(--wp--preset--spacing--10) var(--wp--preset--spacing--20);
+    margin-left: 5px;
+    cursor: pointer;
+    background-color: var(--wp--preset--color--gray-200);
+    transition: background-color 0.3s;
+    transition: order 0.3s;
+    text-align: right;
+    height: 46px;
+  }
+  .wp-block-data-tables-data-filter-donation-year label:hover, .wp-block-data-tables-data-filter-donation-year label:focus,
+  .wp-block-data-tables-data-filter-donor-type label:hover,
+  .wp-block-data-tables-data-filter-donor-type label:focus {
+    background-color: var(--wp--custom--color--hover);
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio]:not(:checked) + label,
+  .wp-block-data-tables-data-filter-donor-type input[type=radio]:not(:checked) + label {
+    transition: 0.2ms all ease-out;
+    transform: rotateX(-90deg) translateX(50%);
+    transform-origin: top center;
+    opacity: 0.3;
+    z-index: 10;
+  }
+  .wp-block-data-tables-data-filter-donation-year:hover input[type=radio] + label,
+  .wp-block-data-tables-data-filter-donation-year:hover input[type=radio]:checked + label, .wp-block-data-tables-data-filter-donation-year:focus-within input[type=radio] + label,
+  .wp-block-data-tables-data-filter-donation-year:focus-within input[type=radio]:checked + label,
+  .wp-block-data-tables-data-filter-donor-type:hover input[type=radio] + label,
+  .wp-block-data-tables-data-filter-donor-type:hover input[type=radio]:checked + label,
+  .wp-block-data-tables-data-filter-donor-type:focus-within input[type=radio] + label,
+  .wp-block-data-tables-data-filter-donor-type:focus-within input[type=radio]:checked + label {
+    opacity: 1;
+    transform: rotateX(0) translateX(0);
+    visibility: visible;
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio]:checked + label,
+  .wp-block-data-tables-data-filter-donor-type input[type=radio]:checked + label {
+    background-color: var(--wp--preset--color--contrast-2);
+    color: var(--wp--preset--color--white);
+    position: relative;
+    opacity: 1;
+    order: -1;
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio]:checked + label::after,
+  .wp-block-data-tables-data-filter-donor-type input[type=radio]:checked + label::after {
+    content: "\e313";
+    transition: transform 0.3s ease-in-out;
+    font-weight: 300;
+    font-size: 40px;
+    font-family: var(--wp--preset--font-family--icon);
+    color: var(--wp--preset--color--white);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    position: absolute;
+    height: 46px;
+    width: 46px;
+  }
+  .wp-block-data-tables-data-filter-donation-year input[type=radio]:checked + label::before,
+  .wp-block-data-tables-data-filter-donor-type input[type=radio]:checked + label::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 46px;
+    width: 46px;
+    content: "";
+    background: var(--wp--preset--color--accent-7);
+  }
+}
