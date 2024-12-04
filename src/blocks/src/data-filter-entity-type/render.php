@@ -16,6 +16,10 @@ $app_namespace = TTFT_APP_NAMESPACE;
 $state_key     = 'entityType';
 
 $entity_type = get_query_var( 'entity_type', sanitize_text_field( $_GET['entity_type'] ?? 'think_tank' ) );
+if ( ! $entity_type ) {
+	$entity_type = 'think_tank';
+
+}
 
 wp_interactivity_state(
 	$app_namespace,
@@ -28,17 +32,18 @@ wp_interactivity_state(
 );
 
 $context = array(
-	$state_key => $entity_type,
+	$state_key          => $entity_type,
+	'thinkTankSelected' => 'think_tank' === $entity_type || ! $entity_type,
+	'donorSelected'     => 'donor' === $entity_type,
 );
 
 $block_wrapper_attributes = get_block_wrapper_attributes(
 	array(
-		'class'               => 'transaction-results-tabs',
-		'data-wp-interactive' => $app_namespace,
-		'data-wp-watch'       => 'callbacks.updateEntityType',
-		'data-wp-bind--type'  => 'state.entityType',
-		'thinkTankSelected'   => 'think_tank' === $entity_type,
-		'donorSelected'       => 'donor' === $entity_type,
+		'class'                             => 'transaction-results-tabs',
+		'data-wp-interactive'               => $app_namespace,
+		'data-wp-bind--type'                => 'state.entityType',
+		'data-wp-bind--think-tank-selected' => 'think_tank' === $entity_type || ! $entity_type,
+		'data-wp-bind--donor-selected'      => 'donor' === $entity_type,
 	)
 );
 
@@ -55,9 +60,10 @@ ob_start();
 			data-wp-on--click="actions.toggleThinkTank"
 			data-wp-class--active="state.thinkTankSelected"
 			data-entity-type="think_tank"
+			data-wp-class--no-records="!state.foundRecords_think-tank-archive"
 		 >
 			<a href="<?php echo add_query_arg( 'entity_type', 'think_tank' ); ?>" data-entity-type="think_tank"><?php esc_html_e( 'Think Tanks', 'data-table' ); ?>
-			<span class="found-records" data-wp-text="state.foundRecords_think-tank-archive">
+			<span class="found-records" data-wp-class--no-records="!state.foundRecords_think-tank-archive" data-wp-text="state.foundRecords_think-tank-archive">0</span>
 			</a>
 			
 		</li>
@@ -66,9 +72,10 @@ ob_start();
 			data-wp-on--click="actions.toggleDonor"
 			data-wp-class--active="state.donorSelected"
 			data-entity-type="donor"
+			data-wp-class--no-records="!state.foundRecords_donor-archive"
 		>
 			<a href="<?php echo add_query_arg( 'entity_type', 'donor' ); ?>" data-entity-type="donor"><?php esc_html_e( 'Donors', 'data-table' ); ?>
-			<span class="found-records" data-wp-text="state.foundRecords_donor-archive">
+			<span class="found-records" data-wp-class--no-records="!state.foundRecords_donor-archive" data-wp-text="state.foundRecords_donor-archive">0</span>
 			</a>
 		</li>
 	</ul>
