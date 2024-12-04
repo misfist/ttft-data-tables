@@ -60,9 +60,10 @@ ob_start();
 			data-wp-on--click="actions.toggleThinkTank"
 			data-wp-class--active="state.thinkTankSelected"
 			data-entity-type="think_tank"
+			data-wp-class--no-records="!state.foundRecords_think-tank-archive"
 		 >
 			<a href="<?php echo add_query_arg( 'entity_type', 'think_tank' ); ?>" data-entity-type="think_tank"><?php esc_html_e( 'Think Tanks', 'data-table' ); ?>
-			<span class="found-records" data-wp-text="state.foundRecords_think-tank-archive">
+			<span class="found-records" data-wp-class--no-records="!state.foundRecords_think-tank-archive" data-wp-text="state.foundRecords_think-tank-archive">0</span>
 			</a>
 			
 		</li>
@@ -71,9 +72,10 @@ ob_start();
 			data-wp-on--click="actions.toggleDonor"
 			data-wp-class--active="state.donorSelected"
 			data-entity-type="donor"
+			data-wp-class--no-records="!state.foundRecords_donor-archive"
 		>
 			<a href="<?php echo add_query_arg( 'entity_type', 'donor' ); ?>" data-entity-type="donor"><?php esc_html_e( 'Donors', 'data-table' ); ?>
-			<span class="found-records" data-wp-text="state.foundRecords_donor-archive">
+			<span class="found-records" data-wp-class--no-records="!state.foundRecords_donor-archive" data-wp-text="state.foundRecords_donor-archive">0</span>
 			</a>
 		</li>
 	</ul>
