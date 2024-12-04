@@ -218,7 +218,9 @@ const { state, actions, callbacks } = store( 'ttft/data-tables', {
 			}
 		},
 		initTable: () => {
-			state.table = initTable( `#${state.tableId}` );
+			if( ! state.search ) {
+				state.table = initTable( `#${state.tableId}` );
+			}
 		},
 		destroyTable: () => {
 			state.table.clear().draw();
