@@ -16,9 +16,19 @@ $app_namespace = TTFT_APP_NAMESPACE;
 $state_key     = 'entityType';
 
 $entity_type = get_query_var( 'entity_type', sanitize_text_field( $_GET['entity_type'] ?? 'think_tank' ) );
+
+// Check if the entity type is passed in the URL as `customset` parameter.
+$ajax_entity_type = $_GET['customset'];
+if ( ! empty( $ajax_entity_type ) ) {
+	if ( in_array( 'think_tank', $ajax_entity_type ) ) {
+		$entity_type = 'think_tank';
+	} elseif ( in_array( 'donor', $ajax_entity_type ) ) {
+		$entity_type = 'donor';
+	}
+}
+
 if ( ! $entity_type ) {
 	$entity_type = 'think_tank';
-
 }
 
 wp_interactivity_state(
