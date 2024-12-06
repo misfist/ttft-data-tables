@@ -55,6 +55,10 @@ class API {
 		$this->data = new Data();
 
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+
+		add_action( 'save_post_transaction', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'deleted_post', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'edit_post', array( $this, 'clear_transaction_cache' ) );
 	}
 
 	/**
@@ -105,6 +109,136 @@ class API {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->settings['namespace'],
+			'transaction-data',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'serve_transaction_dataset' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			$this->settings['namespace'],
+			'transaction-data/export',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'export_transaction_dataset' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+	}
+
+	/**
+	 * Clear the transaction cache.
+	 *
+	 * @param int $post_id The post ID.
+	 */
+	public function clear_transaction_cache( $post_id ) {
+		if ( get_post_type( $post_id ) !== 'transaction' ) {
+			return;
+		}
+
+		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		delete_option( 'transaction_dataset' );
+	}
+
+	/**
+	 * Get transaction data.
+	 */
+	public function get_transaction_dataset(): array {
+		$cache_key = 'transaction_dataset';
+
+		// Check if the data is cached in options.
+		$cached_data = get_option( $cache_key, false );
+
+		if ( $cached_data !== false ) {
+			return $cached_data;
+		}
+
+		$post_type = 'transaction';
+		$args      = array(
+			'post_type'      => $post_type,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		);
+
+		$transactions = get_posts( $args );
+
+		$data = array();
+
+		if ( ! empty( $transactions ) && ! is_wp_error( $transactions ) ) {
+			foreach ( $transactions as $transaction_id ) {
+				$donor      = get_the_terms( $transaction_id, 'donor' );
+				$think_tank = get_the_terms( $transaction_id, 'think_tank' );
+				$year       = get_the_terms( $transaction_id, 'donation_year' );
+				$donor_type = get_the_terms( $transaction_id, 'donor_type' );
+
+				$data[] = array(
+					'donor'       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
+					'think_tank'  => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
+					'year'        => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
+					'donor_type'  => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
+					'amount'      => get_post_meta( $transaction_id, 'amount', true ) ?: '0',
+					'amount_min'  => get_post_meta( $transaction_id, 'amount_min', true ) ?: '0',
+					'amount_max'  => get_post_meta( $transaction_id, 'amount_max', true ) ?: '0',
+					'amount_calc' => get_post_meta( $transaction_id, 'amount_calc', true ) ?: '0',
+					'disclosed'   => get_post_meta( $transaction_id, 'disclosed', true ) ? 'Yes' : 'No',
+				);
+			}
+		}
+
+		// Persist the data using options.
+		update_option( $cache_key, $data );
+
+		return $data;
+	}
+
+	/**
+	 * Get transaction data.
+	 *
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return \WP_REST_Response The response containing JSON data.
+	 */
+	public function serve_transaction_dataset( \WP_REST_Request $request ): \WP_REST_Response {
+		$data = $this->get_transaction_dataset();
+
+		return new \WP_REST_Response( $data, 200 );
+	}
+
+	/**
+	 * Export transaction data as CSV.
+	 *
+	 * @param \WP_REST_Request $request The REST API request.
+	 */
+	public function export_transaction_dataset( \WP_REST_Request $request ) {
+		$data = $this->get_transaction_dataset();
+
+		if ( empty( $data ) ) {
+			wp_send_json_error( __( 'No data available for CSV export.', 'data-tables' ), 404 );
+			exit;
+		}
+
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=think-tank-funding-dataset.csv' );
+
+		$output = fopen( 'php://output', 'w' );
+
+		fputcsv( $output, array_keys( $data[0] ) );
+
+		foreach ( $data as $row ) {
+			fputcsv( $output, $row );
+		}
+
+		fclose( $output );
+
+		exit;
 	}
 
 	/**
