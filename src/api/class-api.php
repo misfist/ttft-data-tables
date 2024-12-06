@@ -55,6 +55,10 @@ class API {
 		$this->data = new Data();
 
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+
+		add_action( 'save_post_transaction', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'deleted_post', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'edit_post', array( $this, 'clear_transaction_cache' ) );
 	}
 
 	/**
