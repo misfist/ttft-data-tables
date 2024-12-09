@@ -40,6 +40,7 @@ class ComposerStaticInit569cc34ce4649bd669b208ce872b538e
         'Ttft\\Data_Tables\\API\\API' => __DIR__ . '/../..' . '/src/api/class-api.php',
         'Ttft\\Data_Tables\\Blocks\\Blocks' => __DIR__ . '/../..' . '/src/blocks/class-blocks.php',
         'Ttft\\Data_Tables\\Data' => __DIR__ . '/../..' . '/src/class-data.php',
+        'Ttft\\Data_Tables\\Data_Aggregator' => __DIR__ . '/../..' . '/src/class-data-aggregator.php',
         'Ttft\\Data_Tables\\Data_Tables' => __DIR__ . '/../..' . '/src/class-data-tables.php',
         'Ttft\\Data_Tables\\Filters' => __DIR__ . '/../..' . '/src/class-filters.php',
         'Ttft\\Data_Tables\\Render' => __DIR__ . '/../..' . '/src/class-render.php',

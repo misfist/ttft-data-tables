@@ -9,6 +9,7 @@
 namespace Ttft\Data_Tables;
 
 use Ttft\Data_Tables\Data;
+use Ttft\Data_Tables\Data_Aggregator;
 use Ttft\Data_Tables\Render;
 use Ttft\Data_Tables\Filters;
 use Ttft\Data_Tables\API\API;
@@ -38,12 +39,13 @@ class Data_Tables {
 	 * @return void
 	 */
 	public function dependencies(): void {
-		$data    = new Data();
-		$render  = new Render();
-		$filters = new Filters();
-		$api     = new API();
-		$blocks  = new Blocks();
-		$ajax    = new AJAX();
+		$data            = new Data();
+		$data_aggregator = new Data_Aggregator();
+		$render          = new Render();
+		$filters         = new Filters();
+		$api             = new API();
+		$blocks          = new Blocks();
+		$ajax            = new AJAX();
 	}
 
 	/**
@@ -56,6 +58,7 @@ class Data_Tables {
 	 */
 	function register_query_vars( array $query_vars ) : array {
 		$query_vars[] = 'table_type';
+		$query_vars[] = 'entity_type';
 		return $query_vars;
 	}
 
