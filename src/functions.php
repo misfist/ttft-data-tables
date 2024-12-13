@@ -166,13 +166,16 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 	$key   = get_donation_accepted_key( $donor_type );
 	$label = '';
 	$class = '';
+	$sort  = $row['donor_types'][ $donor_type ];
 
 	if ( ! empty( $row[ $key ] ) ) {
 		$label = $settings['not_accepted'] ?? esc_attr__( 'Not Accepted', 'data-tables' );
 		$class = 'not-accepted';
+		$sort = 1;
 	} elseif ( ! empty( $row['limited_info'] ) && 0 == $row['donor_types'][ $donor_type ] ) {
 		$label = $settings['no_data'] ?? esc_attr__( 'Not Available', 'data-tables' );
 		$class = 'no-data';
+		$sort = 2;
 	} elseif (
 		isset( $row['disclosed'] ) &&
 		is_array( $row['disclosed'] ) &&
@@ -181,11 +184,13 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 	) {
 		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
 		$class = 'not-disclosed';
+		$sort = 3;
 	}
 
 	return array(
 		'label' => $label,
 		'class' => $class,
+		'sort'  => $sort,
 	);
 }
 
@@ -199,6 +204,7 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 function get_label_and_class_disclosed( $row, $settings ): array {
 	$label = '';
 	$class = '';
+	$sort  = $row['amount_calc'];
 
 	if (
 		isset( $row['disclosed'] ) &&
@@ -206,11 +212,13 @@ function get_label_and_class_disclosed( $row, $settings ): array {
 	) {
 		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
 		$class = 'not-disclosed';
+		$sort  = 1;
 	}
 
 	return array(
 		'label' => $label,
 		'class' => $class,
+		'sort'  => $sort,
 	);
 }
 
