@@ -14,6 +14,6 @@ jobs:
                   WPE_SSHG_KEY_PRIVATE: ${{ secrets.WPE_SSHG_KEY_PRIVATE }}
                   WPE_ENV: fptpdev
                   SRC_PATH: './'
-                  REMOTE_PATH: 'wp-content/plugins/data-tables'
+                  REMOTE_PATH: 'wp-content/plugins/data-tables/'
                   FLAGS: -azvr --inplace --delete --exclude=".*"
                   CACHE_CLEAR: TRUE
