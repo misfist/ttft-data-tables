@@ -50,6 +50,7 @@ class API {
 				'single-donor',
 				'full-data',
 			),
+			'cache_key'   => 'transaction_dataset',
 		);
 
 		$this->data = new Data();
@@ -59,6 +60,7 @@ class API {
 		add_action( 'save_post_transaction', array( $this, 'clear_transaction_cache' ) );
 		add_action( 'deleted_post', array( $this, 'clear_transaction_cache' ) );
 		add_action( 'edit_post', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
 	}
 
 	/**
@@ -133,6 +135,19 @@ class API {
 	}
 
 	/**
+	 * Delete the transaction cache after an import.
+	 * 
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id
+	 * @param  obj $import_settings
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		delete_option( $this->settings['cache_key'] );
+	}
+
+	/**
 	 * Clear the transaction cache.
 	 *
 	 * @param int $post_id The post ID.
@@ -146,14 +161,14 @@ class API {
 			return;
 		}
 
-		delete_option( 'transaction_dataset' );
+		delete_option( $this->settings['cache_key'] );
 	}
 
 	/**
 	 * Get transaction data.
 	 */
 	public function get_transaction_dataset(): array {
-		$cache_key = 'transaction_dataset';
+		$cache_key = $this->settings['cache_key'];
 
 		// Check if the data is cached in options.
 		$cached_data = get_option( $cache_key, false );
