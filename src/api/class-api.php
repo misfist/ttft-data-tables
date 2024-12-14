@@ -179,17 +179,20 @@ class API {
 				$think_tank = get_the_terms( $transaction_id, 'think_tank' );
 				$year       = get_the_terms( $transaction_id, 'donation_year' );
 				$donor_type = get_the_terms( $transaction_id, 'donor_type' );
+				$parent_id  = ( $donor && ! is_wp_error( $donor ) && 0 !== $donor[0]->parent ) ? $donor[0]->parent : null;
 
 				$data[] = array(
-					'donor'       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
-					'think_tank'  => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
-					'year'        => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
-					'donor_type'  => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
-					'amount'      => get_post_meta( $transaction_id, 'amount', true ) ?: '0',
-					'amount_min'  => get_post_meta( $transaction_id, 'amount_min', true ) ?: '0',
-					'amount_max'  => get_post_meta( $transaction_id, 'amount_max', true ) ?: '0',
-					'amount_calc' => get_post_meta( $transaction_id, 'amount_calc', true ) ?: '0',
-					'disclosed'   => get_post_meta( $transaction_id, 'disclosed', true ) ? 'Yes' : 'No',
+					'Specific Donor'                       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
+					'Parent Organization/Country'          => ( $parent_id ) ? get_term( $parent_id, 'donor' )->name : '',
+					'Recipient Think Tank'                 => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
+					'Year'                                 => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
+					'Donor Type'                           => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
+					'Exact Amount (if provided)'           => (int) get_post_meta( $transaction_id, 'amount', true ) ?: (int) '0',
+					'Minimum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: (int) '0',
+					'Maximum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: (int) '0',
+					'Minimum + Exact Donation'             => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: (int) '0',
+					'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+					'Source'                               => get_post_meta( $transaction_id, 'source', true ) ?: '',
 				);
 			}
 		}
