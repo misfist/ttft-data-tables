@@ -50,6 +50,7 @@ class API {
 				'single-donor',
 				'full-data',
 			),
+			'cache_key'   => 'transaction_dataset',
 		);
 
 		$this->data = new Data();
@@ -59,6 +60,7 @@ class API {
 		add_action( 'save_post_transaction', array( $this, 'clear_transaction_cache' ) );
 		add_action( 'deleted_post', array( $this, 'clear_transaction_cache' ) );
 		add_action( 'edit_post', array( $this, 'clear_transaction_cache' ) );
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
 	}
 
 	/**
@@ -133,6 +135,19 @@ class API {
 	}
 
 	/**
+	 * Delete the transaction cache after an import.
+	 * 
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id
+	 * @param  obj $import_settings
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		delete_option( $this->settings['cache_key'] );
+	}
+
+	/**
 	 * Clear the transaction cache.
 	 *
 	 * @param int $post_id The post ID.
@@ -146,14 +161,14 @@ class API {
 			return;
 		}
 
-		delete_option( 'transaction_dataset' );
+		delete_option( $this->settings['cache_key'] );
 	}
 
 	/**
 	 * Get transaction data.
 	 */
 	public function get_transaction_dataset(): array {
-		$cache_key = 'transaction_dataset';
+		$cache_key = $this->settings['cache_key'];
 
 		// Check if the data is cached in options.
 		$cached_data = get_option( $cache_key, false );
@@ -179,17 +194,20 @@ class API {
 				$think_tank = get_the_terms( $transaction_id, 'think_tank' );
 				$year       = get_the_terms( $transaction_id, 'donation_year' );
 				$donor_type = get_the_terms( $transaction_id, 'donor_type' );
+				$parent_id  = ( $donor && ! is_wp_error( $donor ) && 0 !== $donor[0]->parent ) ? $donor[0]->parent : null;
 
 				$data[] = array(
-					'donor'       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
-					'think_tank'  => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
-					'year'        => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
-					'donor_type'  => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
-					'amount'      => get_post_meta( $transaction_id, 'amount', true ) ?: '0',
-					'amount_min'  => get_post_meta( $transaction_id, 'amount_min', true ) ?: '0',
-					'amount_max'  => get_post_meta( $transaction_id, 'amount_max', true ) ?: '0',
-					'amount_calc' => get_post_meta( $transaction_id, 'amount_calc', true ) ?: '0',
-					'disclosed'   => get_post_meta( $transaction_id, 'disclosed', true ) ? 'Yes' : 'No',
+					'Specific Donor'                       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
+					'Parent Organization/Country'          => ( $parent_id ) ? get_term( $parent_id, 'donor' )->name : '',
+					'Recipient Think Tank'                 => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
+					'Year'                                 => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
+					'Donor Type'                           => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
+					'Exact Amount (if provided)'           => (int) get_post_meta( $transaction_id, 'amount', true ) ?: (int) '0',
+					'Minimum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: (int) '0',
+					'Maximum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: (int) '0',
+					'Minimum + Exact Donation'             => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: (int) '0',
+					'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+					'Source'                               => get_post_meta( $transaction_id, 'source', true ) ?: '',
 				);
 			}
 		}
