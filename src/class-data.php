@@ -592,7 +592,7 @@ class Data {
 	 *
 	 * @return array The aggregated donor archive data.
 	 */
-	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+	public function get_donor_archive_data( string $donation_year = '', string $donor_type = '', string $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
 		$data = array_reduce(
@@ -652,7 +652,7 @@ class Data {
 	 *
 	 * @return array The aggregated think tank data.
 	 */
-	public function get_single_think_tank_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
+	public function get_single_think_tank_data( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
 		$raw_data = $this->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 		$data = array_reduce(
@@ -701,7 +701,7 @@ class Data {
 	 *
 	 * @return array The aggregated donor data.
 	 */
-	public function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
+	public function get_single_donor_data( string $donor = '', string $donation_year = '', string $donor_type = '' ): array {
 		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 		$data = array();
@@ -719,10 +719,9 @@ class Data {
 					'amount_calc'     => $item['amount_calc'],
 					'donor_type'      => $item['donor_type'],
 					'source'          => $item['source'],
-					'disclosed'       => strtolower( $item['disclosed'] ), // Collect the disclosed value as 'yes' or 'no'.
+					'disclosed'       => strtolower( $item['disclosed'] ),
 				);
 			} else {
-				// If the key already exists, sum the amount_calc.
 				$data[ $key ]['amount_calc'] += $item['amount_calc'];
 
 				if ( $data[ $key ]['disclosed'] !== 'yes' && strtolower( $item['disclosed'] ) === 'yes' ) {
@@ -731,7 +730,6 @@ class Data {
 			}
 		}
 
-		// Convert the keys back to numeric indexing.
 		$return_data = array_values( $data );
 
 		return $return_data;
@@ -824,7 +822,7 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ) {
+	public static function get_single_think_tank_total( string $think_tank = '', string $donation_year = '', string $donor_type = '' ) {
 		$raw_data = ( new self() )->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 		$total = 0;
@@ -843,7 +841,7 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public static function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ) {
+	public static function get_single_donor_total( string $donor = '', string $donation_year = '', string $donor_type = '' ) {
 		$raw_data = ( new self() )->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 		$total = 0;
@@ -899,7 +897,7 @@ class Data {
 	 * @param  string $taxonomy
 	 * @return array
 	 */
-	public function get_search_term_ids( $search, $taxonomy ) {
+	public function get_search_term_ids( string $search, string $taxonomy ): array {
 		$search = sanitize_text_field( $search );
 		$args   = array(
 			'taxonomy'   => $taxonomy,
