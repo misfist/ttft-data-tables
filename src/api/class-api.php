@@ -158,7 +158,7 @@ class API {
 
 	/**
 	 * Delete the transaction cache after an import.
-	 * 
+	 *
 	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
 	 *
 	 * @param  int $import_id
@@ -341,6 +341,24 @@ class API {
 		exit;
 	}
 
+	/**
+	 * Get the data for each transaction.
+	 *
+	 * @param  integer $transaction_id
+	 * @return array
+	 */
+	public function process_transaction( int $transaction_id ): array {
+		$donors     = wp_get_post_terms(
+			$transaction_id,
+			'donor',
+			array(
+				'orderby' => 'parent',
+			)
+		);
+		$think_tank = get_the_terms( $transaction_id, 'think_tank' );
+		$year       = get_the_terms( $transaction_id, 'donation_year' );
+		$donor_type = get_the_terms( $transaction_id, 'donor_type' );
+
 		$specific_donor = '';
 		$parent_id      = null;
 
@@ -352,6 +370,22 @@ class API {
 				$parent_id      = current( $donors )->parent ?: null;
 			}
 		}
+
+		return array(
+			'Specific Donor'                            => $specific_donor,
+			'Parent Organization/Country'               => $parent_id ? get_term( $parent_id )->name : '',
+			'Recipient Think Tank'                      => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
+			'Year'                                      => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
+			'Donor Type'                                => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
+			'Exact Amount (if provided)'                => (int) get_post_meta( $transaction_id, 'amount', true ) ?: 0,
+			'Minimum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: 0,
+			'Maximum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: 0,
+			'Minimum + Exact Donation'                  => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: 0,
+			'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+			'Source'                                    => get_post_meta( $transaction_id, 'source', true ) ?: '',
+		);
+	}
+
 	/**
 	 * Handles the request to retrieve data.
 	 *
