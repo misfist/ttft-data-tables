@@ -259,6 +259,17 @@ class API {
 		exit;
 	}
 
+		$specific_donor = '';
+		$parent_id      = null;
+
+		if ( $donors && ! is_wp_error( $donors ) ) {
+			if ( count( $donors ) === 1 ) {
+				$specific_donor = $donors[0]->name;
+			} else {
+				$specific_donor = end( $donors )->name;
+				$parent_id      = current( $donors )->parent ?: null;
+			}
+		}
 	/**
 	 * Handles the request to retrieve data.
 	 *
