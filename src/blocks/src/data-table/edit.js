@@ -76,10 +76,10 @@ export default function Edit( {
 	);
 
 	const tableTypeOptions = [
-		{ label: __( 'Donor Archive', 'data-table' ), value: 'donor-archive' },
+		{ label: __( 'Donors', 'data-table' ), value: 'donor-archive' },
 		{ label: __( 'Single Donor', 'data-table' ), value: 'single-donor' },
 		{
-			label: __( 'Think Tank Archive', 'data-table' ),
+			label: __( 'Think Tanks', 'data-table' ),
 			value: 'think-tank-archive',
 		},
 		{

@@ -46,19 +46,19 @@ function get_post_id_by_slug( $slug, $post_type = 'think_tank' ) {
 /**
  * Retrieves the Transparency Score for a given think tank slug.
  *
- * @param string $think_tank_slug The think tank slug.
+ * @param string $think_tank The think tank slug.
  * @return int The Transparency Score.
  */
-function get_transparency_score_from_slug( $think_tank_slug ): int {
+function get_transparency_score_from_slug( $think_tank ): int {
 	$post_type = 'think_tank';
 	$args      = array(
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
-		'name'           => $think_tank_slug,
+		'name'           => $think_tank,
 		'fields'         => 'ids',
 	);
 
-	$think_tank = get_post_from_term( $think_tank_slug, $post_type );
+	$think_tank = get_post_from_term( $think_tank, $post_type );
 
 	if ( ! empty( $think_tank ) && ! is_wp_error( $think_tank ) ) {
 		$score = get_post_meta( $think_tank, 'transparency_score', true );
@@ -131,6 +131,7 @@ function generate_star_rating( $score = 0 ): string {
 	$stars = ob_get_clean();
 	return $stars;
 }
+
 /**
  * Match donor type name with post meta key
  *
@@ -171,11 +172,11 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 	if ( ! empty( $row[ $key ] ) ) {
 		$label = $settings['not_accepted'] ?? esc_attr__( 'Not Accepted', 'data-tables' );
 		$class = 'not-accepted';
-		$sort = 1;
+		$sort  = 1;
 	} elseif ( ! empty( $row['limited_info'] ) && 0 == $row['donor_types'][ $donor_type ] ) {
 		$label = $settings['no_data'] ?? esc_attr__( 'Not Available', 'data-tables' );
 		$class = 'no-data';
-		$sort = 2;
+		$sort  = 2;
 	} elseif (
 		isset( $row['disclosed'] ) &&
 		is_array( $row['disclosed'] ) &&
@@ -184,7 +185,7 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 	) {
 		$label = $settings['unknown_amount'] ?? esc_attr__( 'Unknown Amt', 'data-tables' );
 		$class = 'not-disclosed';
-		$sort = 3;
+		$sort  = 3;
 	}
 
 	return array(
@@ -197,8 +198,8 @@ function get_label_and_class_archive_think_tank( $row, $donor_type, $settings ):
 /**
  * Get label and class for amount display.
  *
- * @param array  $row        Data row for the entity.
- * @param array  $settings   Settings for default labels.
+ * @param array $row        Data row for the entity.
+ * @param array $settings   Settings for default labels.
  * @return array Contains 'label' and 'class' keys.
  */
 function get_label_and_class_disclosed( $row, $settings ): array {
@@ -237,3 +238,144 @@ function convert_camel_to_snake_keys( array $args ): array {
 	return $converted_args;
 }
 
+/**
+ * Get the sum of `amount_calc` for a given array of post IDs.
+ *
+ * @param array $post_ids Array of post IDs.
+ * @return int The summed value of `amount_calc`.
+ */
+function get_total( array $post_ids ): int {
+    if ( empty( $post_ids ) ) {
+        return 0;
+    }
+
+    $total_amount = 0;
+
+    foreach ( $post_ids as $post_id ) {
+        $amount_calc   = (int) get_post_meta( $post_id, 'amount_calc', true );
+        $total_amount += $amount_calc;
+    }
+
+    return $total_amount;
+}
+
+/**
+ * Check if all posts in a given array of post IDs have `disclosed` set to 'no'.
+ *
+ * @param array $post_ids Array of post IDs.
+ * @return bool True if all posts have `disclosed` set to 'no', false otherwise.
+ */
+function is_undisclosed( array $post_ids ): bool {
+    if ( empty( $post_ids ) ) {
+        return false;
+    }
+
+    foreach ( $post_ids as $post_id ) {
+        $disclosed = get_post_meta( $post_id, 'disclosed', true );
+        if ( strtolower( $disclosed ) !== 'no' ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Get the total `amount_calc` and check if all transactions are undisclosed by terms.
+ *
+ * @param string $think_tank The slug of the think_tank taxonomy term.
+ * @param string $donor_type The slug of the donor_type taxonomy term.
+ * @return array {
+ *     @type int  $amount_calc The summed value of `amount_calc`.
+ *     @type bool $undisclosed True if all transactions are undisclosed, false otherwise.
+ * }
+ */
+function get_think_tank_sums( string $think_tank = '', string $donor_type = '' ): array {
+    $post_ids = get_think_tank_post_ids( $think_tank, $donor_type );
+
+    return array(
+        'amount_calc' => get_total( $post_ids ),
+        'undisclosed' => is_undisclosed( $post_ids ),
+    );
+}
+
+/**
+ * Fetch transactions by taxonomy terms and return post IDs.
+ *
+ * @param string $think_tank The slug of the think_tank taxonomy term.
+ * @param string $donor_type The slug of the donor_type taxonomy term.
+ * @return array Array of post IDs.
+ */
+function get_think_tank_post_ids( string $think_tank = '', string $donor_type = '' ): array {
+	$args = array(
+		'post_type'      => 'transaction',
+		'posts_per_page' => -1,
+		'tax_query'      => array(),
+		'fields'         => 'ids',
+	);
+
+	if( ! empty( $think_tank ) ) {
+		$args['tax_query'][] = array(
+			'taxonomy' => 'think_tank',
+			'field'    => 'slug',
+			'terms'    => $think_tank,
+		);
+	}
+
+	if( ! empty( $donor_type ) ) {
+		$args['tax_query'][] = array(
+			'taxonomy' => 'donor_type',
+			'field'    => 'slug',
+			'terms'    => $donor_type,
+		);
+	}
+
+	$query = new \WP_Query( $args );
+
+	return $query->have_posts() ? $query->posts : array();
+}
+
+/**
+ * Get the total `amount_calc` and check if all transactions are undisclosed by terms.
+ *
+ * @param string $donor The slug of the donor taxonomy term.
+ * @return array {
+ *     @type int  $amount_calc The summed value of `amount_calc`.
+ *     @type bool $undisclosed True if all transactions are undisclosed, false otherwise.
+ * }
+ */
+function get_donor_sums( string $donor = '' ): array {
+    $post_ids = get_donor_post_ids( $donor );
+
+    return array(
+        'amount_calc' => get_total( $post_ids ),
+        'undisclosed' => is_undisclosed( $post_ids ),
+    );
+}
+
+/**
+ * Fetch transactions by taxonomy terms and return post IDs.
+ *
+ * @param string $donor The slug of the donor taxonomy term.
+ * @return array Array of post IDs.
+ */
+function get_donor_post_ids( string $donor = '' ): array {
+	$args = array(
+		'post_type'      => 'transaction',
+		'posts_per_page' => -1,
+		'tax_query'      => array(),
+		'fields'         => 'ids',
+	);
+
+	if( ! empty( $donor ) ) {
+		$args['tax_query'][] = array(
+			'taxonomy' => 'donor',
+			'field'    => 'slug',
+			'terms'    => $donor,
+		);
+	}
+
+	$query = new \WP_Query( $args );
+
+	return $query->have_posts() ? $query->posts : array();
+}
