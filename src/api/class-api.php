@@ -188,6 +188,9 @@ class API {
 
 	/**
 	 * Get transaction data.
+	 *
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return array The transaction data.
 	 */
 	public function get_transaction_dataset( \WP_REST_Request $request ): array {
 		$think_tank    = sanitize_text_field( $request->get_param( 'think_tank' ) );
