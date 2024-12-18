@@ -151,6 +151,28 @@ class API {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'export_transaction_dataset' ),
 				'permission_callback' => '__return_true',
+				'args'                => array(
+					'think_tank' => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'donor'      => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'year'       => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'donor_type' => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
 			)
 		);
 
@@ -188,6 +210,9 @@ class API {
 
 	/**
 	 * Get transaction data.
+	 *
+	 * @param \WP_REST_Request $request The REST API request.
+	 * @return array The transaction data.
 	 */
 	public function get_transaction_dataset( \WP_REST_Request $request ): array {
 		$think_tank    = sanitize_text_field( $request->get_param( 'think_tank' ) );
@@ -318,7 +343,7 @@ class API {
 	 * @param \WP_REST_Request $request The REST API request.
 	 */
 	public function export_transaction_dataset( \WP_REST_Request $request ) {
-		$data = $this->get_transaction_dataset();
+		$data = $this->get_transaction_dataset( $request );
 
 		if ( empty( $data ) ) {
 			wp_send_json_error( __( 'No data available for CSV export.', 'data-tables' ), 404 );
