@@ -119,6 +119,28 @@ class API {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'serve_transaction_dataset' ),
 				'permission_callback' => '__return_true',
+				'args'                => array(
+					'think_tank' => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'donor'      => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'year'       => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'donor_type' => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
 			)
 		);
 
@@ -136,7 +158,7 @@ class API {
 
 	/**
 	 * Delete the transaction cache after an import.
-	 * 
+	 *
 	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
 	 *
 	 * @param  int $import_id
@@ -167,8 +189,13 @@ class API {
 	/**
 	 * Get transaction data.
 	 */
-	public function get_transaction_dataset(): array {
-		$cache_key = $this->settings['cache_key'];
+	public function get_transaction_dataset( \WP_REST_Request $request ): array {
+		$think_tank    = sanitize_text_field( $request->get_param( 'think_tank' ) );
+		$donor         = sanitize_text_field( $request->get_param( 'donor' ) );
+		$donation_year = sanitize_text_field( $request->get_param( 'year' ) );
+		$donor_type    = sanitize_text_field( $request->get_param( 'donor_type' ) );
+
+		$cache_key = $this->settings['cache_key'] . '_' . md5( serialize( $request->get_params() ) );
 
 		// Check if the data is cached in options.
 		$cached_data = get_option( $cache_key, false );
@@ -177,38 +204,86 @@ class API {
 			return $cached_data;
 		}
 
+		$data = array();
+
 		$post_type = 'transaction';
 		$args      = array(
 			'post_type'      => $post_type,
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
+			'tax_query'      => array(),
 		);
+
+		if ( $think_tank ) {
+			$think_tanks = get_terms(
+				array(
+					'taxonomy'   => 'think_tank',
+					'hide_empty' => false,
+					'fields'     => 'ids',
+					'search'     => $think_tank,
+				)
+			);
+			if ( ! empty( $think_tanks ) && ! is_wp_error( $think_tanks ) ) {
+				$args['tax_query'][] = array(
+					'taxonomy' => 'think_tank',
+					'field'    => 'term_id',
+					'terms'    => $think_tanks,
+				);
+			} else {
+				return $data;
+			}
+		}
+		if ( $donor ) {
+			$donors = get_terms(
+				array(
+					'taxonomy'   => 'donor',
+					'hide_empty' => false,
+					'fields'     => 'ids',
+					'search'     => $donor,
+				)
+			);
+			if ( ! empty( $donors ) && ! is_wp_error( $donors ) ) {
+				$args['tax_query'][] = array(
+					'taxonomy' => 'donor',
+					'field'    => 'term_id',
+					'terms'    => $donors,
+				);
+			} else {
+				return $data;
+			}
+		}
+		if ( $donation_year ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donation_year',
+				'field'    => 'slug',
+				'terms'    => $donation_year,
+			);
+		}
+		if ( $donor_type ) {
+			$donor_types = get_terms(
+				array(
+					'taxonomy'   => 'donor_type',
+					'hide_empty' => false,
+					'fields'     => 'ids',
+					'search'     => $donor_type,
+				)
+			);
+			if ( ! empty( $donor_types ) && ! is_wp_error( $donor_types ) ) {
+				$args['tax_query'][] = array(
+					'taxonomy' => 'donor_type',
+					'field'    => 'term_id',
+					'terms'    => $donor_types,
+				);
+			} else {
+				return $data;
+			}
+		}
 
 		$transactions = get_posts( $args );
 
-		$data = array();
-
 		if ( ! empty( $transactions ) && ! is_wp_error( $transactions ) ) {
 			foreach ( $transactions as $transaction_id ) {
-				$donor      = get_the_terms( $transaction_id, 'donor' );
-				$think_tank = get_the_terms( $transaction_id, 'think_tank' );
-				$year       = get_the_terms( $transaction_id, 'donation_year' );
-				$donor_type = get_the_terms( $transaction_id, 'donor_type' );
-				$parent_id  = ( $donor && ! is_wp_error( $donor ) && 0 !== $donor[0]->parent ) ? $donor[0]->parent : null;
-
-				$data[] = array(
-					'Specific Donor'                       => ( $donor && ! is_wp_error( $donor ) ) ? $donor[0]->name : '',
-					'Parent Organization/Country'          => ( $parent_id ) ? get_term( $parent_id, 'donor' )->name : '',
-					'Recipient Think Tank'                 => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
-					'Year'                                 => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
-					'Donor Type'                           => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
-					'Exact Amount (if provided)'           => (int) get_post_meta( $transaction_id, 'amount', true ) ?: (int) '0',
-					'Minimum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: (int) '0',
-					'Maximum Donation (if range provided)' => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: (int) '0',
-					'Minimum + Exact Donation'             => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: (int) '0',
-					'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
-					'Source'                               => get_post_meta( $transaction_id, 'source', true ) ?: '',
-				);
+				$data[] = $this->process_transaction( $transaction_id );
 			}
 		}
 
@@ -225,9 +300,16 @@ class API {
 	 * @return \WP_REST_Response The response containing JSON data.
 	 */
 	public function serve_transaction_dataset( \WP_REST_Request $request ): \WP_REST_Response {
-		$data = $this->get_transaction_dataset();
+		$data = $this->get_transaction_dataset( $request );
 
-		return new \WP_REST_Response( $data, 200 );
+		if ( empty( $data ) ) {
+			return new \WP_REST_Response( array( 'error' => 'No data available' ), 404 );
+		}
+
+		$response = new \WP_REST_Response( $data, 200 );
+		$response->header( 'X-WP-Total', count( $data ) );
+
+		return $response;
 	}
 
 	/**
@@ -257,6 +339,51 @@ class API {
 		fclose( $output );
 
 		exit;
+	}
+
+	/**
+	 * Get the data for each transaction.
+	 *
+	 * @param  integer $transaction_id
+	 * @return array
+	 */
+	public function process_transaction( int $transaction_id ): array {
+		$donors     = wp_get_post_terms(
+			$transaction_id,
+			'donor',
+			array(
+				'orderby' => 'parent',
+			)
+		);
+		$think_tank = get_the_terms( $transaction_id, 'think_tank' );
+		$year       = get_the_terms( $transaction_id, 'donation_year' );
+		$donor_type = get_the_terms( $transaction_id, 'donor_type' );
+
+		$specific_donor = '';
+		$parent_id      = null;
+
+		if ( $donors && ! is_wp_error( $donors ) ) {
+			if ( count( $donors ) === 1 ) {
+				$specific_donor = $donors[0]->name;
+			} else {
+				$specific_donor = end( $donors )->name;
+				$parent_id      = current( $donors )->parent ?: null;
+			}
+		}
+
+		return array(
+			'Specific Donor'                            => $specific_donor,
+			'Parent Organization/Country'               => $parent_id ? get_term( $parent_id )->name : '',
+			'Recipient Think Tank'                      => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
+			'Year'                                      => ( $year && ! is_wp_error( $year ) ) ? $year[0]->name : '',
+			'Donor Type'                                => ( $donor_type && ! is_wp_error( $donor_type ) ) ? $donor_type[0]->name : '',
+			'Exact Amount (if provided)'                => (int) get_post_meta( $transaction_id, 'amount', true ) ?: 0,
+			'Minimum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: 0,
+			'Maximum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: 0,
+			'Minimum + Exact Donation'                  => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: 0,
+			'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+			'Source'                                    => get_post_meta( $transaction_id, 'source', true ) ?: '',
+		);
 	}
 
 	/**

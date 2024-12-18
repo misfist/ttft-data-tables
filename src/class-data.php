@@ -592,7 +592,7 @@ class Data {
 	 *
 	 * @return array The aggregated donor archive data.
 	 */
-	public function get_donor_archive_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+	public function get_donor_archive_data( string $donation_year = '', string $donor_type = '', string $search = '' ): array {
 		$raw_data = $this->get_donor_archive_raw_data( $donation_year, $donor_type, $search );
 
 		$data = array_reduce(
@@ -652,7 +652,7 @@ class Data {
 	 *
 	 * @return array The aggregated think tank data.
 	 */
-	public function get_single_think_tank_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
+	public function get_single_think_tank_data( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
 		$raw_data = $this->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 		$data = array_reduce(
@@ -701,7 +701,7 @@ class Data {
 	 *
 	 * @return array The aggregated donor data.
 	 */
-	public function get_single_donor_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
+	public function get_single_donor_data( string $donor = '', string $donation_year = '', string $donor_type = '' ): array {
 		$raw_data = $this->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 		$data = array();
@@ -719,10 +719,9 @@ class Data {
 					'amount_calc'     => $item['amount_calc'],
 					'donor_type'      => $item['donor_type'],
 					'source'          => $item['source'],
-					'disclosed'       => strtolower( $item['disclosed'] ), // Collect the disclosed value as 'yes' or 'no'.
+					'disclosed'       => strtolower( $item['disclosed'] ),
 				);
 			} else {
-				// If the key already exists, sum the amount_calc.
 				$data[ $key ]['amount_calc'] += $item['amount_calc'];
 
 				if ( $data[ $key ]['disclosed'] !== 'yes' && strtolower( $item['disclosed'] ) === 'yes' ) {
@@ -731,10 +730,88 @@ class Data {
 			}
 		}
 
-		// Convert the keys back to numeric indexing.
 		$return_data = array_values( $data );
 
 		return $return_data;
+	}
+
+	/**
+	 * Fetch transactions by taxonomy terms and return post IDs.
+	 *
+	 * @param string $think_tank The slug of the think_tank taxonomy term.
+	 * @param string $donor_type The slug of the donor_type taxonomy term.
+	 * @return array Array of post IDs.
+	 */
+	public static function get_think_tank_post_ids( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
+		$args = array(
+			'post_type'      => 'transaction',
+			'posts_per_page' => -1,
+			'tax_query'      => array(),
+			'fields'         => 'ids',
+		);
+
+		if( ! empty( $think_tank ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'think_tank',
+				'field'    => 'slug',
+				'terms'    => $think_tank,
+			);
+		}
+
+		if( ! empty( $donation_year ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donation_year',
+				'field'    => 'slug',
+				'terms'    => $donation_year,
+			);
+		}
+
+		if( ! empty( $donor_type ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donor_type',
+				'field'    => 'slug',
+				'terms'    => $donor_type,
+			);
+		}
+
+		$query = new \WP_Query( $args );
+
+		return $query->have_posts() ? $query->posts : array();
+	}
+
+	/**
+	 * Fetch transactions by taxonomy terms and return post IDs.
+	 *
+	 * @param string $donor The slug of the donor taxonomy term.
+	 * @return array Array of post IDs.
+	 */
+	public static function get_donor_post_ids( string $donor = '', string $donation_year = '' ): array {
+		$args = array(
+			'post_type'      => 'transaction',
+			'posts_per_page' => -1,
+			'tax_query'      => array(),
+			'fields'         => 'ids',
+		);
+
+		if( ! empty( $donor ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donor',
+				'field'    => 'slug',
+				'terms'    => $donor,
+			);
+		}
+
+		if( ! empty( $donation_year ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy' => 'donation_year',
+				'field'    => 'slug',
+				'terms'    => $donation_year,
+			);
+		}
+
+		$query = new \WP_Query( $args );
+
+		return $query->have_posts() ? $query->posts : array();
 	}
 
 	/**
@@ -745,7 +822,7 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public static function get_single_think_tank_total( $think_tank = '', $donation_year = '', $donor_type = '' ) {
+	public static function get_single_think_tank_total( string $think_tank = '', string $donation_year = '', string $donor_type = '' ) {
 		$raw_data = ( new self() )->get_single_think_tank_raw_data( $think_tank, $donation_year, $donor_type );
 
 		$total = 0;
@@ -764,7 +841,7 @@ class Data {
 	 * @param string $donor_type    The donor type.
 	 * @return int The total calculated amount.
 	 */
-	public static function get_single_donor_total( $donor = '', $donation_year = '', $donor_type = '' ) {
+	public static function get_single_donor_total( string $donor = '', string $donation_year = '', string $donor_type = '' ) {
 		$raw_data = ( new self() )->get_single_donor_raw_data( $donor, $donation_year, $donor_type );
 
 		$total = 0;
@@ -820,7 +897,7 @@ class Data {
 	 * @param  string $taxonomy
 	 * @return array
 	 */
-	public function get_search_term_ids( $search, $taxonomy ) {
+	public function get_search_term_ids( string $search, string $taxonomy ): array {
 		$search = sanitize_text_field( $search );
 		$args   = array(
 			'taxonomy'   => $taxonomy,
@@ -851,6 +928,84 @@ class Data {
 
 		// If all values are 'no', return false. Otherwise, return true.
 		return ! empty( $undisclosed );
+	}
+
+	/**
+	 * Check if all transactions for the given post IDs are undisclosed.
+	 *
+	 * @param array $post_ids Array of transaction post IDs.
+	 * @return bool True if all transactions are undisclosed, false otherwise.
+	 */
+	public static function is_undisclosed( array $post_ids ): bool {
+		$meta_values = ( new self() )->get_meta_values_for_records( $post_ids, 'disclosed' );
+		
+		$all_undisclosed = array_filter(
+			$meta_values,
+			function ( $disclosed ) {
+				return strtolower( $disclosed ) !== 'no';
+			}
+		);
+	
+		return empty( $all_undisclosed );
+	}
+
+	/**
+	 * Get the sum of `amount_calc` for a given array of post IDs.
+	 *
+	 * @param array $post_ids Array of post IDs.
+	 * @return int The summed value of `amount_calc`.
+	 */
+	public static function get_total( array $post_ids ): int {
+		if ( empty( $post_ids ) ) {
+			return 0;
+		}
+
+		$total_amount = 0;
+
+		foreach ( $post_ids as $post_id ) {
+			$amount_calc   = (int) get_post_meta( $post_id, 'amount_calc', true );
+			$total_amount += $amount_calc;
+		}
+
+		return $total_amount;
+	}
+
+	/**
+	 * Get the total `amount_calc` and check if all transactions are undisclosed by terms.
+	 *
+	 * @param string $think_tank The slug of the think_tank taxonomy term.
+	 * @param string $donation_year The slug of the donation_year taxonomy term.
+	 * @param string $donor_type The slug of the donor_type taxonomy term.
+	 * @return array {
+	 *     @type int  $amount_calc The summed value of `amount_calc`.
+	 *     @type bool $undisclosed True if all transactions are undisclosed, false otherwise.
+	 * }
+	 */
+	public static function get_think_tank_sums( string $think_tank = '', $donation_year = '', string $donor_type = '' ): array {
+		$post_ids = self::get_think_tank_post_ids( $think_tank, $donation_year , $donor_type );
+
+		return array(
+			'amount_calc' => self::get_total( $post_ids ),
+			'undisclosed' => self::is_undisclosed( $post_ids ),
+		);
+	}
+
+	/**
+	 * Get the total `amount_calc` and check if all transactions are undisclosed by terms.
+	 *
+	 * @param string $donor The slug of the donor taxonomy term.
+	 * @return array {
+	 *     @type int  $amount_calc The summed value of `amount_calc`.
+	 *     @type bool $undisclosed True if all transactions are undisclosed, false otherwise.
+	 * }
+	 */
+	public static function get_donor_sums( string $donor = '', string $donation_year = '' ): array {
+		$post_ids = self::get_donor_post_ids( $donor, $donation_year );
+
+		return array(
+			'amount_calc' => self::get_total( $post_ids ),
+			'undisclosed' => self::is_undisclosed( $post_ids ),
+		);
 	}
 
 }
