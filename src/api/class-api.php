@@ -318,7 +318,7 @@ class API {
 	 * @param \WP_REST_Request $request The REST API request.
 	 */
 	public function export_transaction_dataset( \WP_REST_Request $request ) {
-		$data = $this->get_transaction_dataset();
+		$data = $this->get_transaction_dataset( $request );
 
 		if ( empty( $data ) ) {
 			wp_send_json_error( __( 'No data available for CSV export.', 'data-tables' ), 404 );
