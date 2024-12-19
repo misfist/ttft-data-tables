@@ -308,15 +308,24 @@ class Data {
 	}
 
 	/**
-	 * Retrieve donor data, optionally filtered by donation year.
+	 * Retrieve donor data, optionally filtered by donation year, donor type, or search query.
+	 *
+	 * - For "All Donors" (no search), this function aggregates amounts by top-level donors.
+	 * - For "Search," it delegates to `get_donor_search_raw_data` to handle term-specific matches.
 	 *
 	 * @param string $donation_year The slug of the donation year to filter transactions by (optional).
-	 * @return array
+	 * @param string $donor_type    The slug of the donor type to filter transactions by (optional).
+	 * @param string $search        A search keyword to match donor terms (optional).
+	 * @return array The donor data, structured as an associative array keyed by donor slug.
 	 */
 	public function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $search = '' ): array {
+		if ( ! empty( $search ) ) {
+			return $this->get_donor_search_raw_data( $search );
+			// return $this->get_parent_donor_search_raw_data( $search );
+		}
+
 		$donation_year = sanitize_text_field( $donation_year );
 		$donor_type    = sanitize_text_field( $donor_type );
-		$search        = sanitize_text_field( $search );
 
 		$transient_key = 'donor_archive_raw_' . md5( $donation_year . $donor_type . $search );
 		$data          = get_transient( $transient_key );
@@ -345,24 +354,6 @@ class Data {
 			);
 		}
 
-		if ( ! empty( $search ) ) {
-			$taxonomy = 'donor';
-			$terms    = $this->get_search_term_ids( $search, $taxonomy );
-
-			if( ! $terms ) {
-				/**
-				 * If no terms are found, search produces no results, return an empty array.
-				 */
-				return array();
-			} 
-
-			$args['tax_query'][] = array(
-				'taxonomy' => $taxonomy,
-				'field'    => 'id',
-				'terms'    => (array) $terms,
-			);
-		}
-
 		$query = new \WP_Query( $args );
 
 		$data = array();
@@ -372,15 +363,13 @@ class Data {
 				$query->the_post();
 				$post_id = get_the_ID();
 
-				$tax_args = array(
-					'orderby' => 'term_id',
-				);
 				/**
 				 * Limit to "top level" donors
 				 */
-				if ( empty( $search ) ) {
-					$tax_args['parent'] = 0;
-				}
+				$tax_args = array(
+					'orderby' => 'term_id',
+					'parent'  => 0,
+				);
 
 				$donors = wp_get_object_terms( $post_id, 'donor', $tax_args );
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
@@ -417,7 +406,252 @@ class Data {
 
 		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
-		return $data;
+		return apply_filters( 'donor_archive_raw_data', $data, $donation_year, $donor_type );
+	}
+
+	/**
+	 * Retrieve donor data for search query.
+	 * This function is used to show all donors that match the search term.
+	 *
+	 * @param string $donation_year The donation year to filter by.
+	 * @param string $donor_type    The donor type to filter by.
+	 * @param string $search        The search term.
+	 * @return array An array of donor data.
+	 */
+	public function get_donor_search_raw_data( $search = '' ): array {
+		$search = sanitize_text_field( $search );
+
+		if ( empty( $search ) ) {
+			return array();
+		}
+
+		$transient_key = 'donor_search_raw_' . md5( $search );
+		$data          = get_transient( $transient_key );
+		if ( false !== $data ) {
+			return $data;
+		}
+
+		$taxonomy = 'donor';
+		$terms    = $this->get_search_term_ids( $search, $taxonomy );
+
+		if ( ! $terms ) {
+			return array();
+		}
+
+		$args = array(
+			'post_type'      => 'transaction',
+			'posts_per_page' => -1,
+			'orderby'        => 'relevance',
+			'tax_query'      => array(
+				array(
+					'taxonomy'         => $taxonomy,
+					'field'            => 'id',
+					'terms'            => (array) $terms,
+					'include_children' => true,
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+		$data  = array();
+
+		$parent_contributions = array();
+		$child_terms          = array();
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$post_id = get_the_ID();
+
+				$donors = wp_get_object_terms( $post_id, $taxonomy, array( 'orderby' => 'term_id' ) );
+				if ( empty( $donors ) || is_wp_error( $donors ) ) {
+					continue;
+				}
+
+				foreach ( $donors as $donor ) {
+					$donor_name  = $donor->name;
+					$donor_slug  = $donor->slug;
+					$parent_term = get_term( $donor->parent, $taxonomy );
+
+					$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
+
+					$is_parent = ( $donor->parent === 0 );
+
+					// Track child terms and their parent relationships.
+					if ( $parent_term && ! is_wp_error( $parent_term ) ) {
+						$parent_slug                 = $parent_term->slug;
+						$child_terms[ $parent_slug ] = true; // Mark parent as having child terms.
+						$donor_name                  = $parent_term->name . ' > ' . $donor_name;
+					} else {
+						$parent_slug = $donor_slug;
+					}
+
+					if ( ! isset( $data[ $donor_slug ] ) ) {
+						$data[ $donor_slug ] = array(
+							'donor'       => $donor_name,
+							'amount_calc' => 0,
+							'disclosed'   => array(),
+							'donor_slug'  => $donor_slug,
+							'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
+							'donor_link'  => get_term_link( $parent_slug, 'donor' ),
+							'year'        => get_the_term_list( $post_id, 'donation_year' ),
+						);
+					}
+
+					$amount    = intval( get_post_meta( $post_id, 'amount_calc', true ) );
+					$disclosed = strtolower( get_post_meta( $post_id, 'disclosed', true ) );
+
+					$data[ $donor_slug ]['amount_calc'] += $amount;
+					$data[ $donor_slug ]['disclosed'][]  = $disclosed;
+
+					// Track contributions to the parent.
+					if ( $is_parent && ! isset( $parent_contributions[ $parent_slug ] ) ) {
+						$parent_contributions[ $parent_slug ] = array(
+							'amount_calc' => 0,
+						);
+					}
+					if ( isset( $parent_contributions[ $parent_slug ] ) ) {
+						$parent_contributions[ $parent_slug ]['amount_calc'] += $amount;
+					}
+				}
+			}
+
+			wp_reset_postdata();
+		}
+
+		// Remove parent donors that have child terms unless they are direct contributors.
+		foreach ( $parent_contributions as $parent_slug => $parent_data ) {
+			if ( isset( $child_terms[ $parent_slug ] ) && isset( $data[ $parent_slug ] ) ) {
+				unset( $data[ $parent_slug ] );
+			}
+		}
+
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+
+		return apply_filters( 'donor_search_raw_data', $data, $donation_year, $donor_type );
+	}
+
+	/**
+	 * Search for donor posts and retrieve parent donor data.
+	 * This function is used to show top-level donors in the search results.
+	 *
+	 * @param string $donation_year The donation year to filter by (not used here).
+	 * @param string $donor_type    The donor type to filter by (not used here).
+	 * @param string $search        The search term.
+	 * @return array An array of parent donor data.
+	 */
+	public function get_parent_donor_search_raw_data( $search = '' ): array {
+		$search = sanitize_text_field( $search );
+
+		if ( empty( $search ) ) {
+			return array();
+		}
+
+		$transient_key = 'parent_donor_search_raw_' . md5( $donation_year . $donor_type . $search );
+		$data          = get_transient( $transient_key );
+		if ( false !== $data ) {
+			return $data;
+		}
+
+		$transaction_terms = $this->get_transaction_donor_terms();
+		if ( empty( $transaction_terms ) ) {
+			return array();
+		}
+
+		$post_type = 'donor';
+		$args      = array(
+			'post_type'      => $post_type,
+			'posts_per_page' => -1,
+			's'              => $search,
+			'search_columns' => array( 'post_title' ),
+			'sortby'         => 'relevance',
+		);
+
+		$query = new \WP_Query( $args );
+
+		$data = array();
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$post    = $query->post;
+				$post_id = get_the_ID();
+
+				if ( $query->post->post_parent ) {
+					$post_id = $query->post->post_parent;
+					$post    = get_post( $post_id );
+				}
+
+				$taxonomy    = 'donor';
+				$donor_terms = wp_get_object_terms( $post_id, $taxonomy, array( 'fields' => 'slugs' ) );
+
+				if ( empty( $donor_terms ) || is_wp_error( $donor_terms ) ) {
+					continue;
+				}
+
+				$valid_terms = array_intersect( $donor_terms, $transaction_terms );
+				if ( empty( $valid_terms ) ) {
+					continue;
+				}
+
+				$amount_calc = intval( get_post_meta( $post_id, 'amount_calc', true ) );
+				$disclosed   = strtolower( get_post_meta( $post_id, 'disclosed', true ) );
+				$post_slug   = $post->post_name;
+
+				$data[ $post_slug ] = array(
+					'donor'       => $post->post_title,
+					'amount_calc' => $amount_calc,
+					'disclosed'   => array( $disclosed ),
+					'donor_type'  => get_the_term_list( $donor_post_id, 'donor_type' ),
+					'donor_slug'  => $post_slug,
+					'donor_link'  => get_permalink( $post_id ),
+					'year'        => get_the_term_list( $post_id, 'donation_year' ),
+				);
+			}
+
+			wp_reset_postdata();
+		}
+
+		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+
+		return apply_filters( 'parent_donor_search_raw_data', array_values( $data ), $search );
+	}
+
+	/**
+	 * Retrieve parent terms from search.
+	 *
+	 * @param string $search   The search term.
+	 * @param string $taxonomy The taxonomy to search in.
+	 * @return array An array of parent terms.
+	 */
+	private function get_parent_terms_from_search( string $search, string $taxonomy ): array {
+		$term_ids = $this->get_search_term_ids( $search, $taxonomy );
+
+		if ( empty( $term_ids ) ) {
+			return array();
+		}
+
+		$parent_terms = array();
+
+		foreach ( $term_ids as $term_id ) {
+			$term = get_term( $term_id, $taxonomy );
+			if ( is_wp_error( $term ) || ! $term ) {
+				continue;
+			}
+
+			if ( $term->parent === 0 ) {
+				// Keep parent terms directly.
+				$parent_terms[ $term->term_id ] = $term;
+			} else {
+				// If child, find and add the parent term.
+				$parent_term = get_term( $term->parent, $taxonomy );
+				if ( $parent_term && ! is_wp_error( $parent_term ) ) {
+					$parent_terms[ $parent_term->term_id ] = $parent_term;
+				}
+			}
+		}
+
+		return $parent_terms;
 	}
 
 	/**
@@ -750,7 +984,7 @@ class Data {
 			'fields'         => 'ids',
 		);
 
-		if( ! empty( $think_tank ) ) {
+		if ( ! empty( $think_tank ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'think_tank',
 				'field'    => 'slug',
@@ -758,7 +992,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donation_year ) ) {
+		if ( ! empty( $donation_year ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
 				'field'    => 'slug',
@@ -766,7 +1000,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donor_type ) ) {
+		if ( ! empty( $donor_type ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donor_type',
 				'field'    => 'slug',
@@ -793,7 +1027,7 @@ class Data {
 			'fields'         => 'ids',
 		);
 
-		if( ! empty( $donor ) ) {
+		if ( ! empty( $donor ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donor',
 				'field'    => 'slug',
@@ -801,7 +1035,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donation_year ) ) {
+		if ( ! empty( $donation_year ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
 				'field'    => 'slug',
@@ -938,14 +1172,14 @@ class Data {
 	 */
 	public static function is_undisclosed( array $post_ids ): bool {
 		$meta_values = ( new self() )->get_meta_values_for_records( $post_ids, 'disclosed' );
-		
+
 		$all_undisclosed = array_filter(
 			$meta_values,
 			function ( $disclosed ) {
 				return strtolower( $disclosed ) !== 'no';
 			}
 		);
-	
+
 		return empty( $all_undisclosed );
 	}
 
@@ -982,7 +1216,7 @@ class Data {
 	 * }
 	 */
 	public static function get_think_tank_sums( string $think_tank = '', $donation_year = '', string $donor_type = '' ): array {
-		$post_ids = self::get_think_tank_post_ids( $think_tank, $donation_year , $donor_type );
+		$post_ids = self::get_think_tank_post_ids( $think_tank, $donation_year, $donor_type );
 
 		return array(
 			'amount_calc' => self::get_total( $post_ids ),
@@ -1007,5 +1241,71 @@ class Data {
 			'undisclosed' => self::is_undisclosed( $post_ids ),
 		);
 	}
+
+	/**
+	 * Get donor terms associated with any transaction post.
+	 *
+	 * @return array Array of donor term slugs.
+	 */
+	public function get_transaction_donor_terms(): array {
+		add_filter( 'terms_clauses', array( $this, 'filter_terms_clauses_for_transactions' ), 10, 3 );
+
+		$taxonomy = 'donor';
+		$args     = array(
+			'taxonomy'   => $taxonomy,
+			'fields'     => 'slugs',
+			'hide_empty' => true,
+		);
+
+		$terms = get_terms( $args );
+
+		remove_filter( 'terms_clauses', array( $this, 'filter_terms_clauses_for_transactions' ), 10 );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
+		return $terms;
+	}
+
+	/**
+	 * Modify terms_clauses to filter donor terms associated with transactions.
+	 *
+	 * @param array $clauses The terms query SQL clauses.
+	 * @param array $taxonomies The taxonomies being queried.
+	 * @param array $args Query arguments.
+	 * @return array Modified terms query clauses.
+	 */
+	public function filter_terms_clauses_for_transactions( $clauses, $taxonomies, $args ): array {
+		global $wpdb;
+
+		// var_dump( $clauses, $taxonomies, $args );
+
+		$taxonomy = 'donor';
+
+		if ( ! in_array( $taxonomy, $taxonomies, true ) ) {
+			return $clauses;
+		}
+
+		$post_type = 'transaction';
+
+		$clauses['where'] .= "
+			AND EXISTS (
+				SELECT 1
+				FROM {$wpdb->term_relationships} term_relationships
+				JOIN {$wpdb->posts} posts
+					ON term_relationships.object_id = posts.ID
+				WHERE term_relationships.term_taxonomy_id = tt.term_taxonomy_id
+				AND posts.post_type = '{$post_type}'
+				AND posts.post_status = 'publish'
+			)
+		";
+
+		// Debug the modified clauses.
+		error_log( 'Modified Clauses: ' . print_r( $clauses, true ) );
+
+		return $clauses;
+	}
+
 
 }
