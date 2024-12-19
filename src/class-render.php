@@ -21,6 +21,60 @@ class Render {
 	}
 
 	/**
+	 * Return the appropriate table based on the table_type.
+	 *
+	 * @param string $table_type The type of table to generate.
+	 * @param array  $args Parameters required for table generation.
+	 * @return string The generated table HTML markup.
+	 */
+	public function generate_data_table( string $table_type, array $args ): string {
+		$args = $this->convert_camel_to_snake_keys( $args );
+
+		$donation_year = $args['donation_year'] ?? '';
+		$donor_type    = $args['donor_type'] ?? '';
+		$search        = $args['search'] ?? '';
+
+		if ( $donation_year === 'all' ) {
+			$donation_year = '';
+		}
+
+		if ( $donor_type === 'all' ) {
+			$donor_type = '';
+		}
+
+		switch ( $table_type ) {
+			case 'think-tank-archive':
+				return $this->generate_think_tank_archive_table( $donation_year, $search );
+			case 'single-think-tank':
+				if ( empty( $args['think_tank'] ) ) {
+					return __( 'Think tank is required for single-think-tank.', 'data-tables' );
+				}
+				return $this->generate_single_think_tank_table(
+					$args['think_tank'],
+					$donation_year,
+					$donor_type
+				);
+			case 'donor-archive':
+				return $this->generate_donor_archive_table(
+					$donation_year,
+					$donor_type,
+					$search
+				);
+			case 'single-donor':
+				if ( empty( $args['donor'] ) ) {
+					return __( 'Donor is required for single-donor.', 'data-tables' );
+				}
+				return $this->generate_single_donor_table(
+					$args['donor'],
+					$donation_year,
+					$donor_type
+				);
+			default:
+				return __( 'Invalid table type.', 'data-tables' );
+		}
+	}
+
+	/**
 	 * Generate table for top ten
 	 *
 	 * @param string $donor_type Optional. The slug of the donor_type taxonomy term. Default empty.
@@ -118,60 +172,6 @@ class Render {
 	 */
 	public function render_table_top( string $table_type, ?string $donation_year = null, $count = 0 ): void {
 		echo $this->generate_table_top( $table_type, $donation_year, $count );
-	}
-
-	/**
-	 * Return the appropriate table based on the table_type.
-	 *
-	 * @param string $table_type The type of table to generate.
-	 * @param array  $args Parameters required for table generation.
-	 * @return string The generated table HTML markup.
-	 */
-	public function generate_data_table( string $table_type, array $args ): string {
-		$args = $this->convert_camel_to_snake_keys( $args );
-
-		$donation_year = $args['donation_year'] ?? '';
-		$donor_type    = $args['donor_type'] ?? '';
-		$search        = $args['search'] ?? '';
-
-		if ( $donation_year === 'all' ) {
-			$donation_year = '';
-		}
-
-		if ( $donor_type === 'all' ) {
-			$donor_type = '';
-		}
-
-		switch ( $table_type ) {
-			case 'think-tank-archive':
-				return $this->generate_think_tank_archive_table( $donation_year, $search );
-			case 'single-think-tank':
-				if ( empty( $args['think_tank'] ) ) {
-					return __( 'Think tank is required for single-think-tank.', 'data-tables' );
-				}
-				return $this->generate_single_think_tank_table(
-					$args['think_tank'],
-					$donation_year,
-					$donor_type
-				);
-			case 'donor-archive':
-				return $this->generate_donor_archive_table(
-					$donation_year,
-					$donor_type,
-					$search
-				);
-			case 'single-donor':
-				if ( empty( $args['donor'] ) ) {
-					return __( 'Donor is required for single-donor.', 'data-tables' );
-				}
-				return $this->generate_single_donor_table(
-					$args['donor'],
-					$donation_year,
-					$donor_type
-				);
-			default:
-				return __( 'Invalid table type.', 'data-tables' );
-		}
 	}
 
 	/**
