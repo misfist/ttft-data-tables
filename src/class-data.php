@@ -308,10 +308,15 @@ class Data {
 	}
 
 	/**
-	 * Retrieve donor data, optionally filtered by donation year.
+	 * Retrieve donor data, optionally filtered by donation year, donor type, or search query.
+	 *
+	 * - For "All Donors" (no search), this function aggregates amounts by top-level donors.
+	 * - For "Search," it delegates to `get_donor_search_raw_data` to handle term-specific matches.
 	 *
 	 * @param string $donation_year The slug of the donation year to filter transactions by (optional).
-	 * @return array
+	 * @param string $donor_type    The slug of the donor type to filter transactions by (optional).
+	 * @param string $search        A search keyword to match donor terms (optional).
+	 * @return array The donor data, structured as an associative array keyed by donor slug.
 	 */
 	public function get_donor_archive_raw_data( $donation_year = '', $donor_type = '', $search = '' ): array {
 		if ( ! empty( $search ) ) {
@@ -358,12 +363,13 @@ class Data {
 				$query->the_post();
 				$post_id = get_the_ID();
 
-				$tax_args = array(
-					'orderby' => 'term_id',
-				);
 				/**
 				 * Limit to "top level" donors
 				 */
+				$tax_args = array(
+					'orderby' => 'term_id',
+					'parent'  => 0,
+				);
 
 				$donors = wp_get_object_terms( $post_id, 'donor', $tax_args );
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
@@ -978,7 +984,7 @@ class Data {
 			'fields'         => 'ids',
 		);
 
-		if( ! empty( $think_tank ) ) {
+		if ( ! empty( $think_tank ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'think_tank',
 				'field'    => 'slug',
@@ -986,7 +992,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donation_year ) ) {
+		if ( ! empty( $donation_year ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
 				'field'    => 'slug',
@@ -994,7 +1000,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donor_type ) ) {
+		if ( ! empty( $donor_type ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donor_type',
 				'field'    => 'slug',
@@ -1021,7 +1027,7 @@ class Data {
 			'fields'         => 'ids',
 		);
 
-		if( ! empty( $donor ) ) {
+		if ( ! empty( $donor ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donor',
 				'field'    => 'slug',
@@ -1029,7 +1035,7 @@ class Data {
 			);
 		}
 
-		if( ! empty( $donation_year ) ) {
+		if ( ! empty( $donation_year ) ) {
 			$args['tax_query'][] = array(
 				'taxonomy' => 'donation_year',
 				'field'    => 'slug',
@@ -1166,14 +1172,14 @@ class Data {
 	 */
 	public static function is_undisclosed( array $post_ids ): bool {
 		$meta_values = ( new self() )->get_meta_values_for_records( $post_ids, 'disclosed' );
-		
+
 		$all_undisclosed = array_filter(
 			$meta_values,
 			function ( $disclosed ) {
 				return strtolower( $disclosed ) !== 'no';
 			}
 		);
-	
+
 		return empty( $all_undisclosed );
 	}
 
@@ -1210,7 +1216,7 @@ class Data {
 	 * }
 	 */
 	public static function get_think_tank_sums( string $think_tank = '', $donation_year = '', string $donor_type = '' ): array {
-		$post_ids = self::get_think_tank_post_ids( $think_tank, $donation_year , $donor_type );
+		$post_ids = self::get_think_tank_post_ids( $think_tank, $donation_year, $donor_type );
 
 		return array(
 			'amount_calc' => self::get_total( $post_ids ),
