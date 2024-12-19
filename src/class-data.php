@@ -1236,4 +1236,70 @@ class Data {
 		);
 	}
 
+	/**
+	 * Get donor terms associated with any transaction post.
+	 *
+	 * @return array Array of donor term slugs.
+	 */
+	public function get_transaction_donor_terms(): array {
+		add_filter( 'terms_clauses', array( $this, 'filter_terms_clauses_for_transactions' ), 10, 3 );
+
+		$taxonomy = 'donor';
+		$args     = array(
+			'taxonomy'   => $taxonomy,
+			'fields'     => 'slugs',
+			'hide_empty' => true,
+		);
+
+		$terms = get_terms( $args );
+
+		remove_filter( 'terms_clauses', array( $this, 'filter_terms_clauses_for_transactions' ), 10 );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
+		return $terms;
+	}
+
+	/**
+	 * Modify terms_clauses to filter donor terms associated with transactions.
+	 *
+	 * @param array $clauses The terms query SQL clauses.
+	 * @param array $taxonomies The taxonomies being queried.
+	 * @param array $args Query arguments.
+	 * @return array Modified terms query clauses.
+	 */
+	public function filter_terms_clauses_for_transactions( $clauses, $taxonomies, $args ): array {
+		global $wpdb;
+
+		// var_dump( $clauses, $taxonomies, $args );
+
+		$taxonomy = 'donor';
+
+		if ( ! in_array( $taxonomy, $taxonomies, true ) ) {
+			return $clauses;
+		}
+
+		$post_type = 'transaction';
+
+		$clauses['where'] .= "
+			AND EXISTS (
+				SELECT 1
+				FROM {$wpdb->term_relationships} term_relationships
+				JOIN {$wpdb->posts} posts
+					ON term_relationships.object_id = posts.ID
+				WHERE term_relationships.term_taxonomy_id = tt.term_taxonomy_id
+				AND posts.post_type = '{$post_type}'
+				AND posts.post_status = 'publish'
+			)
+		";
+
+		// Debug the modified clauses.
+		error_log( 'Modified Clauses: ' . print_r( $clauses, true ) );
+
+		return $clauses;
+	}
+
+
 }
