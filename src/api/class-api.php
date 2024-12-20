@@ -350,8 +350,10 @@ class API {
 			exit;
 		}
 
+		$filename = $this->generate_filename( $request );
+
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=think-tank-funding-dataset.csv' );
+		header( 'Content-Disposition: attachment; filename=' . $filename );
 
 		$output = fopen( 'php://output', 'w' );
 
@@ -734,6 +736,33 @@ class API {
 		}
 
 		return wp_json_encode( $response );
+	}
+
+	/**
+	 * Generate a filename with a hash based on request parameters.
+	 *
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return string The generated filename.
+	 */
+	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
+		$expected_params = array( 'think_tank', 'donor', 'year', 'donor_type' );
+
+		$params = array_map(
+			'sanitize_text_field',
+			array_intersect_key( $request->get_params(), array_flip( $expected_params ) )
+		);
+
+		$params = array_filter( $params );
+
+		if ( empty( $params ) ) {
+			return sprintf( '%s.%s', $filename, $extension );
+		}
+
+		ksort( $params );
+
+		$hash = md5( json_encode( $params ) );
+
+		return sprintf( '%s-%s.%s', $filename, $hash, $extension );
 	}
 
 }
