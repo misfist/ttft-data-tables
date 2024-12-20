@@ -399,6 +399,7 @@ class API {
 		}
 
 		return array(
+			'id'                                        => $transaction_id,
 			'Specific Donor'                            => $specific_donor,
 			'Parent Organization/Country'               => $parent_id ? get_term( $parent_id )->name : '',
 			'Recipient Think Tank'                      => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
