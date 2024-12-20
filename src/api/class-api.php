@@ -414,7 +414,7 @@ class API {
 			'Minimum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: 0,
 			'Maximum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: 0,
 			'Minimum + Exact Donation'                  => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: 0,
-			'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+			'Think Tank Disclosed Funding Amount/Range' => (bool) get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
 			'Source'                                    => get_post_meta( $transaction_id, 'source', true ) ?: '',
 		);
 	}
