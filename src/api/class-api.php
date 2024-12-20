@@ -350,8 +350,15 @@ class API {
 			exit;
 		}
 
+		$data = array_map( function( $row ) {
+			unset( $row['ID'] );
+			return $row;
+		}, $data );
+
+		$filename = $this->generate_filename( $request );
+
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename=think-tank-funding-dataset.csv' );
+		header( 'Content-Disposition: attachment; filename=' . $filename );
 
 		$output = fopen( 'php://output', 'w' );
 
@@ -397,6 +404,7 @@ class API {
 		}
 
 		return array(
+			'id'                                        => $transaction_id,
 			'Specific Donor'                            => $specific_donor,
 			'Parent Organization/Country'               => $parent_id ? get_term( $parent_id )->name : '',
 			'Recipient Think Tank'                      => ( $think_tank && ! is_wp_error( $think_tank ) ) ? $think_tank[0]->name : '',
@@ -406,7 +414,7 @@ class API {
 			'Minimum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_min', true ) ?: 0,
 			'Maximum Donation (if range provided)'      => (int) get_post_meta( $transaction_id, 'amount_max', true ) ?: 0,
 			'Minimum + Exact Donation'                  => (int) get_post_meta( $transaction_id, 'amount_calc', true ) ?: 0,
-			'Think Tank Disclosed Funding Amount/Range' => get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
+			'Think Tank Disclosed Funding Amount/Range' => (bool) get_post_meta( $transaction_id, 'disclosed', true ) ? true : false,
 			'Source'                                    => get_post_meta( $transaction_id, 'source', true ) ?: '',
 		);
 	}
@@ -734,6 +742,33 @@ class API {
 		}
 
 		return wp_json_encode( $response );
+	}
+
+	/**
+	 * Generate a filename with a hash based on request parameters.
+	 *
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return string The generated filename.
+	 */
+	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
+		$expected_params = array( 'think_tank', 'donor', 'year', 'donor_type' );
+
+		$params = array_map(
+			'sanitize_text_field',
+			array_intersect_key( $request->get_params(), array_flip( $expected_params ) )
+		);
+
+		$params = array_filter( $params );
+
+		if ( empty( $params ) ) {
+			return sprintf( '%s.%s', $filename, $extension );
+		}
+
+		ksort( $params );
+
+		$hash = md5( json_encode( $params ) );
+
+		return sprintf( '%s-%s.%s', $filename, $hash, $extension );
 	}
 
 }
