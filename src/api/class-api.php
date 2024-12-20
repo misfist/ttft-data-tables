@@ -350,6 +350,11 @@ class API {
 			exit;
 		}
 
+		$data = array_map( function( $row ) {
+			unset( $row['ID'] );
+			return $row;
+		}, $data );
+
 		$filename = $this->generate_filename( $request );
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
