@@ -10,6 +10,13 @@ use function Ttft\Data_Tables\get_transparency_score_from_slug;
 class Data {
 
 	/**
+	 * Array of parsed arguments.
+	 *
+	 * @var array
+	 */
+	private $args = array();
+
+	/**
 	 * Array of settings.
 	 *
 	 * @var array
@@ -32,6 +39,127 @@ class Data {
 		if ( 'local' === wp_get_environment_type() ) {
 			$this->cache_expiration = 0;
 		}
+	}
+
+	/**
+	 * Set the args for the class.
+	 *
+	 * @param array $args Arguments to parse and sanitize.
+	 * @return void
+	 */
+	public function set_args( array $args = array() ): void {
+		$this->args = $this->sanitize_args( $args );
+	}
+
+	/**
+	 * Build cache key for the query.
+	 *
+	 * @param  array  $args
+	 * @return string
+	 */
+	public function get_cache_key( array $args = array() ): string {
+		ksort( $args );
+
+		$params = http_build_query( $args, '', '&' );
+
+		$transient_key = 'query_' . md5( $params );
+
+		return $transient_key;
+	}
+
+	/**
+	 * Sanitize and parse the args.
+	 *
+	 * @param array $args Arguments to parse and sanitize.
+	 * @return array Sanitized and parsed arguments.
+	 */
+	private function sanitize_args( array $args = array() ): array {
+		$defaults = array(
+			'think_tank'    => null,
+			'donor'         => null,
+			'donation_year' => null,
+			'donor_type'    => null,
+			'search'        => null,
+			'limit'         => null, // Do not apply a limit in the query.
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return array(
+			'think_tank'    => isset( $args['think_tank'] ) ? sanitize_text_field( $args['think_tank'] ) : null,
+			'donor'         => isset( $args['donor'] ) ? sanitize_text_field( $args['donor'] ) : null,
+			'donation_year' => isset( $args['donation_year'] ) ? sanitize_text_field( $args['donation_year'] ) : null,
+			'donor_type'    => isset( $args['donor_type'] ) ? sanitize_text_field( $args['donor_type'] ) : null,
+			'search'        => isset( $args['search'] ) ? sanitize_text_field( $args['search'] ) : null,
+			'limit'         => isset( $args['limit'] ) ? absint( $args['limit'] ) : null,
+		);
+	}
+
+	/**
+	 * Generate the query arguments based on the class args.
+	 *
+	 * @return array The generated query arguments.
+	 */
+	private function generate_query_args(): array {
+		// If search is provided, prioritize it and ignore other filters.
+		if ( ! empty( $this->args['search'] ) ) {
+			return array(
+				'post_type'      => 'transaction',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				's'              => $this->args['search'],
+				'search_columns' => array( 'post_title' ),
+			);
+		}
+
+		// Default query for non-search filters.
+		$args = array(
+			'post_type'      => 'transaction',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'tax_query'      => array( 'relation' => 'AND' ),
+		);
+
+		$taxonomies = array(
+			'think_tank',
+			'donor',
+			'donation_year',
+			'donor_type',
+		);
+
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( ! empty( $this->args[ $taxonomy ] ) ) {
+				$args['tax_query'][] = array(
+					'taxonomy' => $taxonomy,
+					'field'    => 'slug',
+					'terms'    => $this->args[ $taxonomy ],
+				);
+			}
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Generate and execute a query based on the parsed args.
+	 *
+	 * @return \WP_Query The generated query object.
+	 */
+	public function generate_query(): \WP_Query {
+		$query_args = $this->generate_query_args();
+
+		$cache_key = $this->get_cache_key( $query_args );
+
+		$cached_query = get_transient( $cache_key );
+
+		if ( false !== $cached_query ) {
+			return $cached_query;
+		}
+
+		$query = new \WP_Query( $query_args );
+		set_transient( $cache_key, $query, $this->cache_expiration );
+
+		return $query;
 	}
 
 	/**
