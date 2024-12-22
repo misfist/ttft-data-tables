@@ -113,8 +113,6 @@ class Data {
 				'post_type'      => $post_type,
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
-				's'              => $this->args['search'],
-				'search_columns' => array( 'post_title' ),
 			);
 
 			if ( ! empty( $this->args['taxonomy'] ) && ! empty( $this->args['terms'] ) ) {
@@ -452,21 +450,16 @@ class Data {
 	 * @return array An array of donor data.
 	 */
 	public function get_donor_search_raw_data( $search = '' ): array {
-		if ( empty( $search ) ) {
-			return array();
-		}
-
 		$taxonomy = 'donor';
 		$terms    = $this->get_search_term_ids( $search, $taxonomy );
-		$args     = array(
-			'search' => $search,
-		);
-		if ( ! empty( $terms ) ) {
-			$args['terms']    = $terms;
-			$args['taxonomy'] = $taxonomy;
-		}
 
-		$this->set_args( $args );
+		$this->set_args(
+			array(
+				'search' => $search,
+				'terms'  => $terms,
+				'taxonomy' => $taxonomy,
+			)
+		);
 
 		$query = $this->generate_query();
 
