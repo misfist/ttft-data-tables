@@ -54,7 +54,7 @@ class Data {
 	/**
 	 * Build cache key for the query.
 	 *
-	 * @param  array  $args
+	 * @param  array $args
 	 * @return string
 	 */
 	public function get_cache_key( array $args = array() ): string {
@@ -81,6 +81,8 @@ class Data {
 			'donor_type'    => null,
 			'search'        => null,
 			'limit'         => null, // Do not apply a limit in the query.
+			'terms'         => null,
+			'taxonomy'      => null,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -92,6 +94,8 @@ class Data {
 			'donor_type'    => isset( $args['donor_type'] ) ? sanitize_text_field( $args['donor_type'] ) : null,
 			'search'        => isset( $args['search'] ) ? sanitize_text_field( $args['search'] ) : null,
 			'limit'         => isset( $args['limit'] ) ? absint( $args['limit'] ) : null,
+			'taxonomy'      => isset( $args['taxonomy'] ) ? sanitize_text_field( $args['taxonomy'] ) : null,
+			'terms'         => isset( $args['terms'] ) ? (array) array_map( 'absint', $args['terms'] ) : null,
 		);
 	}
 
