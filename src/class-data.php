@@ -10,6 +10,13 @@ use function Ttft\Data_Tables\get_transparency_score_from_slug;
 class Data {
 
 	/**
+	 * Array of parsed arguments.
+	 *
+	 * @var array
+	 */
+	private $args = array();
+
+	/**
 	 * Array of settings.
 	 *
 	 * @var array
@@ -35,6 +42,144 @@ class Data {
 	}
 
 	/**
+	 * Set the args for the class.
+	 *
+	 * @param array $args Arguments to parse and sanitize.
+	 * @return void
+	 */
+	public function set_args( array $args = array() ): void {
+		$this->args = $this->sanitize_args( $args );
+	}
+
+	/**
+	 * Build cache key for the query.
+	 *
+	 * @param  array $args
+	 * @return string
+	 */
+	public function get_cache_key( array $args = array() ): string {
+		ksort( $args );
+
+		$params = http_build_query( $args, '', '&' );
+
+		$transient_key = 'query_' . md5( $params );
+
+		return $transient_key;
+	}
+
+	/**
+	 * Sanitize and parse the args.
+	 *
+	 * @param array $args Arguments to parse and sanitize.
+	 * @return array Sanitized and parsed arguments.
+	 */
+	private function sanitize_args( array $args = array() ): array {
+		$defaults = array(
+			'think_tank'    => null,
+			'donor'         => null,
+			'donation_year' => null,
+			'donor_type'    => null,
+			'search'        => null,
+			'limit'         => null, // Do not apply a limit in the query.
+			'terms'         => null,
+			'taxonomy'      => null,
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return array(
+			'think_tank'    => isset( $args['think_tank'] ) ? sanitize_text_field( $args['think_tank'] ) : null,
+			'donor'         => isset( $args['donor'] ) ? sanitize_text_field( $args['donor'] ) : null,
+			'donation_year' => isset( $args['donation_year'] ) ? sanitize_text_field( $args['donation_year'] ) : null,
+			'donor_type'    => isset( $args['donor_type'] ) ? sanitize_text_field( $args['donor_type'] ) : null,
+			'search'        => isset( $args['search'] ) ? sanitize_text_field( $args['search'] ) : null,
+			'limit'         => isset( $args['limit'] ) ? absint( $args['limit'] ) : null,
+			'taxonomy'      => isset( $args['taxonomy'] ) ? sanitize_text_field( $args['taxonomy'] ) : null,
+			'terms'         => isset( $args['terms'] ) ? (array) array_map( 'absint', $args['terms'] ) : null,
+		);
+	}
+
+	/**
+	 * Generate the query arguments based on the class args.
+	 *
+	 * @return array The generated query arguments.
+	 */
+	private function generate_query_args(): array {
+		$post_type = 'transaction';
+
+		// If search is provided, prioritize it and apply `taxonomy` and `terms` if available.
+		if ( ! empty( $this->args['search'] ) ) {
+			$args = array(
+				'post_type'      => $post_type,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			);
+
+			if ( ! empty( $this->args['taxonomy'] ) && ! empty( $this->args['terms'] ) ) {
+				$args['tax_query'] = array(
+					array(
+						'taxonomy'         => $this->args['taxonomy'],
+						'field'            => 'id',
+						'terms'            => $this->args['terms'],
+						'include_children' => true,
+					),
+				);
+			}
+
+			return $args;
+		}
+
+		// Default query for non-search filters.
+		$args = array(
+			'post_type'      => $post_type,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'tax_query'      => array( 'relation' => 'AND' ),
+		);
+
+		$taxonomies = array(
+			'think_tank',
+			'donor',
+			'donation_year',
+			'donor_type',
+		);
+
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( ! empty( $this->args[ $taxonomy ] ) ) {
+				$args['tax_query'][] = array(
+					'taxonomy' => $taxonomy,
+					'field'    => 'slug',
+					'terms'    => $this->args[ $taxonomy ],
+				);
+			}
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Generate and execute a query based on the parsed args.
+	 *
+	 * @return \WP_Query The generated query object.
+	 */
+	public function generate_query(): \WP_Query {
+		$query_args = $this->generate_query_args();
+
+		$cache_key = $this->get_cache_key( $query_args );
+
+		$cached_query = get_transient( $cache_key );
+
+		if ( false !== $cached_query ) {
+			return $cached_query;
+		}
+
+		$query = new \WP_Query( $query_args );
+		set_transient( $cache_key, $query, $this->cache_expiration );
+
+		return $query;
+	}
+
+	/**
 	 * Get Raw Table Data
 	 *
 	 * @param string $donor_type Optional. The slug of the donor_type taxonomy term. Default empty.
@@ -43,67 +188,46 @@ class Data {
 	 * @return array An array of transaction data including think_tank term and total amount.
 	 */
 	public function get_top_ten_raw_data( $donor_type = '', $donation_year = '', $number_of_items = 10 ): array {
-		$transient_key = 'top_ten_raw_data_' . md5( $donor_type . '_' . $donation_year . '_' . $number_of_items );
-		$data          = get_transient( $transient_key );
+		$this->set_args(
+			array(
+				'donor_type'    => $donor_type,
+				'donation_year' => $donation_year,
+				'limit'         => $number_of_items,
+			)
+		);
 
-		if ( false === $data ) {
-			$args = array(
-				'post_type'      => 'transaction',
-				'post_status'    => 'publish',
-				'posts_per_page' => -1,
-			);
+		$query = $this->generate_query();
 
-			$tax_query = array( 'relation' => 'AND' );
-			if ( $donor_type ) {
-				$tax_query[] = array(
-					'taxonomy' => 'donor_type',
-					'field'    => 'slug',
-					'terms'    => $donor_type,
-				);
-			}
-
-			if ( $donation_year ) {
-				$tax_query[] = array(
-					'taxonomy' => 'donation_year',
-					'field'    => 'slug',
-					'terms'    => $donation_year,
-				);
-			}
-
-			if ( ! empty( $tax_query ) ) {
-				$args['tax_query'] = $tax_query;
-			}
-
-			$query = new \WP_Query( $args );
-			$data  = array();
-
-			foreach ( $query->posts as $post ) {
-				$think_tanks = wp_get_post_terms( $post->ID, 'think_tank' );
-				if ( ! $think_tanks ) {
-					continue;
-				}
-
-				$think_tank = $think_tanks[0];
-				$amount     = get_post_meta( $post->ID, 'amount_calc', true );
-
-				$data[] = array(
-					'think_tank'      => $think_tank->name,
-					'think_tank_slug' => $think_tank->slug,
-					'total_amount'    => (int) $amount,
-					'year'            => implode( ',', wp_get_post_terms( $post->ID, 'donation_year', array( 'fields' => 'names' ) ) ),
-					'type'            => implode( ',', wp_get_post_terms( $post->ID, 'donor_type', array( 'fields' => 'names' ) ) ),
-				);
-			}
-
-			usort(
-				$data,
-				function ( $a, $b ) {
-					return ( strcmp( $a['think_tank'], $b['think_tank'] ) );
-				}
-			);
-
-			set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
+
+		$data = array();
+
+		foreach ( $query->posts as $post_id ) {
+			$think_tanks = wp_get_post_terms( $post_id, 'think_tank' );
+			if ( ! $think_tanks ) {
+				continue;
+			}
+
+			$think_tank = $think_tanks[0];
+			$amount     = get_post_meta( $post_id, 'amount_calc', true );
+
+			$data[] = array(
+				'think_tank'      => $think_tank->name,
+				'think_tank_slug' => $think_tank->slug,
+				'total_amount'    => (int) $amount,
+				'year'            => implode( ',', wp_get_post_terms( $post_id, 'donation_year', array( 'fields' => 'names' ) ) ),
+				'type'            => implode( ',', wp_get_post_terms( $post_id, 'donor_type', array( 'fields' => 'names' ) ) ),
+			);
+		}
+
+		usort(
+			$data,
+			function ( $a, $b ) {
+				return ( strcmp( $a['think_tank'], $b['think_tank'] ) );
+			}
+		);
 
 		return $data;
 	}
@@ -117,55 +241,25 @@ class Data {
 	 * @return array
 	 */
 	public function get_single_think_tank_raw_data( $think_tank = '', $donation_year = '', $donor_type = '' ): array {
-		$think_tank    = sanitize_text_field( $think_tank );
-		$donation_year = sanitize_text_field( $donation_year );
-		$donor_type    = sanitize_text_field( $donor_type );
-
-		$transient_key = 'single_think_tank_' . md5( $think_tank . $donation_year . $donor_type );
-		$data          = get_transient( $transient_key );
-		if ( false !== $data ) {
-			return $data;
-		}
-
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'tax_query'      => array(
-				'relation' => 'AND',
-			),
+		$this->set_args(
+			array(
+				'think_tank'    => $think_tank,
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
 		);
 
-		if ( $think_tank ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'think_tank',
-				'field'    => 'slug',
-				'terms'    => $think_tank,
-			);
+		$query = $this->generate_query();
+
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
 
-		if ( $donation_year ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-
-		if ( $donor_type ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donor_type',
-				'field'    => 'slug',
-				'terms'    => $donor_type,
-			);
-		}
-
-		$query = new \WP_Query( $args );
-		$data  = array();
+		$data = array();
 
 		if ( $query->have_posts() ) {
 			foreach ( $query->posts as $post_id ) {
-				$donors = wp_get_object_terms( $post_id, 'donor', array( 'orderby' => 'parent' ) );
+				$donors = wp_get_post_terms( $post_id, 'donor', array( 'orderby' => 'parent' ) );
 
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
 					continue;
@@ -194,7 +288,6 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 		return $data;
 	}
 
@@ -206,61 +299,24 @@ class Data {
 	 * @return array Array of transaction data.
 	 */
 	public function get_single_donor_raw_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
-		$donor         = sanitize_text_field( $donor );
-		$donation_year = sanitize_text_field( $donation_year );
-		$donor_type    = sanitize_text_field( $donor_type );
-
-		$transient_key = 'single_donor_' . md5( $donor . $donation_year . $donor_type );
-		$data          = get_transient( $transient_key );
-		if ( false !== $data || ! empty( $data ) ) {
-			return $data;
-		}
-
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
-			'post_status'    => 'publish',
-			'fields'         => 'ids',
+		$this->set_args(
+			array(
+				'donor'         => $donor,
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
 		);
 
-		$tax_query = array( 'relation' => 'AND' );
+		$query = $this->generate_query();
 
-		if ( ! empty( $donor ) ) {
-			$tax_query[] = array(
-				'taxonomy' => 'donor',
-				'field'    => 'slug',
-				'terms'    => $donor,
-			);
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
-
-		if ( ! empty( $donation_year ) ) {
-			$tax_query[] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-
-		if ( ! empty( $donor_type ) ) {
-			$tax_query[] = array(
-				'taxonomy' => 'donor_type',
-				'field'    => 'slug',
-				'terms'    => $donor_type,
-			);
-		}
-
-		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query;
-		}
-
-		$query = new \WP_Query( $args );
 
 		$data = array();
 
 		if ( $query->have_posts() ) {
 			foreach ( $query->posts as $post_id ) {
-				$query->the_post();
-				$post_id     = get_the_ID();
 				$think_tanks = get_the_terms( $post_id, 'think_tank' );
 
 				if ( ! $think_tanks ) {
@@ -302,8 +358,6 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-
 		return $data;
 	}
 
@@ -324,44 +378,23 @@ class Data {
 			// return $this->get_parent_donor_search_raw_data( $search );
 		}
 
-		$donation_year = sanitize_text_field( $donation_year );
-		$donor_type    = sanitize_text_field( $donor_type );
-
-		$transient_key = 'donor_archive_raw_' . md5( $donation_year . $donor_type . $search );
-		$data          = get_transient( $transient_key );
-		if ( false !== $data ) {
-			return $data;
-		}
-
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
+		$this->set_args(
+			array(
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
 		);
 
-		if ( $donation_year ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
+		$query = $this->generate_query();
 
-		if ( $donor_type ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donor_type',
-				'field'    => 'slug',
-				'terms'    => $donor_type,
-			);
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
-
-		$query = new \WP_Query( $args );
 
 		$data = array();
 
 		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id = get_the_ID();
+			foreach ( $query->posts as $post_id ) {
 
 				/**
 				 * Limit to "top level" donors
@@ -404,8 +437,6 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-
 		return apply_filters( 'donor_archive_raw_data', $data, $donation_year, $donor_type );
 	}
 
@@ -419,49 +450,30 @@ class Data {
 	 * @return array An array of donor data.
 	 */
 	public function get_donor_search_raw_data( $search = '' ): array {
-		$search = sanitize_text_field( $search );
-
-		if ( empty( $search ) ) {
-			return array();
-		}
-
-		$transient_key = 'donor_search_raw_' . md5( $search );
-		$data          = get_transient( $transient_key );
-		if ( false !== $data ) {
-			return $data;
-		}
-
 		$taxonomy = 'donor';
 		$terms    = $this->get_search_term_ids( $search, $taxonomy );
 
-		if ( ! $terms ) {
+		$this->set_args(
+			array(
+				'search' => $search,
+				'terms'  => $terms,
+				'taxonomy' => $taxonomy,
+			)
+		);
+
+		$query = $this->generate_query();
+
+		if ( empty( $query->posts ) ) {
 			return array();
 		}
 
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
-			'orderby'        => 'relevance',
-			'tax_query'      => array(
-				array(
-					'taxonomy'         => $taxonomy,
-					'field'            => 'id',
-					'terms'            => (array) $terms,
-					'include_children' => true,
-				),
-			),
-		);
-
-		$query = new \WP_Query( $args );
-		$data  = array();
+		$data = array();
 
 		$parent_contributions = array();
 		$child_terms          = array();
 
 		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id = get_the_ID();
+			foreach ( $query->posts as $post_id ) {
 
 				$donors = wp_get_object_terms( $post_id, $taxonomy, array( 'orderby' => 'term_id' ) );
 				if ( empty( $donors ) || is_wp_error( $donors ) ) {
@@ -526,8 +538,6 @@ class Data {
 			}
 		}
 
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
-
 		return apply_filters( 'donor_search_raw_data', $data, $donation_year, $donor_type );
 	}
 
@@ -541,44 +551,36 @@ class Data {
 	 * @return array An array of parent donor data.
 	 */
 	public function get_parent_donor_search_raw_data( $search = '' ): array {
-		$search = sanitize_text_field( $search );
-
 		if ( empty( $search ) ) {
 			return array();
 		}
 
-		$transient_key = 'parent_donor_search_raw_' . md5( $donation_year . $donor_type . $search );
-		$data          = get_transient( $transient_key );
-		if ( false !== $data ) {
-			return $data;
+		$taxonomy = 'donor';
+		$terms    = $this->get_search_term_ids( $search, $taxonomy );
+		$args     = array(
+			'search' => $search,
+		);
+		if ( ! empty( $terms ) ) {
+			$args['terms']    = $terms;
+			$args['taxonomy'] = $taxonomy;
 		}
 
-		$transaction_terms = $this->get_transaction_donor_terms();
-		if ( empty( $transaction_terms ) ) {
+		$this->set_args( $args );
+
+		$query = $this->generate_query();
+
+		if ( empty( $query->posts ) ) {
 			return array();
 		}
-
-		$post_type = 'donor';
-		$args      = array(
-			'post_type'      => $post_type,
-			'posts_per_page' => -1,
-			's'              => $search,
-			'search_columns' => array( 'post_title' ),
-			'sortby'         => 'relevance',
-		);
-
-		$query = new \WP_Query( $args );
 
 		$data = array();
 
 		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post    = $query->post;
-				$post_id = get_the_ID();
+			foreach ( $query->posts as $post_id ) {
+				$post = get_post( $post_id );
 
-				if ( $query->post->post_parent ) {
-					$post_id = $query->post->post_parent;
+				if ( $post->post_parent ) {
+					$post_id = $post->post_parent;
 					$post    = get_post( $post_id );
 				}
 
@@ -611,8 +613,6 @@ class Data {
 
 			wp_reset_postdata();
 		}
-
-		set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return apply_filters( 'parent_donor_search_raw_data', array_values( $data ), $search );
 	}
@@ -977,38 +977,15 @@ class Data {
 	 * @return array Array of post IDs.
 	 */
 	public static function get_think_tank_post_ids( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
-			'tax_query'      => array(),
-			'fields'         => 'ids',
+		$this->set_args(
+			array(
+				'think_tank'    => $think_tank,
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
 		);
 
-		if ( ! empty( $think_tank ) ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'think_tank',
-				'field'    => 'slug',
-				'terms'    => $think_tank,
-			);
-		}
-
-		if ( ! empty( $donation_year ) ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-
-		if ( ! empty( $donor_type ) ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donor_type',
-				'field'    => 'slug',
-				'terms'    => $donor_type,
-			);
-		}
-
-		$query = new \WP_Query( $args );
+		$query = $this->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
@@ -1020,30 +997,15 @@ class Data {
 	 * @return array Array of post IDs.
 	 */
 	public static function get_donor_post_ids( string $donor = '', string $donation_year = '' ): array {
-		$args = array(
-			'post_type'      => 'transaction',
-			'posts_per_page' => -1,
-			'tax_query'      => array(),
-			'fields'         => 'ids',
+		$this->set_args(
+			array(
+				'donor'         => $donor,
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
 		);
 
-		if ( ! empty( $donor ) ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donor',
-				'field'    => 'slug',
-				'terms'    => $donor,
-			);
-		}
-
-		if ( ! empty( $donation_year ) ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-
-		$query = new \WP_Query( $args );
+		$query = $this->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
