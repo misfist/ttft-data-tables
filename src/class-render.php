@@ -138,6 +138,7 @@ class Render {
 					$donation_year,
 					$donor_type
 				);
+				break;
 			default:
 				return __( 'Invalid table type.', 'data-tables' );
 		}
