@@ -379,10 +379,16 @@ class API {
 				break;
 
 			case 'single-think-tank':
+				if( ! $think_tank ) {
+					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Think tank is required', 'data-tables' ) ), 400 );
+				}
 				$data = $this->get_single_think_tank_json( $think_tank, $donation_year, $donor_type );
 				break;
 
 			case 'single-donor':
+				if( ! $donor ) {
+					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Donor is required', 'data-tables' ) ), 400 );
+				}
 				$data = $this->get_single_donor_json( $donor, $donation_year, $donor_type );
 				break;
 
