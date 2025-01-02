@@ -27,6 +27,13 @@ class Render {
 	protected $cache_expiration = 12 * HOUR_IN_SECONDS;
 
 	/**
+	 * Cache key prefix.
+	 *
+	 * @var string
+	 */
+	protected $cache_key_prefix = 'data_table_';
+
+	/**
 	 * Constructor to instantiate the Data class
 	 */
 	public function __construct() {
@@ -34,6 +41,41 @@ class Render {
 
 		if ( 'local' === wp_get_environment_type() ) {
 			$this->cache_expiration = 0;
+		}
+	}
+
+	/**
+	 * Generate a unique cache key for the table.
+	 *
+	 * @param string $table_type The type of table.
+	 * @param array  $args Arguments used to generate the table.
+	 * @return string The cache key.
+	 */
+	private function get_cache_key( string $table_type, array $args ): string {
+		ksort( $args );
+		$params = http_build_query( $args, '', '&' );
+
+		return $this->cache_key_prefix . $table_type . '_' . md5( $params );
+	}
+
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $this->cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
 		}
 	}
 
@@ -47,6 +89,12 @@ class Render {
 	public function generate_data_table( string $table_type, array $args ): string {
 		$args = $this->convert_camel_to_snake_keys( $args );
 
+		$cache_key = $this->get_cache_key( $table_type, $args );
+
+		$cached_table = get_transient( $cache_key );
+		if ( false !== $cached_table ) {
+			return $cached_table;
+		}
 
 		$donation_year = $args['donation_year'] ?? '';
 		$donor_type    = $args['donor_type'] ?? '';
@@ -62,27 +110,30 @@ class Render {
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
-				return $this->generate_think_tank_archive_table( $donation_year, $search );
+				$table_html = $this->generate_think_tank_archive_table( $donation_year, $search );
+				break;
 			case 'single-think-tank':
 				if ( empty( $args['think_tank'] ) ) {
 					return __( 'Think tank is required for single-think-tank.', 'data-tables' );
 				}
-				return $this->generate_single_think_tank_table(
+				$table_html = $this->generate_single_think_tank_table(
 					$args['think_tank'],
 					$donation_year,
 					$donor_type
 				);
+				break;
 			case 'donor-archive':
-				return $this->generate_donor_archive_table(
+				$table_html = $this->generate_donor_archive_table(
 					$donation_year,
 					$donor_type,
 					$search
 				);
+				break;
 			case 'single-donor':
 				if ( empty( $args['donor'] ) ) {
 					return __( 'Donor is required for single-donor.', 'data-tables' );
 				}
-				return $this->generate_single_donor_table(
+				$table_html = $this->generate_single_donor_table(
 					$args['donor'],
 					$donation_year,
 					$donor_type
@@ -105,7 +156,21 @@ class Render {
 	 * @return string HTML table markup.
 	 */
 	public function generate_top_ten_table( string $donor_type = '', string $donation_year = '', int $number_of_items = 10 ): string {
-		// Fetch the top ten data using Data
+		$table_type = 'top-ten';
+
+		$args = array(
+			'donor_type'    => isset( $donor_type ) ? sanitize_text_field( $donor_type ) : null,
+			'donation_year' => isset( $donation_year ) ? sanitize_text_field( $donation_year ) : null,
+			'limit'         => isset( $number_of_items ) ? absint( $number_of_items ) : null,
+		);
+
+		$cache_key = $this->get_cache_key( $table_type, $args );
+
+		$cached_table = get_transient( $cache_key );
+		if ( false !== $cached_table ) {
+			return $cached_table;
+		}
+
 		$data = $this->data->get_top_ten_data( $donor_type, $donation_year, $number_of_items );
 
 		ob_start();
@@ -139,7 +204,11 @@ class Render {
 			<?php
 		endif;
 
-		return ob_get_clean();
+		$table_html = ob_get_clean();
+
+		set_transient( $cache_key, $table_html, $this->cache_expiration );
+
+		return $table_html;
 	}
 
 	/**
@@ -462,20 +531,6 @@ class Render {
 	 */
 	public function render_top_ten_table( $donor_type = '', $donation_year = '', $number_of_items = 10 ): void {
 		echo $this->generate_top_ten_table( $donor_type, $donation_year, $number_of_items );
-	}
-
-	/**
-	 * Generate a unique cache key for the table.
-	 *
-	 * @param string $table_type The type of table.
-	 * @param array  $args Arguments used to generate the table.
-	 * @return string The cache key.
-	 */
-	private function get_cache_key( string $table_type, array $args ): string {
-		ksort( $args );
-		$params = http_build_query( $args, '', '&' );
-
-		return 'data_table_' . $table_type . '_' . md5( $params );
 	}
 
 	/**
