@@ -644,7 +644,7 @@ class Data {
 				continue;
 			}
 
-			if ( $term->parent === 0 ) {
+			if ( 0 === $term->parent ) {
 				// Keep parent terms directly.
 				$parent_terms[ $term->term_id ] = $term;
 			} else {
@@ -805,9 +805,9 @@ class Data {
 		// Normalize disclosed values.
 		foreach ( $data as &$think_tank_data ) {
 			foreach ( $think_tank_data['disclosed'] as $donor_type => $disclosed_values ) {
-				$disclosed_values                            = array_unique( $disclosed_values );
+				$disclosed_values = array_unique( $disclosed_values );
 				$think_tank_data['disclosed'][ $donor_type ] =
-					( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
+					( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 			}
 
 			// Ensure donor types remain in the correct order.
@@ -875,7 +875,7 @@ class Data {
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
 			$disclosed_values        = array_unique( $donor_data['disclosed'] );
-			$donor_data['disclosed'] = ( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
+			$donor_data['disclosed'] = ( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
@@ -923,8 +923,7 @@ class Data {
 
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
-			// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
-			$donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+			$donor_data['disclosed'] = ( 1 === count( array_unique( $donor_data['disclosed'] ) ) && 'no' === $donor_data['disclosed'][0] ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
