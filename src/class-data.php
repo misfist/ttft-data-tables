@@ -52,6 +52,21 @@ class Data {
 		if ( 'local' === wp_get_environment_type() ) {
 			$this->cache_expiration = 0;
 		}
+
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
+	}
+
+	/**
+	 * Delete the transaction cache after an import.
+	 *
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		$this->clear_cache();
 	}
 
 	/**
@@ -76,6 +91,27 @@ class Data {
 		$params = http_build_query( $args, '', '&' );
 
 		return $this->cache_key_prefix . md5( $params );
+	}
+
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $this->cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
+		}
 	}
 
 	/**

@@ -42,6 +42,21 @@ class Render {
 		if ( 'local' === wp_get_environment_type() ) {
 			$this->cache_expiration = 0;
 		}
+
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
+	}
+
+	/**
+	 * Delete the transaction cache after an import.
+	 *
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		$this->clear_cache();
 	}
 
 	/**
