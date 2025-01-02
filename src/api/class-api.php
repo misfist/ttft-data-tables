@@ -9,11 +9,11 @@ namespace Ttft\Data_Tables\API;
 
 use Ttft\Data_Tables\Data;
 
-use function \Ttft\Data_Tables\get_think_tank_archive_data;
-use function \Ttft\Data_Tables\get_single_think_tank_data;
-use function \Ttft\Data_Tables\get_donor_archive_data;
-use function \Ttft\Data_Tables\get_single_donor_data;
-use function \Ttft\Data_Tables\generate_star_rating;
+use function Ttft\Data_Tables\get_think_tank_archive_data;
+use function Ttft\Data_Tables\get_single_think_tank_data;
+use function Ttft\Data_Tables\get_donor_archive_data;
+use function Ttft\Data_Tables\get_single_donor_data;
+use function Ttft\Data_Tables\generate_star_rating;
 
 /**
  * Class API
@@ -48,9 +48,8 @@ class API {
 				'donor-archive',
 				'single-think-tank',
 				'single-donor',
-				'full-data',
 			),
-			'cache_key'   => 'transaction_dataset',
+			'cache_key'   => 'transaction_dataset_',
 		);
 
 		$this->data = new Data();
@@ -79,7 +78,7 @@ class API {
 						'required'          => true,
 						'type'              => 'string',
 						'enum'              => $this->settings['table_types'],
-						'validate_callback' => function( $param ) {
+						'validate_callback' => function ( $param ) {
 							return in_array( $param, $this->settings['table_types'], true );
 						},
 					),
@@ -175,7 +174,6 @@ class API {
 				),
 			)
 		);
-
 	}
 
 	/**
@@ -183,12 +181,49 @@ class API {
 	 *
 	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
 	 *
-	 * @param  int $import_id
-	 * @param  obj $import_settings
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
 	 * @return void
 	 */
 	public function after_import( $import_id, $import_settings ): void {
-		delete_option( $this->settings['cache_key'] );
+		clear_cache();
+	}
+
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$cache_key_prefix = $this->settings['cache_key'];
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
+		}
+	}
+
+	/**
+	 * Build cache key for the query.
+	 *
+	 * @param  array $args Arguments from which to derive cache key.
+	 * @return string
+	 */
+	public function get_cache_key( array $args = array() ): string {
+		ksort( $args );
+
+		$params = http_build_query( $args, '', '&' );
+
+		return $this->settings['cache_key'] . md5( $params );
 	}
 
 	/**
@@ -205,7 +240,9 @@ class API {
 			return;
 		}
 
-		delete_option( $this->settings['cache_key'] );
+		$cache_key = $this->data->get_cache_key();
+
+		delete_option( $cache_key );
 	}
 
 	/**
@@ -215,96 +252,36 @@ class API {
 	 * @return array The transaction data.
 	 */
 	public function get_transaction_dataset( \WP_REST_Request $request ): array {
-		$think_tank    = sanitize_text_field( $request->get_param( 'think_tank' ) );
-		$donor         = sanitize_text_field( $request->get_param( 'donor' ) );
-		$donation_year = sanitize_text_field( $request->get_param( 'year' ) );
-		$donor_type    = sanitize_text_field( $request->get_param( 'donor_type' ) );
+		$think_tank    = $this->get_term_from_param( $request->get_param( 'think_tank' ), 'think_tank' );
+		$donor         = $this->get_term_from_param( $request->get_param( 'donor' ), 'donor' );
+		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
+		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
 
-		$cache_key = $this->settings['cache_key'] . '_' . md5( serialize( $request->get_params() ) );
+		$args = array(
+			'think_tank'    => $think_tank,
+			'donor'         => $donor,
+			'donation_year' => $donation_year,
+			'donor_type'    => $donor_type,
+		);
 
-		// Check if the data is cached in options.
-		$cached_data = get_option( $cache_key, false );
+		$this->data->set_args( $args );
 
-		if ( $cached_data !== false ) {
+		$cache_key = $this->get_cache_key( $args );
+
+		$cached_data = get_option( $cache_key );
+		if ( false !== $cached_data ) {
 			return $cached_data;
+		}
+
+		$query = $this->data->generate_query();
+
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
 
 		$data = array();
 
-		$post_type = 'transaction';
-		$args      = array(
-			'post_type'      => $post_type,
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'tax_query'      => array(),
-		);
-
-		if ( $think_tank ) {
-			$think_tanks = get_terms(
-				array(
-					'taxonomy'   => 'think_tank',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $think_tank,
-				)
-			);
-			if ( ! empty( $think_tanks ) && ! is_wp_error( $think_tanks ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'think_tank',
-					'field'    => 'term_id',
-					'terms'    => $think_tanks,
-				);
-			} else {
-				return $data;
-			}
-		}
-		if ( $donor ) {
-			$donors = get_terms(
-				array(
-					'taxonomy'   => 'donor',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $donor,
-				)
-			);
-			if ( ! empty( $donors ) && ! is_wp_error( $donors ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'donor',
-					'field'    => 'term_id',
-					'terms'    => $donors,
-				);
-			} else {
-				return $data;
-			}
-		}
-		if ( $donation_year ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-		if ( $donor_type ) {
-			$donor_types = get_terms(
-				array(
-					'taxonomy'   => 'donor_type',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $donor_type,
-				)
-			);
-			if ( ! empty( $donor_types ) && ! is_wp_error( $donor_types ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'donor_type',
-					'field'    => 'term_id',
-					'terms'    => $donor_types,
-				);
-			} else {
-				return $data;
-			}
-		}
-
-		$transactions = get_posts( $args );
+		$transactions = $query->posts;
 
 		if ( ! empty( $transactions ) && ! is_wp_error( $transactions ) ) {
 			foreach ( $transactions as $transaction_id ) {
@@ -350,10 +327,13 @@ class API {
 			exit;
 		}
 
-		$data = array_map( function( $row ) {
-			unset( $row['ID'] );
-			return $row;
-		}, $data );
+		$data = array_map(
+			function ( $row ) {
+				unset( $row['ID'] );
+				return $row;
+			},
+			$data
+		);
 
 		$filename = $this->generate_filename( $request );
 
@@ -376,7 +356,7 @@ class API {
 	/**
 	 * Get the data for each transaction.
 	 *
-	 * @param  integer $transaction_id
+	 * @param  integer $transaction_id The post ID for transaction.
 	 * @return array
 	 */
 	public function process_transaction( int $transaction_id ): array {
@@ -426,12 +406,15 @@ class API {
 	 * @return \WP_REST_Response The response containing JSON data.
 	 */
 	public function get_data( \WP_REST_Request $request ): \WP_REST_Response {
-		$table_type    = $request->get_param( 'table_type' );
+		$table_type    = sanitize_text_field( $request->get_param( 'table_type' ) );
 		$think_tank    = $this->get_term_from_param( $request->get_param( 'think_tank' ), 'think_tank' );
 		$donor         = $this->get_term_from_param( $request->get_param( 'donor' ), 'donor' );
 		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
 		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
-		$search        = $request->get_param( 'search' );
+		$search        = sanitize_text_field( $request->get_param( 'search' ) );
+		$draw          = intval( $request->get_param( 'draw' ) ); // Retrieve the draw parameter from the request.
+		$start         = intval( $request->get_param( 'start' ) ) ?? 0;
+		$length        = intval( $request->get_param( 'length' ) ) ?? 10;
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
@@ -443,10 +426,16 @@ class API {
 				break;
 
 			case 'single-think-tank':
+				if ( ! $think_tank ) {
+					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Think tank is required', 'data-tables' ) ), 400 );
+				}
 				$data = $this->get_single_think_tank_json( $think_tank, $donation_year, $donor_type );
 				break;
 
 			case 'single-donor':
+				if ( ! $donor ) {
+					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Donor is required', 'data-tables' ) ), 400 );
+				}
 				$data = $this->get_single_donor_json( $donor, $donation_year, $donor_type );
 				break;
 
@@ -748,6 +737,8 @@ class API {
 	 * Generate a filename with a hash based on request parameters.
 	 *
 	 * @param \WP_REST_Request $request The REST API request object.
+	 * @param string           $filename The filename to use for export.
+	 * @param string           $extension The extension used for file.
 	 * @return string The generated filename.
 	 */
 	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
@@ -770,5 +761,4 @@ class API {
 
 		return sprintf( '%s-%s.%s', $filename, $hash, $extension );
 	}
-
 }
