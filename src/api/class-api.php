@@ -362,12 +362,12 @@ class API {
 	 * @return \WP_REST_Response The response containing JSON data.
 	 */
 	public function get_data( \WP_REST_Request $request ): \WP_REST_Response {
-		$table_type    = $request->get_param( 'table_type' );
+		$table_type    = sanitize_text_field( $request->get_param( 'table_type' ) );
 		$think_tank    = $this->get_term_from_param( $request->get_param( 'think_tank' ), 'think_tank' );
 		$donor         = $this->get_term_from_param( $request->get_param( 'donor' ), 'donor' );
 		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
 		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
-		$search        = $request->get_param( 'search' );
+		$search        = sanitize_text_field( $request->get_param( 'search' ) );
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
