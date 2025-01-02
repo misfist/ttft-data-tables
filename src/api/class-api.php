@@ -50,7 +50,7 @@ class API {
 				'single-donor',
 				'full-data',
 			),
-			'cache_key'   => 'transaction_dataset',
+			'cache_key'   => 'transaction_dataset_',
 		);
 
 		$this->data = new Data();
@@ -188,8 +188,44 @@ class API {
 	 * @return void
 	 */
 	public function after_import( $import_id, $import_settings ): void {
-		$cache_key = $this->data->get_cache_key();
-		delete_option( $cache_key );
+		clear_cache();
+	}
+
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$cache_key_prefix = $this->settings['cache_key'];
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
+		}
+	}
+
+	/**
+	 * Build cache key for the query.
+	 *
+	 * @param  array $args Arguments from which to derive cache key.
+	 * @return string
+	 */
+	public function get_cache_key( array $args = array() ): string {
+		ksort( $args );
+
+		$params = http_build_query( $args, '', '&' );
+
+		return $this->settings['cache_key'] . md5( $params );
 	}
 
 	/**
@@ -223,14 +259,21 @@ class API {
 		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
 		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
 
-		$this->data->set_args(
-			array(
-				'think_tank'    => $think_tank,
-				'donor'         => $donor,
-				'donation_year' => $donation_year,
-				'donor_type'    => $donor_type,
-			)
+		$args = array(
+			'think_tank'    => $think_tank,
+			'donor'         => $donor,
+			'donation_year' => $donation_year,
+			'donor_type'    => $donor_type,
 		);
+
+		$this->data->set_args( $args );
+
+		$cache_key = $this->get_cache_key( $args );
+
+		$cached_data = get_option( $cache_key );
+		if ( false !== $cached_data ) {
+			return $cached_data;
+		}
 
 		$query = $this->data->generate_query();
 
