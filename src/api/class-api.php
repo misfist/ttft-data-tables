@@ -9,11 +9,11 @@ namespace Ttft\Data_Tables\API;
 
 use Ttft\Data_Tables\Data;
 
-use function \Ttft\Data_Tables\get_think_tank_archive_data;
-use function \Ttft\Data_Tables\get_single_think_tank_data;
-use function \Ttft\Data_Tables\get_donor_archive_data;
-use function \Ttft\Data_Tables\get_single_donor_data;
-use function \Ttft\Data_Tables\generate_star_rating;
+use function Ttft\Data_Tables\get_think_tank_archive_data;
+use function Ttft\Data_Tables\get_single_think_tank_data;
+use function Ttft\Data_Tables\get_donor_archive_data;
+use function Ttft\Data_Tables\get_single_donor_data;
+use function Ttft\Data_Tables\generate_star_rating;
 
 /**
  * Class API
@@ -48,7 +48,6 @@ class API {
 				'donor-archive',
 				'single-think-tank',
 				'single-donor',
-				'full-data',
 			),
 			'cache_key'   => 'transaction_dataset_',
 		);
@@ -79,7 +78,7 @@ class API {
 						'required'          => true,
 						'type'              => 'string',
 						'enum'              => $this->settings['table_types'],
-						'validate_callback' => function( $param ) {
+						'validate_callback' => function ( $param ) {
 							return in_array( $param, $this->settings['table_types'], true );
 						},
 					),
@@ -175,7 +174,6 @@ class API {
 				),
 			)
 		);
-
 	}
 
 	/**
@@ -183,8 +181,8 @@ class API {
 	 *
 	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
 	 *
-	 * @param  int $import_id
-	 * @param  obj $import_settings
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
 	 * @return void
 	 */
 	public function after_import( $import_id, $import_settings ): void {
@@ -329,10 +327,13 @@ class API {
 			exit;
 		}
 
-		$data = array_map( function( $row ) {
-			unset( $row['ID'] );
-			return $row;
-		}, $data );
+		$data = array_map(
+			function ( $row ) {
+				unset( $row['ID'] );
+				return $row;
+			},
+			$data
+		);
 
 		$filename = $this->generate_filename( $request );
 
@@ -355,7 +356,7 @@ class API {
 	/**
 	 * Get the data for each transaction.
 	 *
-	 * @param  integer $transaction_id
+	 * @param  integer $transaction_id The post ID for transaction.
 	 * @return array
 	 */
 	public function process_transaction( int $transaction_id ): array {
@@ -411,6 +412,9 @@ class API {
 		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
 		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
 		$search        = sanitize_text_field( $request->get_param( 'search' ) );
+		$draw          = intval( $request->get_param( 'draw' ) ); // Retrieve the draw parameter from the request.
+		$start         = intval( $request->get_param( 'start' ) ) ?? 0;
+		$length        = intval( $request->get_param( 'length' ) ) ?? 10;
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
@@ -422,14 +426,14 @@ class API {
 				break;
 
 			case 'single-think-tank':
-				if( ! $think_tank ) {
+				if ( ! $think_tank ) {
 					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Think tank is required', 'data-tables' ) ), 400 );
 				}
 				$data = $this->get_single_think_tank_json( $think_tank, $donation_year, $donor_type );
 				break;
 
 			case 'single-donor':
-				if( ! $donor ) {
+				if ( ! $donor ) {
 					return new \WP_REST_Response( array( 'error' => esc_attr__( 'Donor is required', 'data-tables' ) ), 400 );
 				}
 				$data = $this->get_single_donor_json( $donor, $donation_year, $donor_type );
@@ -733,6 +737,8 @@ class API {
 	 * Generate a filename with a hash based on request parameters.
 	 *
 	 * @param \WP_REST_Request $request The REST API request object.
+	 * @param string           $filename The filename to use for export.
+	 * @param string           $extension The extension used for file.
 	 * @return string The generated filename.
 	 */
 	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
@@ -755,5 +761,4 @@ class API {
 
 		return sprintf( '%s-%s.%s', $filename, $hash, $extension );
 	}
-
 }
