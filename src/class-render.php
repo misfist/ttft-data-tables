@@ -525,9 +525,9 @@ class Render {
 	/**
 	 * Render table for top ten
 	 *
-	 * @param  string  $donor_type
-	 * @param  string  $donation_year
-	 * @param  integer $number_of_items
+	 * @param  string  $donor_type Slug of donor_type taxonomy term.
+	 * @param  string  $donation_year Slug of donation_year taxonomy term.
+	 * @param  integer $number_of_items Number of items to render.
 	 * @return void
 	 */
 	public function render_top_ten_table( $donor_type = '', $donation_year = '', $number_of_items = 10 ): void {
