@@ -981,7 +981,9 @@ class Data {
 	 * @return array Array of post IDs.
 	 */
 	public static function get_think_tank_post_ids( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
-		$this->set_args(
+		$instance = new self();
+
+		$instance->set_args(
 			array(
 				'think_tank'    => $think_tank,
 				'donation_year' => $donation_year,
@@ -989,7 +991,7 @@ class Data {
 			)
 		);
 
-		$query = $this->generate_query();
+		$query = $instance->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
@@ -998,10 +1000,13 @@ class Data {
 	 * Fetch transactions by taxonomy terms and return post IDs.
 	 *
 	 * @param string $donor The slug of the donor taxonomy term.
+	 * @param string $donation_year The slug of the donoation_year taxonomy term.
 	 * @return array Array of post IDs.
 	 */
 	public static function get_donor_post_ids( string $donor = '', string $donation_year = '' ): array {
-		$this->set_args(
+		$instance = new self();
+
+		$instance->set_args(
 			array(
 				'donor'         => $donor,
 				'donation_year' => $donation_year,
@@ -1009,7 +1014,7 @@ class Data {
 			)
 		);
 
-		$query = $this->generate_query();
+		$query = $instance->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
