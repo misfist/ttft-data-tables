@@ -47,6 +47,7 @@ class Render {
 	public function generate_data_table( string $table_type, array $args ): string {
 		$args = $this->convert_camel_to_snake_keys( $args );
 
+
 		$donation_year = $args['donation_year'] ?? '';
 		$donor_type    = $args['donor_type'] ?? '';
 		$search        = $args['search'] ?? '';
@@ -156,7 +157,7 @@ class Render {
 		wp_interactivity_state(
 			TTFT_APP_NAMESPACE,
 			array(
-				'foundRecords_' . $table_type => $count
+				'foundRecords_' . $table_type => $count,
 			)
 		);
 		?>
@@ -417,18 +418,18 @@ class Render {
 					</tr>
 				</thead>
 				<tbody
-                    data-found="<?php echo intval( $count ); ?>"
-                >
+					data-found="<?php echo intval( $count ); ?>"
+				>
 					<?php
 					foreach ( $data as $row ) :
 						$amount = $row['amount_calc'];
-                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
-                        /**
-                         * Check:
-                         * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
-                         */
+						$attrs  = get_label_and_class_disclosed( $row, $this->data->settings );
+						/**
+						 * Check:
+						 * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
+						 */
 						?>
-                        <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
+						<tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
 							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo get_term_link( $row['think_tank_slug'], 'think_tank' ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
 							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo esc_attr( $attrs['sort'] ); ?>">
