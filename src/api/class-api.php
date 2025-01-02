@@ -188,7 +188,8 @@ class API {
 	 * @return void
 	 */
 	public function after_import( $import_id, $import_settings ): void {
-		delete_option( $this->settings['cache_key'] );
+		$cache_key = $this->data->get_cache_key();
+		delete_option( $cache_key );
 	}
 
 	/**
@@ -205,7 +206,9 @@ class API {
 			return;
 		}
 
-		delete_option( $this->settings['cache_key'] );
+		$cache_key = $this->data->get_cache_key();
+
+		delete_option( $cache_key );
 	}
 
 	/**
@@ -215,96 +218,29 @@ class API {
 	 * @return array The transaction data.
 	 */
 	public function get_transaction_dataset( \WP_REST_Request $request ): array {
-		$think_tank    = sanitize_text_field( $request->get_param( 'think_tank' ) );
-		$donor         = sanitize_text_field( $request->get_param( 'donor' ) );
-		$donation_year = sanitize_text_field( $request->get_param( 'year' ) );
-		$donor_type    = sanitize_text_field( $request->get_param( 'donor_type' ) );
+		$think_tank    = $this->get_term_from_param( $request->get_param( 'think_tank' ), 'think_tank' );
+		$donor         = $this->get_term_from_param( $request->get_param( 'donor' ), 'donor' );
+		$donation_year = $this->get_term_from_param( $request->get_param( 'donation_year' ), 'donation_year' );
+		$donor_type    = $this->get_term_from_param( $request->get_param( 'donor_type' ), 'donor_type' );
 
-		$cache_key = $this->settings['cache_key'] . '_' . md5( serialize( $request->get_params() ) );
+		$this->data->set_args(
+			array(
+				'think_tank'    => $think_tank,
+				'donor'         => $donor,
+				'donation_year' => $donation_year,
+				'donor_type'    => $donor_type,
+			)
+		);
 
-		// Check if the data is cached in options.
-		$cached_data = get_option( $cache_key, false );
+		$query = $this->data->generate_query();
 
-		if ( $cached_data !== false ) {
-			return $cached_data;
+		if ( empty( $query->posts ) ) {
+			return array();
 		}
 
 		$data = array();
 
-		$post_type = 'transaction';
-		$args      = array(
-			'post_type'      => $post_type,
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'tax_query'      => array(),
-		);
-
-		if ( $think_tank ) {
-			$think_tanks = get_terms(
-				array(
-					'taxonomy'   => 'think_tank',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $think_tank,
-				)
-			);
-			if ( ! empty( $think_tanks ) && ! is_wp_error( $think_tanks ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'think_tank',
-					'field'    => 'term_id',
-					'terms'    => $think_tanks,
-				);
-			} else {
-				return $data;
-			}
-		}
-		if ( $donor ) {
-			$donors = get_terms(
-				array(
-					'taxonomy'   => 'donor',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $donor,
-				)
-			);
-			if ( ! empty( $donors ) && ! is_wp_error( $donors ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'donor',
-					'field'    => 'term_id',
-					'terms'    => $donors,
-				);
-			} else {
-				return $data;
-			}
-		}
-		if ( $donation_year ) {
-			$args['tax_query'][] = array(
-				'taxonomy' => 'donation_year',
-				'field'    => 'slug',
-				'terms'    => $donation_year,
-			);
-		}
-		if ( $donor_type ) {
-			$donor_types = get_terms(
-				array(
-					'taxonomy'   => 'donor_type',
-					'hide_empty' => false,
-					'fields'     => 'ids',
-					'search'     => $donor_type,
-				)
-			);
-			if ( ! empty( $donor_types ) && ! is_wp_error( $donor_types ) ) {
-				$args['tax_query'][] = array(
-					'taxonomy' => 'donor_type',
-					'field'    => 'term_id',
-					'terms'    => $donor_types,
-				);
-			} else {
-				return $data;
-			}
-		}
-
-		$transactions = get_posts( $args );
+		$transactions = $query->posts;
 
 		if ( ! empty( $transactions ) && ! is_wp_error( $transactions ) ) {
 			foreach ( $transactions as $transaction_id ) {
