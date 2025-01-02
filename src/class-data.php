@@ -31,6 +31,13 @@ class Data {
 	public $cache_expiration = 12 * HOUR_IN_SECONDS;
 
 	/**
+	 * Cache key prefix.
+	 *
+	 * @var string
+	 */
+	protected $cache_key_prefix = 'data_table_query_';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -62,9 +69,7 @@ class Data {
 
 		$params = http_build_query( $args, '', '&' );
 
-		$transient_key = 'query_' . md5( $params );
-
-		return $transient_key;
+		return $this->cache_key_prefix . md5( $params );
 	}
 
 	/**
