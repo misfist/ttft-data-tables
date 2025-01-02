@@ -1,12 +1,18 @@
 <?php
 /**
  * Get data for data tables.
+ *
+ * @package ttft
  */
+
 namespace Ttft\Data_Tables;
 
 use function Ttft\Data_Tables\get_post_from_term;
 use function Ttft\Data_Tables\get_transparency_score_from_slug;
 
+/**
+ * Data class.
+ */
 class Data {
 
 	/**
@@ -61,7 +67,7 @@ class Data {
 	/**
 	 * Build cache key for the query.
 	 *
-	 * @param  array $args
+	 * @param  array $args Arguments from which to derive cache key.
 	 * @return string
 	 */
 	public function get_cache_key( array $args = array() ): string {
@@ -297,10 +303,11 @@ class Data {
 	}
 
 	/**
-	 * Retrieve think tank data for individual donor
+	 * Retrieve think tank data for individual donor.
 	 *
-	 * @param string $donor Optional. Slug of the donor taxonomy term to filter by.
-	 * @param string $donation_year Optional. Slug of the donation_year taxonomy term to filter by.
+	 * @param string $donor Optional. Slug of the donor taxonomy term.
+	 * @param string $donation_year Optional. Slug of the donation_year taxonomy term.
+	 * @param string $donor_type Optional. Slug of the donor_type taxonomy term.
 	 * @return array Array of transaction data.
 	 */
 	public function get_single_donor_raw_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
@@ -449,8 +456,6 @@ class Data {
 	 * Retrieve donor data for search query.
 	 * This function is used to show all donors that match the search term.
 	 *
-	 * @param string $donation_year The donation year to filter by.
-	 * @param string $donor_type    The donor type to filter by.
 	 * @param string $search        The search term.
 	 * @return array An array of donor data.
 	 */
@@ -550,8 +555,6 @@ class Data {
 	 * Search for donor posts and retrieve parent donor data.
 	 * This function is used to show top-level donors in the search results.
 	 *
-	 * @param string $donation_year The donation year to filter by (not used here).
-	 * @param string $donor_type    The donor type to filter by (not used here).
 	 * @param string $search        The search term.
 	 * @return array An array of parent donor data.
 	 */
@@ -854,13 +857,13 @@ class Data {
 				} else {
 					$carry[ $slug ]['amount_calc'] += $amount_calc;
 
-					// Aggregate disclosed values
+					// Aggregate disclosed values.
 					$carry[ $slug ]['disclosed'] = array_merge(
 						$carry[ $slug ]['disclosed'],
 						$item['disclosed']
 					);
 
-					// Handle year aggregation
+					// Handle year aggregation.
 					$years = explode( ', ', $carry[ $slug ]['year'] );
 					if ( ! in_array( $year, $years ) ) {
 						$years[]                = $year;
@@ -977,6 +980,7 @@ class Data {
 	 * Fetch transactions by taxonomy terms and return post IDs.
 	 *
 	 * @param string $think_tank The slug of the think_tank taxonomy term.
+	 * @param string $donation_year The slug of the donation_year taxonomy term.
 	 * @param string $donor_type The slug of the donor_type taxonomy term.
 	 * @return array Array of post IDs.
 	 */
@@ -1098,8 +1102,8 @@ class Data {
 	/**
 	 * Get term IDs that match a search term.
 	 *
-	 * @param  string $search
-	 * @param  string $taxonomy
+	 * @param  string $search The search term.
+	 * @param  string $taxonomy The slug of taxonomy.
 	 * @return array
 	 */
 	public function get_search_term_ids( string $search, string $taxonomy ): array {
@@ -1277,6 +1281,4 @@ class Data {
 
 		return $clauses;
 	}
-
-
 }
