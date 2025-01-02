@@ -442,7 +442,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		return apply_filters( 'donor_archive_raw_data', $data, $donation_year, $donor_type );
+		return apply_filters( 'Ttft\Data_Tables\donor_archive_raw_data', $data, $donation_year, $donor_type );
 	}
 
 	/**
@@ -460,8 +460,8 @@ class Data {
 
 		$this->set_args(
 			array(
-				'search' => $search,
-				'terms'  => $terms,
+				'search'   => $search,
+				'terms'    => $terms,
 				'taxonomy' => $taxonomy,
 			)
 		);
@@ -543,7 +543,7 @@ class Data {
 			}
 		}
 
-		return apply_filters( 'donor_search_raw_data', $data, $donation_year, $donor_type );
+		return apply_filters( 'Ttft\Data_Tables\donor_search_raw_data', $data, $donation_year, $donor_type );
 	}
 
 	/**
@@ -619,7 +619,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		return apply_filters( 'parent_donor_search_raw_data', array_values( $data ), $search );
+		return apply_filters( 'Ttft\Data_Tables\parent_donor_search_raw_data', array_values( $data ), $search );
 	}
 
 	/**
@@ -687,7 +687,7 @@ class Data {
 
 		usort(
 			$data,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $b['total_amount'] - $a['total_amount'];
 			}
 		);
@@ -836,7 +836,7 @@ class Data {
 
 		$data = array_reduce(
 			$raw_data,
-			function( $carry, $item ) {
+			function ( $carry, $item ) {
 				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
@@ -896,7 +896,7 @@ class Data {
 
 		$data = array_reduce(
 			$raw_data,
-			function( $carry, $item ) {
+			function ( $carry, $item ) {
 				$slug = $item['donor_slug'];
 
 				if ( ! isset( $carry[ $slug ] ) ) {
