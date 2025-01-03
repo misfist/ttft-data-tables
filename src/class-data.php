@@ -1,12 +1,18 @@
 <?php
 /**
  * Get data for data tables.
+ *
+ * @package ttft
  */
+
 namespace Ttft\Data_Tables;
 
 use function Ttft\Data_Tables\get_post_from_term;
 use function Ttft\Data_Tables\get_transparency_score_from_slug;
 
+/**
+ * Data class.
+ */
 class Data {
 
 	/**
@@ -31,6 +37,13 @@ class Data {
 	public $cache_expiration = 12 * HOUR_IN_SECONDS;
 
 	/**
+	 * Cache key prefix.
+	 *
+	 * @var string
+	 */
+	protected $cache_key_prefix = 'data_table_query_';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -39,6 +52,21 @@ class Data {
 		if ( 'local' === wp_get_environment_type() ) {
 			$this->cache_expiration = 0;
 		}
+
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
+	}
+
+	/**
+	 * Delete the transaction cache after an import.
+	 *
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		$this->clear_cache();
 	}
 
 	/**
@@ -54,7 +82,7 @@ class Data {
 	/**
 	 * Build cache key for the query.
 	 *
-	 * @param  array $args
+	 * @param  array $args Arguments from which to derive cache key.
 	 * @return string
 	 */
 	public function get_cache_key( array $args = array() ): string {
@@ -62,9 +90,28 @@ class Data {
 
 		$params = http_build_query( $args, '', '&' );
 
-		$transient_key = 'query_' . md5( $params );
+		return $this->cache_key_prefix . md5( $params );
+	}
 
-		return $transient_key;
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $this->cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
+		}
 	}
 
 	/**
@@ -292,10 +339,11 @@ class Data {
 	}
 
 	/**
-	 * Retrieve think tank data for individual donor
+	 * Retrieve think tank data for individual donor.
 	 *
-	 * @param string $donor Optional. Slug of the donor taxonomy term to filter by.
-	 * @param string $donation_year Optional. Slug of the donation_year taxonomy term to filter by.
+	 * @param string $donor Optional. Slug of the donor taxonomy term.
+	 * @param string $donation_year Optional. Slug of the donation_year taxonomy term.
+	 * @param string $donor_type Optional. Slug of the donor_type taxonomy term.
 	 * @return array Array of transaction data.
 	 */
 	public function get_single_donor_raw_data( $donor = '', $donation_year = '', $donor_type = '' ): array {
@@ -437,15 +485,13 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		return apply_filters( 'donor_archive_raw_data', $data, $donation_year, $donor_type );
+		return apply_filters( 'Ttft\Data_Tables\donor_archive_raw_data', $data, $donation_year, $donor_type );
 	}
 
 	/**
 	 * Retrieve donor data for search query.
 	 * This function is used to show all donors that match the search term.
 	 *
-	 * @param string $donation_year The donation year to filter by.
-	 * @param string $donor_type    The donor type to filter by.
 	 * @param string $search        The search term.
 	 * @return array An array of donor data.
 	 */
@@ -455,8 +501,8 @@ class Data {
 
 		$this->set_args(
 			array(
-				'search' => $search,
-				'terms'  => $terms,
+				'search'   => $search,
+				'terms'    => $terms,
 				'taxonomy' => $taxonomy,
 			)
 		);
@@ -538,15 +584,13 @@ class Data {
 			}
 		}
 
-		return apply_filters( 'donor_search_raw_data', $data, $donation_year, $donor_type );
+		return apply_filters( 'Ttft\Data_Tables\donor_search_raw_data', $data, $donation_year, $donor_type );
 	}
 
 	/**
 	 * Search for donor posts and retrieve parent donor data.
 	 * This function is used to show top-level donors in the search results.
 	 *
-	 * @param string $donation_year The donation year to filter by (not used here).
-	 * @param string $donor_type    The donor type to filter by (not used here).
 	 * @param string $search        The search term.
 	 * @return array An array of parent donor data.
 	 */
@@ -614,7 +658,7 @@ class Data {
 			wp_reset_postdata();
 		}
 
-		return apply_filters( 'parent_donor_search_raw_data', array_values( $data ), $search );
+		return apply_filters( 'Ttft\Data_Tables\parent_donor_search_raw_data', array_values( $data ), $search );
 	}
 
 	/**
@@ -639,7 +683,7 @@ class Data {
 				continue;
 			}
 
-			if ( $term->parent === 0 ) {
+			if ( 0 === $term->parent ) {
 				// Keep parent terms directly.
 				$parent_terms[ $term->term_id ] = $term;
 			} else {
@@ -682,7 +726,7 @@ class Data {
 
 		usort(
 			$data,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $b['total_amount'] - $a['total_amount'];
 			}
 		);
@@ -800,9 +844,9 @@ class Data {
 		// Normalize disclosed values.
 		foreach ( $data as &$think_tank_data ) {
 			foreach ( $think_tank_data['disclosed'] as $donor_type => $disclosed_values ) {
-				$disclosed_values                            = array_unique( $disclosed_values );
+				$disclosed_values = array_unique( $disclosed_values );
 				$think_tank_data['disclosed'][ $donor_type ] =
-					( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
+					( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 			}
 
 			// Ensure donor types remain in the correct order.
@@ -831,7 +875,7 @@ class Data {
 
 		$data = array_reduce(
 			$raw_data,
-			function( $carry, $item ) {
+			function ( $carry, $item ) {
 				$slug        = $item['donor_slug'];
 				$amount_calc = $item['amount_calc'];
 				$year        = $item['year'];
@@ -849,13 +893,13 @@ class Data {
 				} else {
 					$carry[ $slug ]['amount_calc'] += $amount_calc;
 
-					// Aggregate disclosed values
+					// Aggregate disclosed values.
 					$carry[ $slug ]['disclosed'] = array_merge(
 						$carry[ $slug ]['disclosed'],
 						$item['disclosed']
 					);
 
-					// Handle year aggregation
+					// Handle year aggregation.
 					$years = explode( ', ', $carry[ $slug ]['year'] );
 					if ( ! in_array( $year, $years ) ) {
 						$years[]                = $year;
@@ -870,7 +914,7 @@ class Data {
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
 			$disclosed_values        = array_unique( $donor_data['disclosed'] );
-			$donor_data['disclosed'] = ( count( $disclosed_values ) === 1 && $disclosed_values[0] === 'no' ) ? 'no' : 'yes';
+			$donor_data['disclosed'] = ( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
@@ -891,7 +935,7 @@ class Data {
 
 		$data = array_reduce(
 			$raw_data,
-			function( $carry, $item ) {
+			function ( $carry, $item ) {
 				$slug = $item['donor_slug'];
 
 				if ( ! isset( $carry[ $slug ] ) ) {
@@ -918,8 +962,7 @@ class Data {
 
 		// Normalize disclosed values for each donor.
 		foreach ( $data as &$donor_data ) {
-			// $donor_data['disclosed'] = array_unique( $donor_data['disclosed'] );
-			$donor_data['disclosed'] = ( count( array_unique( $donor_data['disclosed'] ) ) === 1 && $donor_data['disclosed'][0] === 'no' ) ? 'no' : 'yes';
+			$donor_data['disclosed'] = ( 1 === count( array_unique( $donor_data['disclosed'] ) ) && 'no' === $donor_data['disclosed'][0] ) ? 'no' : 'yes';
 		}
 
 		ksort( $data );
@@ -973,11 +1016,14 @@ class Data {
 	 * Fetch transactions by taxonomy terms and return post IDs.
 	 *
 	 * @param string $think_tank The slug of the think_tank taxonomy term.
+	 * @param string $donation_year The slug of the donation_year taxonomy term.
 	 * @param string $donor_type The slug of the donor_type taxonomy term.
 	 * @return array Array of post IDs.
 	 */
 	public static function get_think_tank_post_ids( string $think_tank = '', string $donation_year = '', string $donor_type = '' ): array {
-		$this->set_args(
+		$instance = new self();
+
+		$instance->set_args(
 			array(
 				'think_tank'    => $think_tank,
 				'donation_year' => $donation_year,
@@ -985,7 +1031,7 @@ class Data {
 			)
 		);
 
-		$query = $this->generate_query();
+		$query = $instance->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
@@ -994,10 +1040,13 @@ class Data {
 	 * Fetch transactions by taxonomy terms and return post IDs.
 	 *
 	 * @param string $donor The slug of the donor taxonomy term.
+	 * @param string $donation_year The slug of the donoation_year taxonomy term.
 	 * @return array Array of post IDs.
 	 */
 	public static function get_donor_post_ids( string $donor = '', string $donation_year = '' ): array {
-		$this->set_args(
+		$instance = new self();
+
+		$instance->set_args(
 			array(
 				'donor'         => $donor,
 				'donation_year' => $donation_year,
@@ -1005,7 +1054,7 @@ class Data {
 			)
 		);
 
-		$query = $this->generate_query();
+		$query = $instance->generate_query();
 
 		return $query->have_posts() ? $query->posts : array();
 	}
@@ -1089,8 +1138,8 @@ class Data {
 	/**
 	 * Get term IDs that match a search term.
 	 *
-	 * @param  string $search
-	 * @param  string $taxonomy
+	 * @param  string $search The search term.
+	 * @param  string $taxonomy The slug of taxonomy.
 	 * @return array
 	 */
 	public function get_search_term_ids( string $search, string $taxonomy ): array {
@@ -1268,6 +1317,4 @@ class Data {
 
 		return $clauses;
 	}
-
-
 }

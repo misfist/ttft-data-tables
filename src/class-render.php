@@ -1,9 +1,15 @@
 <?php
 /**
  * Render class for rendering data tables.
+ *
+ * @package ttft
  */
+
 namespace Ttft\Data_Tables;
 
+/**
+ * Render class.
+ */
 class Render {
 
 	/**
@@ -14,10 +20,78 @@ class Render {
 	protected $data;
 
 	/**
+	 * Cache expiration time.
+	 *
+	 * @var int
+	 */
+	protected $cache_expiration = 12 * HOUR_IN_SECONDS;
+
+	/**
+	 * Cache key prefix.
+	 *
+	 * @var string
+	 */
+	protected $cache_key_prefix = 'data_table_';
+
+	/**
 	 * Constructor to instantiate the Data class
 	 */
 	public function __construct() {
 		$this->data = new Data();
+
+		if ( 'local' === wp_get_environment_type() ) {
+			$this->cache_expiration = 0;
+		}
+
+		add_action( 'pmxi_after_xml_import', array( $this, 'after_import' ), 10, 2 );
+	}
+
+	/**
+	 * Delete the transaction cache after an import.
+	 *
+	 * @link https://www.wpallimport.com/documentation/developers/action-reference/pmxi_after_xml_import/
+	 *
+	 * @param  int $import_id The id of the import.
+	 * @param  obj $import_settings The import settings object.
+	 * @return void
+	 */
+	public function after_import( $import_id, $import_settings ): void {
+		$this->clear_cache();
+	}
+
+	/**
+	 * Generate a unique cache key for the table.
+	 *
+	 * @param string $table_type The type of table.
+	 * @param array  $args Arguments used to generate the table.
+	 * @return string The cache key.
+	 */
+	private function get_cache_key( string $table_type, array $args ): string {
+		ksort( $args );
+		$params = http_build_query( $args, '', '&' );
+
+		return $this->cache_key_prefix . $table_type . '_' . md5( $params );
+	}
+
+	/**
+	 * Clear all cached transients created by this class.
+	 *
+	 * @return void
+	 */
+	public function clear_cache(): void {
+		global $wpdb;
+
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( '_transient_' . $this->cache_key_prefix ) . '%'
+			)
+		);
+
+		foreach ( $results as $option_name ) {
+			$transient_name = str_replace( '_transient_', '', $option_name );
+			delete_transient( $transient_name );
+		}
 	}
 
 	/**
@@ -30,48 +104,63 @@ class Render {
 	public function generate_data_table( string $table_type, array $args ): string {
 		$args = $this->convert_camel_to_snake_keys( $args );
 
+		$cache_key = $this->get_cache_key( $table_type, $args );
+
+		$cached_table = get_transient( $cache_key );
+		if ( false !== $cached_table ) {
+			return $cached_table;
+		}
+
 		$donation_year = $args['donation_year'] ?? '';
 		$donor_type    = $args['donor_type'] ?? '';
 		$search        = $args['search'] ?? '';
 
-		if ( $donation_year === 'all' ) {
+		if ( 'all' === $donation_year ) {
 			$donation_year = '';
 		}
 
-		if ( $donor_type === 'all' ) {
+		if ( 'all' === $donor_type ) {
 			$donor_type = '';
 		}
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
-				return $this->generate_think_tank_archive_table( $donation_year, $search );
+				$table_html = $this->generate_think_tank_archive_table( $donation_year, $search );
+				break;
 			case 'single-think-tank':
 				if ( empty( $args['think_tank'] ) ) {
 					return __( 'Think tank is required for single-think-tank.', 'data-tables' );
 				}
-				return $this->generate_single_think_tank_table(
+				$table_html = $this->generate_single_think_tank_table(
 					$args['think_tank'],
 					$donation_year,
 					$donor_type
 				);
+				break;
 			case 'donor-archive':
-				return $this->generate_donor_archive_table(
+				$table_html = $this->generate_donor_archive_table(
 					$donation_year,
 					$donor_type,
 					$search
 				);
+				break;
 			case 'single-donor':
 				if ( empty( $args['donor'] ) ) {
 					return __( 'Donor is required for single-donor.', 'data-tables' );
 				}
-				return $this->generate_single_donor_table(
+				$table_html = $this->generate_single_donor_table(
 					$args['donor'],
 					$donation_year,
 					$donor_type
 				);
+				break;
 			default:
 				return __( 'Invalid table type.', 'data-tables' );
 		}
+
+		set_transient( $cache_key, $table_html, $this->cache_expiration );
+
+		return $table_html;
 	}
 
 	/**
@@ -83,7 +172,21 @@ class Render {
 	 * @return string HTML table markup.
 	 */
 	public function generate_top_ten_table( string $donor_type = '', string $donation_year = '', int $number_of_items = 10 ): string {
-		// Fetch the top ten data using Data
+		$table_type = 'top-ten';
+
+		$args = array(
+			'donor_type'    => isset( $donor_type ) ? sanitize_text_field( $donor_type ) : null,
+			'donation_year' => isset( $donation_year ) ? sanitize_text_field( $donation_year ) : null,
+			'limit'         => isset( $number_of_items ) ? absint( $number_of_items ) : null,
+		);
+
+		$cache_key = $this->get_cache_key( $table_type, $args );
+
+		$cached_table = get_transient( $cache_key );
+		if ( false !== $cached_table ) {
+			return $cached_table;
+		}
+
 		$data = $this->data->get_top_ten_data( $donor_type, $donation_year, $number_of_items );
 
 		ob_start();
@@ -117,7 +220,11 @@ class Render {
 			<?php
 		endif;
 
-		return ob_get_clean();
+		$table_html = ob_get_clean();
+
+		set_transient( $cache_key, $table_html, $this->cache_expiration );
+
+		return $table_html;
 	}
 
 	/**
@@ -131,11 +238,11 @@ class Render {
 		ob_start();
 		$settings      = get_option( 'site_settings' );
 		$rows_per_page = ( isset( $settings['rows_per_page'] ) && ! empty( $settings['rows_per_page'] ) ) ? (int) $settings['rows_per_page'] : 50;
-		
+
 		wp_interactivity_state(
 			TTFT_APP_NAMESPACE,
 			array(
-				'foundRecords_' . $table_type => $count
+				'foundRecords_' . $table_type => $count,
 			)
 		);
 		?>
@@ -151,7 +258,16 @@ class Render {
 			data-wp-bind--data-search-label='state.searchLabel'
 			data-page-length='<?php echo esc_attr( $rows_per_page ); ?>'
 			data-wp-bind--found-records-<?php echo $table_type; ?>='state.foundRecords_<?php echo $table_type; ?>'
-			data-wp-context='<?php echo json_encode( array( 'pageLength' => $rows_per_page, 'foundRecords' => $count ) ); ?>'
+			data-wp-context='
+			<?php
+			echo json_encode(
+				array(
+					'pageLength'   => $rows_per_page,
+					'foundRecords' => $count,
+				)
+			);
+			?>
+								'
 		>
 		<?php
 		if ( $donation_year ) :
@@ -168,6 +284,7 @@ class Render {
 	 *
 	 * @param string      $table_type The CSS class to apply to the table.
 	 * @param string|null $donation_year Optional. The year of the donations to be displayed in the caption.
+	 * @param int         $count Number to return.
 	 * @return void
 	 */
 	public function render_table_top( string $table_type, ?string $donation_year = null, $count = 0 ): void {
@@ -186,7 +303,7 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-            $count = count( $data );
+			$count = count( $data );
 			$this->render_table_top( 'think-tank-archive', $donation_year, $count );
 			?>
 				<thead>
@@ -205,9 +322,9 @@ class Render {
 					</tr>
 				</thead>
 				<tbody
-                    data-found="<?php echo intval( $count ); ?>"
-                    data-wp-bind--records-found='state.recordsFound'
-                >
+					data-found="<?php echo intval( $count ); ?>"
+					data-wp-bind--records-found='state.recordsFound'
+				>
 					<?php
 					foreach ( $data as $think_tank_slug => $row ) :
 						?>
@@ -222,9 +339,9 @@ class Render {
 								 * - Think tank has disclosed === 'no' - display $this->data->settings['unknown_amount']
 								 */
 								$attrs = get_label_and_class_archive_think_tank( $row, $donor_type, $this->data->settings );
-                                ?>
+								?>
 								<td class="column-min-amount" data-heading="<?php echo esc_attr( $donor_type ); ?>" data-order="<?php echo esc_attr( $attrs['sort'] ); ?>">
-									<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+									<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span class="value"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 								</td>
 								<?php
 							endforeach;
@@ -259,7 +376,7 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-            $count = count( $data );
+			$count = count( $data );
 			$this->render_table_top( 'single-think-tank', $donation_year, $count );
 			?>
 				<thead>
@@ -270,22 +387,22 @@ class Render {
 					</tr>
 				</thead>
 				<tbody
-                    data-found="<?php echo intval( $count ); ?>"
-                    data-wp-bind--records-found='state.recordsFound'
-                >
+					data-found="<?php echo intval( $count ); ?>"
+					data-wp-bind--records-found='state.recordsFound'
+				>
 					<?php
 					foreach ( $data as $row ) :
 						$amount = $row['amount_calc'];
-                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
-                        /**
-                         * Check:
-                         * - Think tank has disclosed == 'no' - display $this->data->settings['unknown_amount']
-                         */
+						$attrs  = get_label_and_class_disclosed( $row, $this->data->settings );
+						/**
+						 * Check:
+						 * - Think tank has disclosed == 'no' - display $this->data->settings['unknown_amount']
+						 */
 						?>
 						<tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
 							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo esc_attr( $attrs['sort'] ); ?>">
-                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+								<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span class="value"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
 						</tr>
@@ -317,7 +434,7 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-            $count = count( $data );
+			$count = count( $data );
 			$this->render_table_top( 'donor-archive', $donation_year, $count );
 			?>
 				<thead>
@@ -328,22 +445,22 @@ class Render {
 					</tr>
 				</thead>
 				<tbody
-                    data-found="<?php echo intval( $count ); ?>"
-                    data-wp-bind--records-found='state.recordsFound'
-                >
+					data-found="<?php echo intval( $count ); ?>"
+					data-wp-bind--records-found='state.recordsFound'
+				>
 					<?php
 					foreach ( $data as $row ) :
 						$amount = $row['amount_calc'];
-                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
-                        /**
-                         * Check:
-                         * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
-                         */
+						$attrs  = get_label_and_class_disclosed( $row, $this->data->settings );
+						/**
+						 * Check:
+						 * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
+						 */
 						?>
 						<tr data-think-tank="<?php echo esc_attr( $row['donor_slug'] ); ?>">
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><a href="<?php echo esc_url( $row['donor_link'] ); ?>"><?php echo esc_html( $row['donor'] ); ?></a></td>
 							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo esc_attr( $attrs['sort'] ); ?>">
-                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+								<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span class="value"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 							<td class="column-donor-type" data-heading="<?php esc_attr_e( 'Type', 'data-tables' ); ?>"><?php echo $row['donor_type']; ?></td>
 						</tr>
@@ -375,7 +492,7 @@ class Render {
 
 		ob_start();
 		if ( $data ) :
-            $count = count( $data );
+			$count = count( $data );
 			$this->render_table_top( 'single-donor', $donation_year, $count );
 			?>
 				<thead>
@@ -386,22 +503,22 @@ class Render {
 					</tr>
 				</thead>
 				<tbody
-                    data-found="<?php echo intval( $count ); ?>"
-                >
+					data-found="<?php echo intval( $count ); ?>"
+				>
 					<?php
 					foreach ( $data as $row ) :
 						$amount = $row['amount_calc'];
-                        $attrs = get_label_and_class_disclosed( $row, $this->data->settings );
-                        /**
-                         * Check:
-                         * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
-                         */
+						$attrs  = get_label_and_class_disclosed( $row, $this->data->settings );
+						/**
+						 * Check:
+						 * - Has disclosed == 'no' - display $this->data->settings['unknown_amount']
+						 */
 						?>
-                        <tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
+						<tr data-think-tank="<?php echo esc_attr( $row['think_tank_slug'] ); ?>">
 							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo get_term_link( $row['think_tank_slug'], 'think_tank' ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
 							<td class="column-donor" data-heading="<?php esc_attr_e( 'Donor', 'data-tables' ); ?>"><?php echo esc_html( $row['donor'] ); ?></td>
 							<td class="column-numeric column-min-amount" data-heading="<?php esc_attr_e( 'Min. Amount', 'data-tables' ); ?>" data-order="<?php echo esc_attr( $attrs['sort'] ); ?>">
-                                <span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
+								<span class="<?php echo $attrs['class']; ?>" data-label="<?php echo $attrs['label']; ?>"><span class="value"><?php echo esc_html( number_format( $amount, 0, '.', ',' ) ); ?></span></span>
 							</td>
 						</tr>
 						
@@ -423,9 +540,9 @@ class Render {
 	/**
 	 * Render table for top ten
 	 *
-	 * @param  string  $donor_type
-	 * @param  string  $donation_year
-	 * @param  integer $number_of_items
+	 * @param  string  $donor_type Slug of donor_type taxonomy term.
+	 * @param  string  $donation_year Slug of donation_year taxonomy term.
+	 * @param  integer $number_of_items Number of items to render.
 	 * @return void
 	 */
 	public function render_top_ten_table( $donor_type = '', $donation_year = '', $number_of_items = 10 ): void {
