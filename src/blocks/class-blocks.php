@@ -10,7 +10,8 @@ class Blocks {
      * Constructor to hook into WordPress actions.
      */
     public function __construct() {
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        // add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'enqueue_block_assets', array( $this, 'enqueue_scripts' ) );
         add_action( 'init', array( $this, 'register_blocks' ) );
     }
 
@@ -20,7 +21,7 @@ class Blocks {
      * @return void
      */
     public function enqueue_scripts(): void {
-        wp_enqueue_script(
+        wp_register_script(
             'data-tables',
             TTFT_URL . 'src/assets/DataTables/datatables.min.js',
             array( 'jquery' ),
