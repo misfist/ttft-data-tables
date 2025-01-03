@@ -47,5 +47,6 @@
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
   "render": "file:./render.php",
+  "viewScript": "data-tables",
   "viewScriptModule": "file:./view.js"
 }

@@ -6,6 +6,7 @@
  *
  * @package Ttft\Data_Tables
  */
+
 namespace Ttft\Data_Tables;
 
 use Ttft\Data_Tables\Data;
@@ -15,6 +16,9 @@ use Ttft\Data_Tables\API\API;
 use Ttft\Data_Tables\AJAX;
 use Ttft\Data_Tables\Blocks\Blocks;
 
+/**
+ * Main class.
+ */
 class Data_Tables {
 
 	const TABLE_ID = 'funding-data';
@@ -51,13 +55,11 @@ class Data_Tables {
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/query_vars/
 	 *
-	 * @param  array $query_vars
+	 * @param  array $query_vars Array of registered query vars.
 	 * @return array
 	 */
-	function register_query_vars( array $query_vars ) : array {
+	public function register_query_vars( array $query_vars ): array {
 		$query_vars[] = 'table_type';
 		return $query_vars;
 	}
-
-
 }
