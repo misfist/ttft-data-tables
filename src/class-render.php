@@ -104,11 +104,13 @@ class Render {
 	public function generate_data_table( string $table_type, array $args ): string {
 		$args = $this->convert_camel_to_snake_keys( $args );
 
-		$cache_key = $this->get_cache_key( $table_type, $args );
+		if ( $this->cache_expiration ) {
+			$cache_key = $this->get_cache_key( $table_type, $args );
 
-		$cached_table = get_transient( $cache_key );
-		if ( false !== $cached_table ) {
-			return $cached_table;
+			$cached_table = get_transient( $cache_key );
+			if ( false !== $cached_table ) {
+				return $cached_table;
+			}
 		}
 
 		$donation_year = $args['donation_year'] ?? '';
@@ -158,7 +160,9 @@ class Render {
 				return __( 'Invalid table type.', 'data-tables' );
 		}
 
-		set_transient( $cache_key, $table_html, $this->cache_expiration );
+		if ( $this->cache_expiration ) {
+			set_transient( $cache_key, $table_html, $this->cache_expiration );
+		}
 
 		return $table_html;
 	}
