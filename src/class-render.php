@@ -127,7 +127,17 @@ class Render {
 
 		switch ( $table_type ) {
 			case 'think-tank-archive':
-				$table_html = $this->generate_think_tank_archive_table( $donation_year, $search );
+				$table_html = $this->generate_think_tank_archive_table(
+					$donation_year,
+					$search
+				);
+				break;
+			case 'donor-archive':
+				$table_html = $this->generate_donor_archive_table(
+					$donation_year,
+					$donor_type,
+					$search
+				);
 				break;
 			case 'single-think-tank':
 				if ( empty( $args['think_tank'] ) ) {
@@ -137,13 +147,6 @@ class Render {
 					$args['think_tank'],
 					$donation_year,
 					$donor_type
-				);
-				break;
-			case 'donor-archive':
-				$table_html = $this->generate_donor_archive_table(
-					$donation_year,
-					$donor_type,
-					$search
 				);
 				break;
 			case 'single-donor':

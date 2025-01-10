@@ -844,7 +844,7 @@ class Data {
 		// Normalize disclosed values.
 		foreach ( $data as &$think_tank_data ) {
 			foreach ( $think_tank_data['disclosed'] as $donor_type => $disclosed_values ) {
-				$disclosed_values = array_unique( $disclosed_values );
+				$disclosed_values                            = array_unique( $disclosed_values );
 				$think_tank_data['disclosed'][ $donor_type ] =
 					( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 			}
