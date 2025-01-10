@@ -1147,7 +1147,7 @@ class Data {
 		$search = sanitize_text_field( $search );
 		$args   = array(
 			'taxonomy'   => $taxonomy,
-			'hide_empty' => false,
+			'hide_empty' => true,
 			'search'     => $search,
 			'fields'     => 'ids',
 		);
