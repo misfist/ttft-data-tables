@@ -430,6 +430,7 @@ class Data {
 			array(
 				'donation_year' => $donation_year,
 				'donor_type'    => $donor_type,
+				'search'        => $search,
 			)
 		);
 
