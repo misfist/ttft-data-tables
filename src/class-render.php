@@ -266,8 +266,9 @@ class Render {
 			<?php
 			echo json_encode(
 				array(
-					'pageLength'   => $rows_per_page,
-					'foundRecords' => $count,
+					'pageLength'                  => $rows_per_page,
+					'foundRecords'                => $count,
+					'foundRecords_' . $table_type => $count,
 				)
 			);
 			?>
