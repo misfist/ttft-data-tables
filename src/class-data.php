@@ -500,6 +500,10 @@ class Data {
 		$taxonomy = 'donor';
 		$terms    = $this->get_search_term_ids( $search, $taxonomy );
 
+		if ( empty( $terms ) ) {
+			return array();
+		}
+
 		$this->set_args(
 			array(
 				'search'   => $search,
