@@ -538,7 +538,7 @@ class Data {
 
 					$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
 
-					$is_parent = ( $donor->parent === 0 );
+					$is_parent = ( 0 === $donor->parent );
 
 					// Track child terms and their parent relationships.
 					if ( $parent_term && ! is_wp_error( $parent_term ) ) {
