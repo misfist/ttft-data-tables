@@ -430,6 +430,7 @@ class Data {
 			array(
 				'donation_year' => $donation_year,
 				'donor_type'    => $donor_type,
+				'search'        => $search,
 			)
 		);
 
@@ -499,6 +500,10 @@ class Data {
 		$taxonomy = 'donor';
 		$terms    = $this->get_search_term_ids( $search, $taxonomy );
 
+		if ( empty( $terms ) ) {
+			return array();
+		}
+
 		$this->set_args(
 			array(
 				'search'   => $search,
@@ -533,7 +538,7 @@ class Data {
 
 					$donor_post_id = get_post_from_term( $donor_slug, 'donor' ) ?? $post_id;
 
-					$is_parent = ( $donor->parent === 0 );
+					$is_parent = ( 0 === $donor->parent );
 
 					// Track child terms and their parent relationships.
 					if ( $parent_term && ! is_wp_error( $parent_term ) ) {
@@ -844,7 +849,7 @@ class Data {
 		// Normalize disclosed values.
 		foreach ( $data as &$think_tank_data ) {
 			foreach ( $think_tank_data['disclosed'] as $donor_type => $disclosed_values ) {
-				$disclosed_values = array_unique( $disclosed_values );
+				$disclosed_values                            = array_unique( $disclosed_values );
 				$think_tank_data['disclosed'][ $donor_type ] =
 					( 1 === count( $disclosed_values ) && 'no' === $disclosed_values[0] ) ? 'no' : 'yes';
 			}
@@ -1146,7 +1151,7 @@ class Data {
 		$search = sanitize_text_field( $search );
 		$args   = array(
 			'taxonomy'   => $taxonomy,
-			'hide_empty' => false,
+			'hide_empty' => true,
 			'search'     => $search,
 			'fields'     => 'ids',
 		);
