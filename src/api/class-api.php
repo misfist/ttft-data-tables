@@ -186,7 +186,7 @@ class API {
 	 * @return void
 	 */
 	public function after_import( $import_id, $import_settings ): void {
-		clear_cache();
+		$this->clear_cache();
 	}
 
 	/**
