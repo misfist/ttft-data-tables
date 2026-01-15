@@ -335,9 +335,15 @@ class Render {
 				>
 					<?php
 					foreach ( $data as $think_tank_slug => $row ) :
+						$term_exists = term_exists( $think_tank_slug, 'think_tank' );
+						if( $think_tank_slug && $term_exists ) :
 						?>
 						<tr data-think-tank="<?php echo esc_attr( $think_tank_slug ); ?>">
-							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>"><a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>"><?php echo esc_html( $row['think_tank'] ); ?></a></td>
+							<td class="column-think-tank" data-heading="<?php esc_attr_e( 'Think Tank', 'data-tables' ); ?>">
+								<a href="<?php echo esc_url( get_term_link( $think_tank_slug, 'think_tank' ) ); ?>">
+									<?php echo esc_html( $row['think_tank'] ); ?>
+								</a>
+							</td>
 							<?php
 							foreach ( $row['donor_types'] as $donor_type => $amount ) :
 								/**
@@ -356,7 +362,9 @@ class Render {
 							?>
 							<td class="column-numeric column-transparency-score" data-heading="<?php esc_attr_e( 'Transparency Score', 'data-tables' ); ?>"><span class="screen-reader-text"><?php echo intval( $row['transparency_score'] ); ?></span><?php echo generate_star_rating( intval( $row['transparency_score'] ) ); ?></td>
 						</tr>
-					<?php endforeach; ?>
+						<?php
+						endif;
+					endforeach; ?>
 				</tbody>
 			</table>
 			<?php
