@@ -119,22 +119,22 @@ class API {
 				'callback'            => array( $this, 'serve_transaction_dataset' ),
 				'permission_callback' => '__return_true',
 				'args'                => array(
-					'think_tank' => array(
+					'think_tank'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor'      => array(
+					'donor'         => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'year'       => array(
+					'donation_year' => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor_type' => array(
+					'donor_type'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -151,22 +151,22 @@ class API {
 				'callback'            => array( $this, 'export_transaction_dataset' ),
 				'permission_callback' => '__return_true',
 				'args'                => array(
-					'think_tank' => array(
+					'think_tank'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor'      => array(
+					'donor'         => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'year'       => array(
+					'donation_year' => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor_type' => array(
+					'donor_type'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -202,13 +202,12 @@ class API {
 		$results = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
-				$wpdb->esc_like( '_transient_' . $cache_key_prefix ) . '%'
+				$wpdb->esc_like( $cache_key_prefix ) . '%'
 			)
 		);
 
 		foreach ( $results as $option_name ) {
-			$transient_name = str_replace( '_transient_', '', $option_name );
-			delete_transient( $transient_name );
+			delete_option( $option_name );
 		}
 	}
 
@@ -320,6 +319,8 @@ class API {
 	 * @param \WP_REST_Request $request The REST API request.
 	 */
 	public function export_transaction_dataset( \WP_REST_Request $request ) {
+		ob_start();
+
 		$data = $this->get_transaction_dataset( $request );
 
 		if ( empty( $data ) ) {
@@ -336,6 +337,8 @@ class API {
 		);
 
 		$filename = $this->generate_filename( $request );
+
+		ob_end_clean();
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=' . $filename );
@@ -742,7 +745,7 @@ class API {
 	 * @return string The generated filename.
 	 */
 	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
-		$expected_params = array( 'think_tank', 'donor', 'year', 'donor_type' );
+		$expected_params = array( 'think_tank', 'donor', 'donation_year', 'donor_type' );
 
 		$params = array_map(
 			'sanitize_text_field',
