@@ -129,7 +129,7 @@ class API {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'year'       => array(
+					'donation_year' => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -161,7 +161,7 @@ class API {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'year'       => array(
+					'donation_year' => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -742,7 +742,7 @@ class API {
 	 * @return string The generated filename.
 	 */
 	public function generate_filename( \WP_REST_Request $request, string $filename = 'think-tank-funding-dataset', string $extension = 'csv' ): string {
-		$expected_params = array( 'think_tank', 'donor', 'year', 'donor_type' );
+		$expected_params = array( 'think_tank', 'donor', 'donation_year', 'donor_type' );
 
 		$params = array_map(
 			'sanitize_text_field',
