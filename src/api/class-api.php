@@ -320,6 +320,8 @@ class API {
 	 * @param \WP_REST_Request $request The REST API request.
 	 */
 	public function export_transaction_dataset( \WP_REST_Request $request ) {
+		ob_start();
+
 		$data = $this->get_transaction_dataset( $request );
 
 		if ( empty( $data ) ) {
@@ -336,6 +338,8 @@ class API {
 		);
 
 		$filename = $this->generate_filename( $request );
+
+		ob_end_clean();
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=' . $filename );
