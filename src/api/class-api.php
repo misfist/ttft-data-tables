@@ -202,13 +202,12 @@ class API {
 		$results = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
-				$wpdb->esc_like( '_transient_' . $cache_key_prefix ) . '%'
+				$wpdb->esc_like( $cache_key_prefix ) . '%'
 			)
 		);
 
 		foreach ( $results as $option_name ) {
-			$transient_name = str_replace( '_transient_', '', $option_name );
-			delete_transient( $transient_name );
+			delete_option( $option_name );
 		}
 	}
 
