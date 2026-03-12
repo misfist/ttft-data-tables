@@ -119,12 +119,12 @@ class API {
 				'callback'            => array( $this, 'serve_transaction_dataset' ),
 				'permission_callback' => '__return_true',
 				'args'                => array(
-					'think_tank' => array(
+					'think_tank'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor'      => array(
+					'donor'         => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -134,7 +134,7 @@ class API {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor_type' => array(
+					'donor_type'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -151,12 +151,12 @@ class API {
 				'callback'            => array( $this, 'export_transaction_dataset' ),
 				'permission_callback' => '__return_true',
 				'args'                => array(
-					'think_tank' => array(
+					'think_tank'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor'      => array(
+					'donor'         => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -166,7 +166,7 @@ class API {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'donor_type' => array(
+					'donor_type'    => array(
 						'required'          => false,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
